@@ -10,6 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import edu.temple.beatbuddy.repository.auth.AuthViewModel
 import edu.temple.beatbuddy.ui.theme.BeatBuddyTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,7 +26,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    val navController = rememberNavController()
+                    val authViewModel : AuthViewModel = viewModel()
+
+                    MyApp(
+                        navController = navController,
+                        authViewModel = authViewModel
+                    )
                 }
             }
         }
@@ -30,17 +40,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
+fun MyApp(
+    navController: NavHostController,
+    authViewModel: AuthViewModel
+) {
+    Navigation(
+        navController = navController,
+        authViewModel = authViewModel
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BeatBuddyTheme {
-        Greeting("Android")
-    }
 }
