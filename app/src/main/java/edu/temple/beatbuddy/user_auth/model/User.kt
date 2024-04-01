@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.model
+package edu.temple.beatbuddy.user_auth.model
 
 data class User(
     val id: String = "",

@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.screen
+package edu.temple.beatbuddy.user_auth.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

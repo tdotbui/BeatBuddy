@@ -4,15 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import edu.temple.beatbuddy.repository.auth.AuthViewModel
-import edu.temple.beatbuddy.screen.HomeScreen
-import edu.temple.beatbuddy.screen.SignInScreen
-import edu.temple.beatbuddy.screen.SignUpScreen
+import edu.temple.beatbuddy.user_auth.repository.SignUpViewModel
+import edu.temple.beatbuddy.user_auth.screen.HomeScreen
+import edu.temple.beatbuddy.user_auth.screen.SignInScreen
+import edu.temple.beatbuddy.user_auth.screen.SignUpScreen
 
 @Composable
 fun Navigation(
     navController: NavHostController,
-    authViewModel: AuthViewModel
 ) {
     NavHost(
         navController = navController,
@@ -32,7 +31,6 @@ fun Navigation(
 
         composable(route = "sign_up") {
             SignUpScreen(
-                authViewModel = authViewModel,
                 goToSignInScreen = {
                     navController.navigate("sign_in") {
                         popUpTo("sign_up") { inclusive = true }

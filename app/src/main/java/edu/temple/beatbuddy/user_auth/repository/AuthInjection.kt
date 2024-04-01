@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.repository.auth
+package edu.temple.beatbuddy.user_auth.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 
