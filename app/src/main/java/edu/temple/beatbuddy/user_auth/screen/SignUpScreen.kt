@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,12 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -46,7 +44,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,7 +51,6 @@ import edu.temple.beatbuddy.R
 import edu.temple.beatbuddy.user_auth.model.AuthResult.*
 import edu.temple.beatbuddy.user_auth.repository.SignUpViewModel
 import edu.temple.beatbuddy.utils.Helpers
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -66,139 +62,150 @@ fun SignUpScreen(
     val keyboard = LocalSoftwareKeyboardController.current
 
     var email by remember { mutableStateOf("") }
-    var fullname by remember { mutableStateOf("") }
+    var fullName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 28.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp),
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 28.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Welcome!",
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
+            Column(
+                modifier = Modifier
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Welcome!",
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
 
-            Text(
-                text = "Create an Account",
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Normal,
-                fontSize = 18.sp
-            )
-        }
-
-        OutlinedTextField(
-            value = fullname,
-            onValueChange = {
-                fullname = it
-            },
-            label = { Text("Full name") },
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.person),
-                    contentDescription = ""
+                Text(
+                    text = "Create an Account",
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 18.sp
                 )
             }
-        )
 
-        OutlinedTextField(
-            value = email,
-            onValueChange = {
-                email = it
-            },
-            label = { Text("Email") },
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.email),
-                    contentDescription = ""
-                )
-            }
-        )
+            OutlinedTextField(
+                value = fullName,
+                onValueChange = {
+                    fullName = it
+                },
+                label = { Text("Full name") },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.person),
+                        contentDescription = ""
+                    )
+                }
+            )
 
-        OutlinedTextField(
-            value = password,
-            onValueChange = {
-                password = it
-            },
-            label = { Text("Password") },
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.password),
-                    contentDescription = ""
-                )
-            },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-        )
+            OutlinedTextField(
+                value = email,
+                onValueChange = {
+                    email = it
+                },
+                label = { Text("Email") },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.email),
+                        contentDescription = ""
+                    )
+                }
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = {
+                    password = it
+                },
+                label = { Text("Password") },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.password),
+                        contentDescription = ""
+                    )
+                },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            )
 
-        Button(
-            onClick = {
-                keyboard?.hide()
-                signUpViewModel.signUp(email, password, fullname)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(48.dp)
-                .padding(horizontal = 32.dp, vertical = 16.dp)
-                .clip(shape = RoundedCornerShape(50.dp)),
-            contentPadding = PaddingValues(),
-            colors = ButtonDefaults.buttonColors(Color.Transparent)
-        ) {
-            Box(
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    keyboard?.hide()
+                    signUpViewModel.signUp(email, password, fullName)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(48.dp)
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            listOf(
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.colorScheme.tertiary
-                            )
-                        ),
-                        shape = RoundedCornerShape(50.dp)
-                    ),
-                contentAlignment = Alignment.Center
+                    .padding(horizontal = 32.dp, vertical = 16.dp)
+                    .clip(shape = RoundedCornerShape(50.dp)),
+                contentPadding = PaddingValues(),
+                colors = ButtonDefaults.buttonColors(Color.Transparent)
             ) {
-                Text(
-                    text = "Sign Up",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(48.dp)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary,
+                                    MaterialTheme.colorScheme.tertiary
+                                )
+                            ),
+                            shape = RoundedCornerShape(50.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Sign Up",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
-        }
 
-        val annotatedString = buildAnnotatedString {
-            append("Already have an account? ")
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                pushStringAnnotation(tag = "Sign in", annotation = "Sign in")
-                append("Sign in")
+            val annotatedString = buildAnnotatedString {
+                append("Already have an account? ")
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                    pushStringAnnotation(tag = "Sign in", annotation = "Sign in")
+                    append("Sign in")
+                }
             }
-        }
 
-        ClickableText(
-            text = annotatedString,
-            onClick = { goToSignInScreen() }
-        )
+            ClickableText(
+                text = annotatedString,
+                onClick = { goToSignInScreen() }
+            )
+        }
 
         when (signUpViewModel.signUpResponse) {
             is Loading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White.copy(alpha = 0.6f))
+                        .wrapContentSize(Alignment.Center)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
             is Success -> {
                 goToSignInScreen()
@@ -206,7 +213,7 @@ fun SignUpScreen(
             is Error -> {
                 Helpers.showMessage(context, (signUpViewModel.signUpResponse as Error).exception.localizedMessage)
                 signUpViewModel.resetResponse()
-                fullname = ""
+                fullName = ""
                 email = ""
                 password = ""
             }

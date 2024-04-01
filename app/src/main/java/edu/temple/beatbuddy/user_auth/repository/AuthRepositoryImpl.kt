@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import edu.temple.beatbuddy.user_auth.model.AuthRepository
 import edu.temple.beatbuddy.user_auth.model.AuthResult.Success
 import edu.temple.beatbuddy.user_auth.model.AuthResult.Error
+import edu.temple.beatbuddy.user_auth.model.SignInResponse
 import edu.temple.beatbuddy.user_auth.model.SignUpResponse
 import edu.temple.beatbuddy.user_auth.model.User
 import kotlinx.coroutines.tasks.await
@@ -28,6 +29,16 @@ class AuthRepositoryImpl @Inject constructor(
             val user = User(id = it.uid, fullName = fullName, email = email)
             saveUserToFirestore(user = user)
         }
+        Success(true)
+    } catch (e: Exception) {
+        Error(e)
+    }
+
+    override suspend fun firebaseSignInWithEmailAndPassword(
+        email: String,
+        password: String
+    ): SignInResponse = try {
+        auth.signInWithEmailAndPassword(email, password).await()
         Success(true)
     } catch (e: Exception) {
         Error(e)
