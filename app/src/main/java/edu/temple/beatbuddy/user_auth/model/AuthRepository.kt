@@ -16,4 +16,6 @@ interface AuthRepository {
         email: String,
         password: String
     ): SignInResponse
+
+    fun signOut()
 }

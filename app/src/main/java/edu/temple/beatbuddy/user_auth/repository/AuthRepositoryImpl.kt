@@ -44,6 +44,8 @@ class AuthRepositoryImpl @Inject constructor(
         Error(e)
     }
 
+    override fun signOut() = auth.signOut()
+
     private suspend fun saveUserToFirestore(user: User) {
         firestore.collection("users").document(user.id).set(user).await()
     }

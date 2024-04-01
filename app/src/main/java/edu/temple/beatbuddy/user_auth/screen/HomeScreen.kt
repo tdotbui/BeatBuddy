@@ -9,9 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import edu.temple.beatbuddy.user_auth.repository.ProfileViewModel
 
 @Composable
 fun HomeScreen(
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     onSignOut: () -> Unit
 ) {
     Column(
@@ -21,14 +24,19 @@ fun HomeScreen(
     ) {
         Text(text = "This is the home screen")
 
-        Button(onClick = { onSignOut() }) {
+        Button(
+            onClick = {
+                profileViewModel.signOut()
+                onSignOut()
+            }
+        ) {
             Text(text = "Sign out")
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewHomeScreen() {
-    HomeScreen({})
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewHomeScreen() {
+//    HomeScreen({})
+//}
