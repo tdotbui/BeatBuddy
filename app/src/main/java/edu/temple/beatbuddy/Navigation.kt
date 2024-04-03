@@ -4,8 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import edu.temple.beatbuddy.user_auth.repository.SignUpViewModel
-import edu.temple.beatbuddy.user_auth.screen.HomeScreen
+import edu.temple.beatbuddy.user_profile.screen.HomeScreen
 import edu.temple.beatbuddy.user_auth.screen.SignInScreen
 import edu.temple.beatbuddy.user_auth.screen.SignUpScreen
 

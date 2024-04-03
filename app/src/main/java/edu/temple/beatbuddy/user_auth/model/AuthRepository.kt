@@ -4,6 +4,8 @@ import com.google.firebase.auth.FirebaseUser
 
 typealias SignUpResponse = AuthResult<Boolean>
 typealias SignInResponse = AuthResult<Boolean>
+typealias FetchCurrentUserResponse = AuthResult<User>
+
 interface AuthRepository {
     val currentUser: FirebaseUser?
     suspend fun firebaseSignUpWithEmailAndPassword(
@@ -18,4 +20,6 @@ interface AuthRepository {
     ): SignInResponse
 
     fun signOut()
+
+    suspend fun fetchCurrentUser(): FetchCurrentUserResponse
 }
