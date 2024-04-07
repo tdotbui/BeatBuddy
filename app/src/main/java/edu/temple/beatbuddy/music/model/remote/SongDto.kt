@@ -1,10 +1,6 @@
-package edu.temple.beatbuddy.music.model
+package edu.temple.beatbuddy.music.model.remote
 
-import edu.temple.beatbuddy.music.model.remote.AlbumDto
-import edu.temple.beatbuddy.music.model.remote.ArtistDto
-
-
-data class Song(
+data class SongDto(
     val id: Long,
 
     val album: AlbumDto,
@@ -21,7 +17,5 @@ data class Song(
     val title: String,
     val title_short: String,
     val title_version: String,
-    val type: String,
-
-    val genre: Int
+    val type: String
 )

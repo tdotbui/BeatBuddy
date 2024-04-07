@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import edu.temple.beatbuddy.music.view_model.SongListViewModel
 import edu.temple.beatbuddy.user_auth.model.AuthResult.*
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_auth.repository.ProfileViewModel
@@ -37,6 +38,9 @@ fun HomeScreen(
     onSignOut: () -> Unit
 ) {
     val context = LocalContext.current
+
+    val songListViewModel = hiltViewModel<SongListViewModel>()
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {

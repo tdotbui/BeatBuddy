@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.music.model.remote
+package edu.temple.beatbuddy.utils
 
 sealed class Resource<T>(
     val data: T? = null,
