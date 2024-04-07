@@ -26,20 +26,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.music.view_model.SongListViewModel
 import edu.temple.beatbuddy.user_auth.model.AuthResult.*
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_auth.repository.ProfileViewModel
+import edu.temple.beatbuddy.utils.Genre
 import edu.temple.beatbuddy.utils.Helpers
 
 @Composable
 fun HomeScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
+    songListViewModel: SongListViewModel = hiltViewModel(),
     onSignOut: () -> Unit
 ) {
     val context = LocalContext.current
-
-    val songListViewModel = hiltViewModel<SongListViewModel>()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -125,6 +126,7 @@ fun HomeScreen(
 
             Button(
                 onClick = {
+                    songListViewModel.getSongs(Genre.DANCE)
                     profileViewModel.signOut()
                     onSignOut()
                           },

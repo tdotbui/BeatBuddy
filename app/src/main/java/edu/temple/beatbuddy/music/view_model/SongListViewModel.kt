@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.music.repository.SongListRepository
 import edu.temple.beatbuddy.utils.Genre
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,11 +19,13 @@ class SongListViewModel @Inject constructor(
         getSongs(Genre.POP)
     }
 
-    private fun getSongs(genre: Int) {
+    fun getSongs(genre: Int) {
         viewModelScope.launch {
             songListRepository.getSongList(true, genre)
-                .also { response ->
-                    Log.d("Result", response.toString())
+                .collectLatest {
+                    it.data?.let {
+                        Log.d("test", it[2].artist.toString())
+                    }
                 }
         }
     }
