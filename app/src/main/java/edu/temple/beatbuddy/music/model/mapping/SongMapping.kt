@@ -1,14 +1,11 @@
 package edu.temple.beatbuddy.music.model.mapping
 
-import edu.temple.beatbuddy.music.model.Song
-import edu.temple.beatbuddy.music.model.remote.AlbumDto
-import edu.temple.beatbuddy.music.model.remote.ArtistDto
+import edu.temple.beatbuddy.music.model.local.Song
 import edu.temple.beatbuddy.music.model.remote.SongDto
-import edu.temple.beatbuddy.utils.Genre
 
 fun SongDto.toSong(
     genre: Int
-): Song =  Song(
+): Song = Song(
     id = id,
 
     album = album,

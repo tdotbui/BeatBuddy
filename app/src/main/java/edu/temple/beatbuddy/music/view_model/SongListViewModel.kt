@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.music.repository.SongListRepository
 import edu.temple.beatbuddy.utils.Genre
+import edu.temple.beatbuddy.utils.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,18 +18,46 @@ class SongListViewModel @Inject constructor(
     private val songListRepository: SongListRepository
 ): ViewModel() {
 
+    private var songListState = MutableStateFlow(SongListState())
+        private set
+
     init {
-        getSongs(Genre.POP)
+        getSongsByGenre(songListState.value.selectedGenre)
     }
 
-    fun getSongs(genre: Int) {
+    fun getSongsByGenre(genre: Int) {
         viewModelScope.launch {
-            songListRepository.getSongList(true, genre)
-                .collectLatest {
-                    it.data?.let {
-                        Log.d("test", it[2].artist.toString())
+            songListRepository.getSongList(
+                fetchFromRemote = true,
+                genre = genre
+            ).collectLatest { result ->
+                when(result) {
+                    is Resource.Success -> {
+                        result.data?.let { songList ->
+                            songListState.update {
+                                it.copy(
+                                    currentSongList = songList,
+                                    selectedGenre = genre,
+                                    isLoading = false
+                                )
+                            }
+                        }
+                    }
+                    is Resource.Error -> {
+                        songListState.update {
+                            it.copy(
+                                errorMessage = result.message,
+                                isLoading = false
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        songListState.update {
+                            it.copy(isLoading = true)
+                        }
                     }
                 }
+            }
         }
     }
 }

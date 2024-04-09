@@ -1,5 +1,7 @@
 package edu.temple.beatbuddy
 
+import android.app.Application
+import androidx.room.Room
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -8,6 +10,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import edu.temple.beatbuddy.music.model.local.SongDatabase
 import edu.temple.beatbuddy.music.model.remote.SongApi
 import edu.temple.beatbuddy.music.repository.SongListRepository
 import edu.temple.beatbuddy.music.repository.SongListRepositoryImpl
@@ -46,5 +49,15 @@ class AppModule {
             .client(client)
             .build()
             .create(SongApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesSongDatabase(app: Application): SongDatabase {
+        return Room.databaseBuilder(
+            app,
+            SongDatabase::class.java,
+            "songDb.db"
+        ).build()
     }
 }

@@ -126,7 +126,28 @@ fun HomeScreen(
 
             Button(
                 onClick = {
-                    songListViewModel.getSongs(Genre.DANCE)
+                    songListViewModel.getSongsByGenre(Genre.DANCE)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(text = "Dance")
+            }
+
+            Button(
+                onClick = {
+                    songListViewModel.getSongsByGenre(Genre.HIPHOP)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(text = "Hip Hop")
+            }
+
+            Button(
+                onClick = {
                     profileViewModel.signOut()
                     onSignOut()
                           },
