@@ -18,7 +18,7 @@ class SongListViewModel @Inject constructor(
     private val songListRepository: SongListRepository
 ): ViewModel() {
 
-    private var songListState = MutableStateFlow(SongListState())
+    var songListState = MutableStateFlow(SongListState())
         private set
 
     init {

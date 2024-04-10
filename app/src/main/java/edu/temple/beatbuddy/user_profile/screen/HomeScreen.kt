@@ -37,8 +37,8 @@ import edu.temple.beatbuddy.utils.Helpers
 @Composable
 fun HomeScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
-    songListViewModel: SongListViewModel = hiltViewModel(),
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    goToMusicList: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -126,25 +126,25 @@ fun HomeScreen(
 
             Button(
                 onClick = {
-                    songListViewModel.getSongsByGenre(Genre.DANCE)
+                    goToMusicList()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = "Dance")
+                Text(text = "Explore")
             }
-
-            Button(
-                onClick = {
-                    songListViewModel.getSongsByGenre(Genre.HIPHOP)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(text = "Hip Hop")
-            }
+//
+//            Button(
+//                onClick = {
+//                    songListViewModel.getSongsByGenre(Genre.HIPHOP)
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(16.dp)
+//            ) {
+//                Text(text = "Hip Hop")
+//            }
 
             Button(
                 onClick = {

@@ -25,7 +25,7 @@ data class Song(
     val readable: Boolean,
     val title: String,
     val title_short: String,
-    val title_version: String,
+//    val title_version: String,
     val type: String,
 
     val genre: Int
