@@ -1,5 +1,8 @@
 package edu.temple.beatbuddy
 
+import android.app.DownloadManager
+import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.MediaController
@@ -23,15 +26,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import edu.temple.beatbuddy.ui.theme.BeatBuddyTheme
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,29 +59,24 @@ class MainActivity : ComponentActivity() {
 
         val playlist: List<Song> = listOf(
             Song(
-                title = "Master of Puppets",
-                artist = "Metallica",
-                media = R.raw.master_of_puppets
+                title = "Incredible (feat. Labrinth)",
+                artist = "Sia",
+                media = "https://cdns-preview-7.dzcdn.net/stream/c-792912511f37c14d55918e5f6db232a7-1.mp3"
             ),
             Song(
-                title = "Everyday Normal Guy 2",
-                artist = "Jon Lajoie",
-                media = R.raw.everyday_normal_guy_2
+                title = "Single Soon",
+                artist = "Selena Gomez",
+                media = "https://cdns-preview-7.dzcdn.net/stream/c-70c8502cd24b1c54e6a8a5d22238f60c-2.mp3"
             ),
             Song(
-                title = "Lose Yourself",
-                artist = "Eminem",
-                media = R.raw.lose_yourself
+                title = "The Show",
+                artist = "Niall Horan",
+                media = "https://cdns-preview-e.dzcdn.net/stream/c-eb83feaa48488c9fd4d5d80ae217ac6d-6.mp3"
             ),
             Song(
-                title = "Crazy",
-                artist = "Gnarls Barkley",
-                media = R.raw.crazy
-            ),
-            Song(
-                title = "Till I Collapse",
-                artist = "Eminem",
-                media = R.raw.till_i_collapse
+                title = "We can't be friends (wait for your love)",
+                artist = "Ariana Grande",
+                media = "https://cdns-preview-e.dzcdn.net/stream/c-ee20b2df47cfce93945821c121f9716c-5.mp3"
             )
         )
 
@@ -94,7 +109,9 @@ fun SongList(player: ExoPlayer, playlist: List<Song>) {
 @Composable
 fun SongCard(player: ExoPlayer ,song: Song) {
     val context = LocalContext.current
-    val packageName = context.packageName
+
+    val playerView = PlayerView(context)
+    val playWhenReady by rememberSaveable { mutableStateOf(true) }
 
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -116,9 +133,17 @@ fun SongCard(player: ExoPlayer ,song: Song) {
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = {
                 Log.d("SongCard", "Queue pressed")
-                player.addMediaItem(MediaItem.fromUri("android.resource://$packageName/${song.media}"))
+
+                player.setMediaItem(MediaItem.fromUri(song.media))
+                playerView.player = player
             }) {
                 Text("Queue")
+
+
+                LaunchedEffect(player) {
+                    player.prepare()
+                    player.playWhenReady = playWhenReady
+                }
             }
         }
     }
