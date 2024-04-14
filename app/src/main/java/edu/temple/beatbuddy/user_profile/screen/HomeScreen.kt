@@ -134,17 +134,6 @@ fun HomeScreen(
             ) {
                 Text(text = "Explore")
             }
-//
-//            Button(
-//                onClick = {
-//                    songListViewModel.getSongsByGenre(Genre.HIPHOP)
-//                },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(16.dp)
-//            ) {
-//                Text(text = "Hip Hop")
-//            }
 
             Button(
                 onClick = {

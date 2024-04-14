@@ -54,28 +54,17 @@ fun SongRowItem(
             .build()
     ).state
 
-//    val defaultColor = MaterialTheme.colorScheme.secondaryContainer
-//    var dominantColor by remember { mutableStateOf(defaultColor) }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
             .padding(8.dp)
             .clip(RoundedCornerShape(10.dp))
-//            .background(
-//                Brush.verticalGradient(
-//                    colors = listOf(
-//                        MaterialTheme.colorScheme.secondaryContainer, dominantColor
-//                    )
-//                )
-//            )
             .clickable {
 //                navHostController.navigate()
             }
     ) {
         if (imageState is AsyncImagePainter.State.Success) {
-//            dominantColor =
             Image(
                 painter = imageState.painter,
                 contentDescription = "\"${song.title}\" track cover",
