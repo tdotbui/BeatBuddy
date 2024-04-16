@@ -48,8 +48,6 @@ import androidx.media3.ui.PlayerView
 import edu.temple.beatbuddy.ui.theme.BeatBuddyTheme
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.io.File
 import java.io.FileOutputStream
 
@@ -108,11 +106,6 @@ fun SongList(player: ExoPlayer, playlist: List<Song>) {
 
 @Composable
 fun SongCard(player: ExoPlayer ,song: Song) {
-    val context = LocalContext.current
-
-    val playerView = PlayerView(context)
-    val playWhenReady by rememberSaveable { mutableStateOf(true) }
-
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -132,18 +125,15 @@ fun SongCard(player: ExoPlayer ,song: Song) {
             }
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = {
-                Log.d("SongCard", "Queue pressed")
+                Log.d("SongCard", "${song.title}, ${song.artist} added to queue")
+                player.addMediaItem(MediaItem.fromUri(song.media))
 
-                player.setMediaItem(MediaItem.fromUri(song.media))
-                playerView.player = player
+                if (!player.isPlaying) {
+                    player.prepare()
+                    player.play()
+                }
             }) {
                 Text("Queue")
-
-
-                LaunchedEffect(player) {
-                    player.prepare()
-                    player.playWhenReady = playWhenReady
-                }
             }
         }
     }
