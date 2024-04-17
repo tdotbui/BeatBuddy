@@ -125,7 +125,7 @@ fun SongCard(player: ExoPlayer ,song: Song) {
             }
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = {
-                Log.d("SongCard", "${song.title}, ${song.artist} added to queue")
+                Log.d("SongCard", "QUEUED: ${song.title}, ${song.artist}")
                 player.addMediaItem(MediaItem.fromUri(song.media))
 
                 if (!player.isPlaying) {
@@ -147,7 +147,7 @@ fun MediaController(player: ExoPlayer) {
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         Button(onClick = {
-            Log.d("MediaController", "Backward pressed")
+            Log.d("MediaController", "BACKWARD")
             if (player.hasPreviousMediaItem()) {
                 Log.d("MediaController", "Going to previous song")
                 player.seekToPreviousMediaItem()
@@ -161,10 +161,10 @@ fun MediaController(player: ExoPlayer) {
         Button(onClick = {
             if (player.currentMediaItem != null) {
                 if (player.isPlaying) {
-                    Log.d("MediaController", "Pause pressed")
+                    Log.d("MediaController", "PAUSED")
                     player.pause()
                 } else {
-                    Log.d("MediaController", "Play pressed")
+                    Log.d("MediaController", "PLAYING: ${player.currentMediaItem!!.mediaId}")
                     player.prepare()
                     player.play()
                 }
@@ -175,7 +175,7 @@ fun MediaController(player: ExoPlayer) {
             Text("Play/Pause")
         }
         Button(onClick = {
-            Log.d("MediaController", "Forward pressed")
+            Log.d("MediaController", "FORWARD")
             if (player.hasNextMediaItem()) {
                 Log.d("MediaController", "Going to next song")
                 player.seekToNextMediaItem()
@@ -185,12 +185,11 @@ fun MediaController(player: ExoPlayer) {
         }) {
             Text("Forward")
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    BeatBuddyTheme {
+        Button(onClick = {
+            Log.d("MediaController", "QUEUE CLEARED")
+            player.clearMediaItems()
+        }) {
+            Text("Clear")
+        }
     }
 }
