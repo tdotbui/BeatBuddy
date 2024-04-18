@@ -3,8 +3,8 @@ package edu.temple.beatbuddy.music.model.remote
 data class SongDto(
     val id: Long?,
 
-    val album: AlbumDto,
-    val artist: ArtistDto,
+    val album: AlbumDto?,
+    val artist: ArtistDto?,
     val duration: Int?,
     val explicit_content_cover: Int?,
     val explicit_content_lyrics: Int?,

@@ -26,6 +26,9 @@ class SongListViewModel @Inject constructor(
     }
 
     fun getSongsByGenre(genre: Int) {
+        songListState.update {
+            it.copy(isLoading = true)
+        }
         viewModelScope.launch {
             songListRepository.getSongList(
                 fetchFromRemote = true,
@@ -51,11 +54,12 @@ class SongListViewModel @Inject constructor(
                             )
                         }
                     }
-                    is Resource.Loading -> {
-                        songListState.update {
-                            it.copy(isLoading = true)
-                        }
-                    }
+//                    is Resource.Loading -> {
+//                        songListState.update {
+//                            it.copy(isLoading = true)
+//                        }
+//                    }
+                    else -> {}
                 }
             }
         }

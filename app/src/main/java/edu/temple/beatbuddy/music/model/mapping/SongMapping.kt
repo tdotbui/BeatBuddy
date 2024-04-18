@@ -1,6 +1,8 @@
 package edu.temple.beatbuddy.music.model.mapping
 
 import edu.temple.beatbuddy.music.model.local.Song
+import edu.temple.beatbuddy.music.model.remote.AlbumDto
+import edu.temple.beatbuddy.music.model.remote.ArtistDto
 import edu.temple.beatbuddy.music.model.remote.SongDto
 
 fun SongDto.toSong(
@@ -8,8 +10,8 @@ fun SongDto.toSong(
 ): Song = Song(
     id = id ?: 0L,
 
-    album = album,
-    artist = artist,
+    album = album ?: AlbumDto("", "", "", "", "", 0, "", "", "", ""),
+    artist = artist ?: ArtistDto(0, "", "", "", "", "", "", "", "",""),
     duration = duration ?: 0,
     explicit_content_cover = explicit_content_cover ?: 0,
     explicit_content_lyrics = explicit_content_lyrics ?: 0,

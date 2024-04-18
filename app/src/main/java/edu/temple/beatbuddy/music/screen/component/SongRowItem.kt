@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.rounded.ImageNotSupported
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,87 +48,93 @@ import edu.temple.beatbuddy.music.model.local.Song
 @Composable
 fun SongRowItem(
     song: Song,
-    navHostController: NavHostController
+    onMusicClick: () -> Unit,
+    onClick: () -> Unit
 ) {
+    val context = LocalContext.current
+
     val imageState = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current)
+        model = ImageRequest.Builder(context)
             .data(song.album.cover_medium)
             .size(Size.ORIGINAL)
             .build()
     ).state
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
-            .padding(8.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .clickable {
-//                navHostController.navigate()
-            }
+            .height(66.dp),
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        if (imageState is AsyncImagePainter.State.Success) {
-            Image(
-                painter = imageState.painter,
-                contentDescription = "\"${song.title}\" track cover",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(80.dp)
-                    .padding(8.dp)
-                    .clip(RoundedCornerShape(10.dp))
-            )
-        }
+        Divider()
 
-        if (imageState is AsyncImagePainter.State.Error) {
-            Box(
+        Box(
+            modifier = Modifier
+                .wrapContentSize(),
+        ) {
+            Row(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(8.dp)
-                    .width(80.dp)
-                    .clip(RoundedCornerShape(10.dp)),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clickable { onMusicClick() },
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    modifier = Modifier.size(60.dp),
-                    imageVector = Icons.Rounded.ImageNotSupported,
-                    contentDescription = "\"${song.title}\" track cover"
-                )
+                Box(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(48.dp)
+                        .clip(MaterialTheme.shapes.medium)
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (imageState.painter != null) {
+                        Image(
+                            painter = imageState.painter!!,
+                            contentDescription = song.title,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(MaterialTheme.shapes.medium)
+                        )
+                    } else {
+                        Icon(
+                            modifier = Modifier.size(56.dp),
+                            imageVector = Icons.Rounded.ImageNotSupported,
+                            contentDescription = "\"${song.title}\" track cover"
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(5f)
+                        .padding(bottom = 4.dp),
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text(
+                        text = song.title,
+                        maxLines = 1,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+
+                    Text(
+                        text = song.artist.name!!,
+                        maxLines = 1,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                }
             }
-        }
 
-        Column(
-            modifier = Modifier.padding(start = 12.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = song.title,
-                color = Color.Black,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp,
-                maxLines = 1
-            )
-
-            Text(
-                text = song.artist.name,
-                color = Color.Black,
-                fontWeight = FontWeight.Light,
-                fontSize = 12.sp,
-                maxLines = 1
-            )
-        }
-
-        Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Navigate",
-                color = Color.Black,
-                fontWeight = FontWeight.Light,
-                fontSize = 12.sp,
-                maxLines = 1
+            Icon(
+                imageVector = Icons.Default.MoreHoriz,
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .clickable { onClick() }
             )
         }
     }
