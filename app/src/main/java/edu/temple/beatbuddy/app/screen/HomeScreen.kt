@@ -25,11 +25,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import edu.temple.beatbuddy.music.screen.MusicBrowseScreen
+import edu.temple.beatbuddy.browse_music.screen.MusicBrowseScreen
+import edu.temple.beatbuddy.discover.screen.ProfileListScreen
+import edu.temple.beatbuddy.user_profile.screen.UserProfileScreen
 
 @Composable
 fun HomeScreen() {
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(1) }
 
     val tabs = listOf(
         TabItem(Icons.Default.Swipe, "Top's pick"),
@@ -88,8 +90,8 @@ fun HomeScreen() {
                 0 -> TabScreen1()
                 1 -> MusicBrowseScreen()
                 2 -> TabScreen3()
-                3 -> TabScreen4()
-                4 -> TabScreen5()
+                3 -> ProfileListScreen()
+                4 -> UserProfileScreen(onSignOut = {})
             }
         }
     }
@@ -112,20 +114,6 @@ fun TabScreen1() {
 }
 
 @Composable
-fun TabScreen2() {
-    Text(text = "This is Tab 2")
-}
-@Composable
 fun TabScreen3() {
     Text(text = "This is Tab 3")
-}
-
-@Composable
-fun TabScreen4() {
-    Text(text = "This is Tab 4")
-}
-
-@Composable
-fun TabScreen5() {
-    Text(text = "This is Tab 5")
 }

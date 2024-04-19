@@ -32,7 +32,6 @@ import edu.temple.beatbuddy.utils.Helpers
 fun UserProfileScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     onSignOut: () -> Unit,
-    goToMusicList: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -117,17 +116,6 @@ fun UserProfileScreen(
                 modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp),
                 style = MaterialTheme.typography.titleSmall
             )
-
-            Button(
-                onClick = {
-                    goToMusicList()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(text = "Explore")
-            }
 
             Button(
                 onClick = {

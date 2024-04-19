@@ -1,10 +1,10 @@
-package edu.temple.beatbuddy.music.model.local
+package edu.temple.beatbuddy.browse_music.model.local
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import edu.temple.beatbuddy.music.model.remote.AlbumDto
-import edu.temple.beatbuddy.music.model.remote.ArtistDto
+import edu.temple.beatbuddy.browse_music.model.remote.AlbumDto
+import edu.temple.beatbuddy.browse_music.model.remote.ArtistDto
 
 @Entity("SongEntity")
 data class Song(

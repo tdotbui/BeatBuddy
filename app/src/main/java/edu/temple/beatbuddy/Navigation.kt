@@ -5,8 +5,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import edu.temple.beatbuddy.app.screen.HomeScreen
-import edu.temple.beatbuddy.music.screen.MusicBrowseScreen
-import edu.temple.beatbuddy.user_profile.screen.UserProfileScreen
 import edu.temple.beatbuddy.user_auth.screen.SignInScreen
 import edu.temple.beatbuddy.user_auth.screen.SignUpScreen
 
@@ -16,7 +14,7 @@ fun Navigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "sign_in"
     ) {
         composable(route = "sign_in") {
             SignInScreen(
@@ -35,21 +33,6 @@ fun Navigation(
                 goToSignInScreen = {
                     navController.navigate("sign_in") {
                         popUpTo("sign_up") { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        composable(route = "home") {
-            UserProfileScreen(
-                onSignOut = {
-                    navController.navigate("sign_in") {
-                        popUpTo("home") { inclusive = true }
-                    }
-                },
-                goToMusicList = {
-                    navController.navigate("music") {
-                        popUpTo("home") { inclusive = true }
                     }
                 }
             )

@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.music.model.remote
+package edu.temple.beatbuddy.browse_music.model.remote
 
 import retrofit2.http.GET
 import retrofit2.http.Path

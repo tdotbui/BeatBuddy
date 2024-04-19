@@ -1,9 +1,9 @@
-package edu.temple.beatbuddy.music.model.mapping
+package edu.temple.beatbuddy.browse_music.model.mapping
 
-import edu.temple.beatbuddy.music.model.local.Song
-import edu.temple.beatbuddy.music.model.remote.AlbumDto
-import edu.temple.beatbuddy.music.model.remote.ArtistDto
-import edu.temple.beatbuddy.music.model.remote.SongDto
+import edu.temple.beatbuddy.browse_music.model.local.Song
+import edu.temple.beatbuddy.browse_music.model.remote.AlbumDto
+import edu.temple.beatbuddy.browse_music.model.remote.ArtistDto
+import edu.temple.beatbuddy.browse_music.model.remote.SongDto
 
 fun SongDto.toSong(
     genre: Int

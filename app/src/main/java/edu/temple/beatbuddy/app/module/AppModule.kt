@@ -3,14 +3,18 @@ package edu.temple.beatbuddy.app.module
 import android.app.Application
 import androidx.room.Room
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import edu.temple.beatbuddy.music.model.local.SongDatabase
-import edu.temple.beatbuddy.music.model.remote.SongApi
+import edu.temple.beatbuddy.browse_music.model.local.SongDatabase
+import edu.temple.beatbuddy.browse_music.model.remote.SongApi
+import edu.temple.beatbuddy.discover.repository.AllUsersRepository
+import edu.temple.beatbuddy.discover.repository.AllUsersRepositoryImpl
 import edu.temple.beatbuddy.user_auth.model.AuthRepository
 import edu.temple.beatbuddy.user_auth.repository.AuthRepositoryImpl
 import okhttp3.OkHttpClient
@@ -57,4 +61,12 @@ class AppModule {
             "songDb.db"
         ).build()
     }
+
+    @Provides
+    fun provideUsersRef() = Firebase.firestore.collection("users")
+
+    @Provides
+    fun provideAllUsersRepository(
+        usersRef: CollectionReference
+    ): AllUsersRepository = AllUsersRepositoryImpl(usersRef)
 }

@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.music.screen.component
+package edu.temple.beatbuddy.browse_music.screen.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
