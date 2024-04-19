@@ -1,6 +1,6 @@
-package edu.temple.beatbuddy.browse_music.repository
+package edu.temple.beatbuddy.music_browse.repository
 
-import edu.temple.beatbuddy.browse_music.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.Flow
 

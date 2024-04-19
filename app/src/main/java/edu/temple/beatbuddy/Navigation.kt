@@ -14,7 +14,7 @@ fun Navigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "sign_in"
+        startDestination = "home"
     ) {
         composable(route = "sign_in") {
             SignInScreen(

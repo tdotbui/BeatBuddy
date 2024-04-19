@@ -1,9 +1,9 @@
-package edu.temple.beatbuddy.browse_music.repository
+package edu.temple.beatbuddy.music_browse.repository
 
-import edu.temple.beatbuddy.browse_music.model.local.Song
-import edu.temple.beatbuddy.browse_music.model.local.SongDatabase
-import edu.temple.beatbuddy.browse_music.model.mapping.toSong
-import edu.temple.beatbuddy.browse_music.model.remote.SongApi
+import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.local.SongDatabase
+import edu.temple.beatbuddy.music_browse.model.mapping.toSong
+import edu.temple.beatbuddy.music_browse.model.remote.SongApi
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

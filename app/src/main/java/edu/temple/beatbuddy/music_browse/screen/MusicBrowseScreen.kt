@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.browse_music.screen
+package edu.temple.beatbuddy.music_browse.screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -18,9 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import edu.temple.beatbuddy.browse_music.screen.component.GenreItem
-import edu.temple.beatbuddy.browse_music.screen.component.SongRowItem
-import edu.temple.beatbuddy.browse_music.view_model.SongListViewModel
+import edu.temple.beatbuddy.music_browse.screen.component.GenreItem
+import edu.temple.beatbuddy.music_browse.screen.component.SongRowItem
+import edu.temple.beatbuddy.music_browse.view_model.SongListViewModel
 import edu.temple.beatbuddy.utils.Genre
 
 @SuppressLint("StateFlowValueCalledInComposition")

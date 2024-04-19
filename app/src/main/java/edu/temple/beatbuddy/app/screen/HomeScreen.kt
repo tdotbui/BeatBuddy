@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Feed
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -25,8 +26,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import edu.temple.beatbuddy.browse_music.screen.MusicBrowseScreen
+import edu.temple.beatbuddy.music_browse.screen.MusicBrowseScreen
 import edu.temple.beatbuddy.discover.screen.ProfileListScreen
+import edu.temple.beatbuddy.music_post.screen.FeedsScreen
 import edu.temple.beatbuddy.user_profile.screen.UserProfileScreen
 
 @Composable
@@ -36,7 +38,7 @@ fun HomeScreen() {
     val tabs = listOf(
         TabItem(Icons.Default.Swipe, "Top's pick"),
         TabItem(Icons.Default.Widgets, "Browse"),
-        TabItem(Icons.Default.Home, "Home"),
+        TabItem(Icons.Default.Feed, "Feeds"),
         TabItem(Icons.Default.Search, "Explore"),
         TabItem(Icons.Default.Person, "Profile"),
     )
@@ -89,7 +91,7 @@ fun HomeScreen() {
             when (selectedTabIndex) {
                 0 -> TabScreen1()
                 1 -> MusicBrowseScreen()
-                2 -> TabScreen3()
+                2 -> FeedsScreen()
                 3 -> ProfileListScreen()
                 4 -> UserProfileScreen(onSignOut = {})
             }

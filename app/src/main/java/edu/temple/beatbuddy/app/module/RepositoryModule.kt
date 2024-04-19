@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import edu.temple.beatbuddy.browse_music.repository.SongListRepository
-import edu.temple.beatbuddy.browse_music.repository.SongListRepositoryImpl
+import edu.temple.beatbuddy.music_browse.repository.SongListRepository
+import edu.temple.beatbuddy.music_browse.repository.SongListRepositoryImpl
 import javax.inject.Singleton
 
 @Module

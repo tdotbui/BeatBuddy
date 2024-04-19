@@ -1,9 +1,9 @@
-package edu.temple.beatbuddy.browse_music.view_model
+package edu.temple.beatbuddy.music_browse.view_model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.temple.beatbuddy.browse_music.repository.SongListRepository
+import edu.temple.beatbuddy.music_browse.repository.SongListRepository
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest

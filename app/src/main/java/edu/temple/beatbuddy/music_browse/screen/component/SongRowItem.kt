@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.browse_music.screen.component
+package edu.temple.beatbuddy.music_browse.screen.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
-import edu.temple.beatbuddy.browse_music.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.local.Song
 
 @Composable
 fun SongRowItem(

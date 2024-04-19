@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.browse_music.model.remote
+package edu.temple.beatbuddy.music_browse.model.remote
 
 import com.google.gson.annotations.SerializedName
 

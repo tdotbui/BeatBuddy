@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.browse_music.model.local
+package edu.temple.beatbuddy.music_browse.model.local
 
 import androidx.room.Dao
 import androidx.room.Query

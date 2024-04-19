@@ -11,8 +11,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import edu.temple.beatbuddy.browse_music.model.local.SongDatabase
-import edu.temple.beatbuddy.browse_music.model.remote.SongApi
+import edu.temple.beatbuddy.music_browse.model.local.SongDatabase
+import edu.temple.beatbuddy.music_browse.model.remote.SongApi
 import edu.temple.beatbuddy.discover.repository.AllUsersRepository
 import edu.temple.beatbuddy.discover.repository.AllUsersRepositoryImpl
 import edu.temple.beatbuddy.user_auth.model.AuthRepository
