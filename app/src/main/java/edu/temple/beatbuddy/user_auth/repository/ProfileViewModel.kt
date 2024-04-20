@@ -13,6 +13,7 @@ import edu.temple.beatbuddy.user_auth.model.AuthRepository
 import edu.temple.beatbuddy.user_auth.model.AuthResult
 import edu.temple.beatbuddy.user_auth.model.FetchCurrentUserResponse
 import edu.temple.beatbuddy.user_auth.model.User
+import edu.temple.beatbuddy.utils.Helpers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Feed
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Swipe
@@ -23,17 +22,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import edu.temple.beatbuddy.music_browse.screen.MusicBrowseScreen
 import edu.temple.beatbuddy.discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
+import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
+import edu.temple.beatbuddy.user_auth.model.AuthResult
+import edu.temple.beatbuddy.user_auth.repository.ProfileViewModel
 import edu.temple.beatbuddy.user_profile.screen.UserProfileScreen
+import edu.temple.beatbuddy.utils.Helpers
+import edu.temple.beatbuddy.utils.Resource
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    songPostViewModel: SongPostViewModel = hiltViewModel(),
+    profileViewModel: ProfileViewModel = hiltViewModel(),
+    goToSignInScreen: () -> Unit
+) {
     var selectedTabIndex by remember { mutableIntStateOf(1) }
+    val context = LocalContext.current
+
+    if (profileViewModel.currentUserResponse is AuthResult.Success) {
+        val user = (profileViewModel.currentUserResponse as AuthResult.Success).data
+        Helpers.saveUidToSharedPreferences(context, user.id)
+    }
 
     val tabs = listOf(
         TabItem(Icons.Default.Swipe, "Top's pick"),
@@ -90,10 +106,13 @@ fun HomeScreen() {
         ) {
             when (selectedTabIndex) {
                 0 -> TabScreen1()
-                1 -> MusicBrowseScreen()
-                2 -> FeedsScreen()
+                1 -> MusicBrowseScreen(songPostViewModel = songPostViewModel)
+                2 -> FeedsScreen(songPostViewModel = songPostViewModel)
                 3 -> ProfileListScreen()
-                4 -> UserProfileScreen(onSignOut = {})
+                4 -> UserProfileScreen(
+                    profileViewModel = profileViewModel,
+                    onSignOut = { goToSignInScreen() }
+                )
             }
         }
     }
@@ -107,7 +126,7 @@ data class TabItem(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPV() {
-    HomeScreen()
+    HomeScreen(goToSignInScreen =  {})
 }
 
 @Composable

@@ -91,7 +91,8 @@ fun SongPostItem(
                     )
 
                     Text(
-                        text = user?.username ?: "username",
+                        text = user?.email ?: "",
+//                        text = user?.username ?: "username",
                         fontWeight = FontWeight.SemiBold
                     )
                 }

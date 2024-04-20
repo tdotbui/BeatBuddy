@@ -1,9 +1,11 @@
-package edu.temple.beatbuddy.discover.view_model
+package edu.temple.beatbuddy.music_post.view_model
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.temple.beatbuddy.discover.repository.UsersRepository
+import edu.temple.beatbuddy.music_post.model.SongPost
+import edu.temple.beatbuddy.music_post.repository.SongPostRepository
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -12,35 +14,36 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AllUsersViewModel @Inject constructor(
-    private val repository: UsersRepository
+class SongPostViewModel @Inject constructor(
+    private val repository: SongPostRepository
 ): ViewModel() {
-    var allUsersState = MutableStateFlow(AllUsersState())
+
+    var songPostState = MutableStateFlow(SongPostState())
         private set
 
     init {
-        fetchAllUsers()
+        fetchSongPosts()
     }
 
-    private fun fetchAllUsers() = viewModelScope.launch {
-        allUsersState.update {
+    private fun fetchSongPosts() = viewModelScope.launch {
+        songPostState.update {
             it.copy(isLoading = true)
         }
-
-        repository.fetchAllUsersFromFireStore().collectLatest { result ->
+        repository.fetchPostsFromFirestore().collectLatest { result ->
             when(result) {
                 is Resource.Success -> {
-                    result.data?.let {users ->
-                        allUsersState.update {
+                    Log.d("Success", "Success from Firestore")
+                    result.data?.let {posts ->
+                        songPostState.update {
                             it.copy(
-                                users = users,
+                                posts = posts,
                                 isLoading = false
                             )
                         }
                     }
                 }
                 is Resource.Error -> {
-                    allUsersState.update {
+                    songPostState.update {
                         it.copy(
                             errorMessage = result.message,
                             isLoading = false
@@ -48,7 +51,7 @@ class AllUsersViewModel @Inject constructor(
                     }
                 }
                 is Resource.Loading -> {
-                    allUsersState.update {
+                    songPostState.update {
                         it.copy(
                             isLoading = true
                         )
@@ -56,5 +59,10 @@ class AllUsersViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun makePost(songPost: SongPost) = viewModelScope.launch {
+        repository.shareAPost(songPost)
+        fetchSongPosts()
     }
 }

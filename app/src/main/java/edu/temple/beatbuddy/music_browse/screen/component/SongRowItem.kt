@@ -46,7 +46,7 @@ import edu.temple.beatbuddy.music_browse.model.local.Song
 fun SongRowItem(
     song: Song,
     onMusicClick: () -> Unit,
-    onClick: () -> Unit
+    shareClick: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -145,9 +145,12 @@ fun SongRowItem(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    MenuItem("Option 1") { /* Handle Option 1 click */ }
-                    MenuItem("Option 2") { /* Handle Option 2 click */ }
-                    MenuItem("Option 3") { /* Handle Option 3 click */ }
+                    MenuItem("Play") { /* Handle Option 1 click */ }
+                    MenuItem("Add to playlist") { /* Handle Option 2 click */ }
+                    MenuItem("Share") {
+                        shareClick()
+                        expanded = false
+                    }
                 }
             }
         }

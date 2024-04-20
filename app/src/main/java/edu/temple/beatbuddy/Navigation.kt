@@ -14,7 +14,7 @@ fun Navigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "sign_in"
     ) {
         composable(route = "sign_in") {
             SignInScreen(
@@ -39,7 +39,13 @@ fun Navigation(
         }
 
         composable(route = "home") {
-            HomeScreen()
+            HomeScreen(
+                goToSignInScreen = {
+                    navController.navigate("sign_in") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

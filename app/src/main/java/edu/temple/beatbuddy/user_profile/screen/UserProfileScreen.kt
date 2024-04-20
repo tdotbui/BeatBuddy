@@ -30,7 +30,7 @@ import edu.temple.beatbuddy.utils.Helpers
 
 @Composable
 fun UserProfileScreen(
-    profileViewModel: ProfileViewModel = hiltViewModel(),
+    profileViewModel: ProfileViewModel,
     onSignOut: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -88,7 +88,7 @@ fun UserProfileScreen(
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = user.email,
+                            text = user.id,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

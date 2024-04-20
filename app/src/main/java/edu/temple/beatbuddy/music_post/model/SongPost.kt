@@ -4,20 +4,20 @@ import com.google.firebase.Timestamp
 import edu.temple.beatbuddy.user_auth.model.User
 
 data class SongPost(
-    val postId: String,
-    val ownerUid: String,
-    val caption: String? = "",
+    val postId: String = "",
+    val ownerUid: String = "",
+    val caption: String? = null,
     var likes: Int = 0,
-    val timestamp: Timestamp,
+    val timestamp: Timestamp? = null,
 
-    val songId: Long,
-    val title: String,
-    val preview: String,
-    val artistName: String,
-    val artistPicture: String,
-    val songImage: String,
+    val songId: Long? = 0L,
+    val title: String = "",
+    val preview: String = "",
+    val artistName: String = "",
+    val artistPicture: String = "",
+    val songImage: String = "",
 
-    val user: User?
+    val user: User? = null
 )
 
 object MockPost {

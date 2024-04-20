@@ -13,14 +13,17 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import edu.temple.beatbuddy.music_browse.model.local.SongDatabase
 import edu.temple.beatbuddy.music_browse.model.remote.SongApi
-import edu.temple.beatbuddy.discover.repository.AllUsersRepository
-import edu.temple.beatbuddy.discover.repository.AllUsersRepositoryImpl
+import edu.temple.beatbuddy.discover.repository.UsersRepository
+import edu.temple.beatbuddy.discover.repository.UsersRepositoryImpl
+import edu.temple.beatbuddy.music_post.repository.SongPostRepository
+import edu.temple.beatbuddy.music_post.repository.SongPostRepositoryImpl
 import edu.temple.beatbuddy.user_auth.model.AuthRepository
 import edu.temple.beatbuddy.user_auth.repository.AuthRepositoryImpl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -63,10 +66,21 @@ class AppModule {
     }
 
     @Provides
+    @Named("UsersRef")
     fun provideUsersRef() = Firebase.firestore.collection("users")
 
     @Provides
-    fun provideAllUsersRepository(
-        usersRef: CollectionReference
-    ): AllUsersRepository = AllUsersRepositoryImpl(usersRef)
+    fun provideUsersRepository(
+        @Named("UsersRef") usersRef: CollectionReference
+    ): UsersRepository = UsersRepositoryImpl(usersRef)
+
+    @Provides
+    @Named("PostRef")
+    fun providePostRef() = Firebase.firestore.collection("posts")
+
+    @Provides
+    fun provideSongPostRepository(
+        @Named("PostRef") postRef: CollectionReference,
+        @Named("UsersRef") usersRef: CollectionReference
+    ): SongPostRepository = SongPostRepositoryImpl(postRef, usersRef)
 }
