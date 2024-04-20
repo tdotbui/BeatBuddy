@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.exoplayer.ExoPlayer
 import edu.temple.beatbuddy.music_browse.screen.MusicBrowseScreen
 import edu.temple.beatbuddy.discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
@@ -50,6 +51,8 @@ fun HomeScreen(
         val user = (profileViewModel.currentUserResponse as AuthResult.Success).data
         Helpers.saveUidToSharedPreferences(context, user.id)
     }
+
+    val musicPlayer = ExoPlayer.Builder(context).build()
 
     val tabs = listOf(
         TabItem(Icons.Default.Swipe, "Top's pick"),
@@ -107,7 +110,10 @@ fun HomeScreen(
             when (selectedTabIndex) {
                 0 -> TabScreen1()
                 1 -> MusicBrowseScreen(songPostViewModel = songPostViewModel)
-                2 -> FeedsScreen(songPostViewModel = songPostViewModel)
+                2 -> FeedsScreen(
+                    songPostViewModel = songPostViewModel,
+                    player = musicPlayer
+                )
                 3 -> ProfileListScreen()
                 4 -> UserProfileScreen(
                     profileViewModel = profileViewModel,

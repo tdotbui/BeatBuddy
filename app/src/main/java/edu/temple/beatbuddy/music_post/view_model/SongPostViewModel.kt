@@ -1,9 +1,11 @@
 package edu.temple.beatbuddy.music_post.view_model
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.repository.SongPostRepository
 import edu.temple.beatbuddy.utils.Resource
@@ -21,8 +23,15 @@ class SongPostViewModel @Inject constructor(
     var songPostState = MutableStateFlow(SongPostState())
         private set
 
+    var currentSongPost = MutableStateFlow<SongPost?>(null)
+        private set
+
     init {
         fetchSongPosts()
+    }
+
+    fun setCurrentSong(songPost: SongPost) {
+        currentSongPost.value = songPost
     }
 
     private fun fetchSongPosts() = viewModelScope.launch {

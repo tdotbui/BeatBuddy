@@ -42,28 +42,6 @@ class SongPostRepositoryImpl @Inject constructor(
         emit(Resource.Loading(false))
     }
 
-//    private val coroutineScope = CoroutineScope(Dispatchers.IO)
-//    override fun fetchPostsFromFirestore(): Flow<Resource<List<SongPost>>> = callbackFlow {
-//        val snapshotListener = postRef.addSnapshotListener { snapshot, e ->
-//            val response = if (snapshot != null) {
-//                val posts = snapshot.toObjects(SongPost::class.java).map { songPost ->
-//                    coroutineScope.async {
-//                        val user = getUser(songPost.ownerUid)
-//                        songPost.copy(user = user)
-//                    }
-//                }
-//                val postList = coroutineScope.async { posts.awaitAll() }
-//                Resource.Success(postList)
-//            } else {
-//                Resource.Error(e?.message ?: "Snapshot is null")
-//            }
-//            trySend(response)
-//        }
-//        awaitClose {
-//            snapshotListener.remove()
-//        }
-//    }
-
     override suspend fun shareAPost(songPost: SongPost): Resource<Boolean> = try {
         val id = postRef.document().id
         val post = songPost.copy(postId = id)

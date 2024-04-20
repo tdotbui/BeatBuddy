@@ -26,9 +26,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,21 +41,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import edu.temple.beatbuddy.app.screen.HomeScreen
 import edu.temple.beatbuddy.component.ImageFactory
+import edu.temple.beatbuddy.component.VinylAlbumCover
+import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
 import edu.temple.beatbuddy.discover.screen.component.ProfilePicture
 import edu.temple.beatbuddy.music_post.model.MockPost
 import edu.temple.beatbuddy.music_post.model.SongPost
+import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.utils.ImageSize
 
 @Composable
 fun SongPostItem(
     songPost: SongPost,
+    player: ExoPlayer,
     likePost: () -> Unit,
-    play: () -> Unit
+    songPostViewModel: SongPostViewModel
 ) {
     val context = LocalContext.current
     val user = songPost.user
@@ -60,7 +71,18 @@ fun SongPostItem(
     var didLike by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
 
-    var imageOpacity = if (isPlaying) 1f else 0.5f
+    val imageOpacity = if (isPlaying) 1f else 0.5f
+
+    val playerView = PlayerView(context)
+    val playWhenReady by rememberSaveable { mutableStateOf(true) }
+
+    val currentSong by songPostViewModel.currentSongPost.collectAsState()
+
+    LaunchedEffect(currentSong) {
+        if (currentSong?.postId != songPost.postId) {
+            isPlaying = false
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -90,21 +112,12 @@ fun SongPostItem(
                         size = ImageSize.xSmall
                     )
 
-                    Text(
-                        text = user?.email ?: "",
-//                        text = user?.username ?: "username",
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-
-                if (isPlaying) {
-                    Icon(
-                        imageVector = Icons.Default.PauseCircleOutline,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .clickable { isPlaying = false }
-                    )
+                    (user?.username ?: user?.email)?.let {
+                        Text(
+                            text = it,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
 
@@ -113,17 +126,17 @@ fun SongPostItem(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                ImageFactory(
-                    context = context,
-                    imageUrl = songPost.songImage,
-                    imageVector = Icons.Default.ImageNotSupported,
-                    description = songPost.title,
-                    modifier = Modifier
-                        .size(250.dp)
-                        .alpha(imageOpacity)
-                )
-
                 if (!isPlaying) {
+                    ImageFactory(
+                        context = context,
+                        imageUrl = songPost.songImage,
+                        imageVector = Icons.Default.ImageNotSupported,
+                        description = songPost.title,
+                        modifier = Modifier
+                            .size(250.dp)
+                            .alpha(imageOpacity)
+                    )
+
                     Icon(
                         imageVector = Icons.Default.PlayCircleOutline,
                         contentDescription = null,
@@ -131,19 +144,47 @@ fun SongPostItem(
                             .size(200.dp)
                             .alpha(0.3f)
                             .clickable {
+                                songPostViewModel.setCurrentSong(songPost)
+                                player.setMediaItem(MediaItem.fromUri(songPost.preview))
+                                playerView.player = player
                                 isPlaying = true
                             }
                     )
+                } else {
+                    VinylAlbumCoverAnimation(
+                        imageUrl = songPost.songImage,
+                        isPlaying = isPlaying
+                    )
+
+                    Icon(
+                        imageVector = Icons.Default.PauseCircleOutline,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .alpha(0.5f)
+                            .clickable {
+                                player.pause()
+                                isPlaying = false
+                            },
+                    )
+
+                    LaunchedEffect(player) {
+                        player.prepare()
+                        player.playWhenReady = playWhenReady
+                    }
                 }
             }
 
             Row(
                 modifier = Modifier.padding(16.dp)
             ) {
-                Text(
-                    text = user?.username ?: "username",
-                    fontWeight = FontWeight.SemiBold
-                )
+                (user?.username ?: user?.email)?.let {
+                    Text(
+                        text = it,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
 
                 val caption = songPost.caption
                 caption?.run {
@@ -156,20 +197,28 @@ fun SongPostItem(
 
             Row(
                 modifier = Modifier
-                    .width(150.dp)
+                    .wrapContentSize()
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Icon(
-                    imageVector = if (didLike) Icons.Default.ThumbUp else Icons.Default.ThumbUpOffAlt,
-                    contentDescription = null,
+                Row(
                     modifier = Modifier
-                        .clickable {
-                            didLike = !didLike
-                            likePost()
-                        }
-                )
+                        .wrapContentSize(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = if (didLike) Icons.Default.ThumbUp else Icons.Default.ThumbUpOffAlt,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable {
+                                didLike = !didLike
+                                likePost()
+                            }
+                    )
+
+                    Text(text = "${songPost.likes}")
+                }
 
                 Icon(
                     imageVector = Icons.Default.Comment,
@@ -190,6 +239,8 @@ fun SongPostItem(
 fun SongPostPV() {
     SongPostItem(
         songPost = MockPost.posts[2],
-        {}, {}
+        player = ExoPlayer.Builder(LocalContext.current).build(),
+        {},
+        songPostViewModel = hiltViewModel()
     )
 }

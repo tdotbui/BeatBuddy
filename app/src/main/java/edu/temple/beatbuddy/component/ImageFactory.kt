@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
@@ -44,7 +45,8 @@ fun ImageFactory(
         Icon(
             modifier = Modifier.size(50.dp),
             imageVector = imageVector,
-            contentDescription = "$description image"
+            contentDescription = "$description image",
+            tint = Color.Gray
         )
     }
 }

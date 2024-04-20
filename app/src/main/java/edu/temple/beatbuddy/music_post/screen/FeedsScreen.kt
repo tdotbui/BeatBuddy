@@ -14,13 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.exoplayer.ExoPlayer
 import edu.temple.beatbuddy.music_post.model.MockPost
 import edu.temple.beatbuddy.music_post.screen.component.SongPostItem
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 
 @Composable
 fun FeedsScreen(
-    songPostViewModel: SongPostViewModel
+    songPostViewModel: SongPostViewModel,
+    player: ExoPlayer
 ) {
     val posts by songPostViewModel.songPostState.collectAsState()
 
@@ -31,10 +33,10 @@ fun FeedsScreen(
             items(posts.posts.size) { index ->
                 SongPostItem(
                     songPost = posts.posts[index],
-                    likePost = { }
-                ) {
-
-                }
+                    player = player,
+                    likePost = { },
+                    songPostViewModel = songPostViewModel
+                )
             }
         }
 
