@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PermIdentity
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,8 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import edu.temple.beatbuddy.R
-import edu.temple.beatbuddy.user_auth.model.AuthResult.*
-import edu.temple.beatbuddy.user_auth.repository.SignUpViewModel
+import edu.temple.beatbuddy.user_auth.view_model.SignUpViewModel
 import edu.temple.beatbuddy.utils.Helpers
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -63,7 +65,10 @@ fun SignUpScreen(
 
     var email by remember { mutableStateOf("") }
     var fullName by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val userState by signUpViewModel.userState.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxWidth()
@@ -111,6 +116,20 @@ fun SignUpScreen(
             )
 
             OutlinedTextField(
+                value = username,
+                onValueChange = {
+                    username = it
+                },
+                label = { Text("Username") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.PermIdentity,
+                        contentDescription = ""
+                    )
+                }
+            )
+
+            OutlinedTextField(
                 value = email,
                 onValueChange = {
                     email = it
@@ -145,7 +164,7 @@ fun SignUpScreen(
             Button(
                 onClick = {
                     keyboard?.hide()
-                    signUpViewModel.signUp(email, password, fullName)
+                    signUpViewModel.signUpWithEmailAndPassword(email, password, fullName, username)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -193,37 +212,29 @@ fun SignUpScreen(
             )
         }
 
-        when (signUpViewModel.signUpResponse) {
-            is Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White.copy(alpha = 0.6f))
-                        .wrapContentSize(Alignment.Center)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+        if (userState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.3f))
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
-            is Success -> {
-                goToSignInScreen()
-            }
-            is Error -> {
-                Helpers.showMessage(context, (signUpViewModel.signUpResponse as Error).exception.localizedMessage)
-                signUpViewModel.resetResponse()
-                fullName = ""
-                email = ""
-                password = ""
-            }
-            else -> {}
+        }
+
+        if (userState.isSignedUp) {
+            goToSignInScreen()
+        }
+
+        if (userState.errorMessage != null) {
+            Helpers.showMessage(context, userState.errorMessage)
+            userState.errorMessage = null
+            email = ""
+            password = ""
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewSignUp() {
-//    SignUpScreen(signUpViewModel = )
-//}

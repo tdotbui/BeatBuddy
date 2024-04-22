@@ -32,11 +32,9 @@ import edu.temple.beatbuddy.music_browse.screen.MusicBrowseScreen
 import edu.temple.beatbuddy.discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
-import edu.temple.beatbuddy.user_auth.model.AuthResult
-import edu.temple.beatbuddy.user_auth.repository.ProfileViewModel
+import edu.temple.beatbuddy.user_auth.view_model.ProfileViewModel
 import edu.temple.beatbuddy.user_profile.screen.UserProfileScreen
 import edu.temple.beatbuddy.utils.Helpers
-import edu.temple.beatbuddy.utils.Resource
 
 @Composable
 fun HomeScreen(
@@ -47,9 +45,10 @@ fun HomeScreen(
     var selectedTabIndex by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
 
-    if (profileViewModel.currentUserResponse is AuthResult.Success) {
-        val user = (profileViewModel.currentUserResponse as AuthResult.Success).data
-        Helpers.saveUidToSharedPreferences(context, user.id)
+    val userState by profileViewModel.userState.collectAsState()
+
+    if (userState.user != null) {
+        Helpers.saveUidToSharedPreferences(context, userState.user!!.id)
     }
 
     val musicPlayer = ExoPlayer.Builder(context).build()

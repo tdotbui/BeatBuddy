@@ -2,6 +2,7 @@ package edu.temple.beatbuddy.app.module
 
 import android.app.Application
 import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,7 +18,7 @@ import edu.temple.beatbuddy.discover.repository.UsersRepository
 import edu.temple.beatbuddy.discover.repository.UsersRepositoryImpl
 import edu.temple.beatbuddy.music_post.repository.SongPostRepository
 import edu.temple.beatbuddy.music_post.repository.SongPostRepositoryImpl
-import edu.temple.beatbuddy.user_auth.model.AuthRepository
+import edu.temple.beatbuddy.user_auth.repository.AuthRepository
 import edu.temple.beatbuddy.user_auth.repository.AuthRepositoryImpl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -29,12 +30,16 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+
     @Provides
     @Singleton
-    fun provideAuthRepository(): AuthRepository = AuthRepositoryImpl(
-        auth = Firebase.auth,
-        firestore = FirebaseFirestore.getInstance()
-    )
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        auth: FirebaseAuth,
+        @Named("UsersRef") usersRef: CollectionReference
+    ): AuthRepository = AuthRepositoryImpl(auth, usersRef)
 
     private val interceptor: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,14 +45,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import edu.temple.beatbuddy.R
-import edu.temple.beatbuddy.user_auth.model.AuthResult.*
-import edu.temple.beatbuddy.user_auth.repository.SignInViewModel
+import edu.temple.beatbuddy.user_auth.view_model.SignInViewModel
 import edu.temple.beatbuddy.utils.Helpers
+import edu.temple.beatbuddy.utils.Resource
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -65,6 +65,8 @@ fun SignInScreen(
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val userState by signInViewModel.userState.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxWidth()
@@ -180,36 +182,29 @@ fun SignInScreen(
             )
         }
 
-        when (signInViewModel.signInResponse) {
-            is Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White.copy(alpha = 0.3f))
-                        .wrapContentSize(Alignment.Center)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+        if (userState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.3f))
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
-            is Success -> {
-                onSignIn()
-            }
-            is Error -> {
-                Helpers.showMessage(context, (signInViewModel.signInResponse as Error).exception.localizedMessage)
-                signInViewModel.resetResponse()
-                email = ""
-                password = ""
-            }
-            else -> {}
+        }
+
+        if (userState.isLoggedIn) {
+            onSignIn()
+        }
+
+        if (userState.errorMessage != null) {
+            Helpers.showMessage(context, userState.errorMessage)
+            userState.errorMessage = null
+            email = ""
+            password = ""
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewSignIn() {
-//    SignInScreen({}, {})
-//}

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.firebase.auth.FirebaseAuth
 import edu.temple.beatbuddy.app.screen.HomeScreen
 import edu.temple.beatbuddy.user_auth.screen.SignInScreen
 import edu.temple.beatbuddy.user_auth.screen.SignUpScreen
@@ -12,9 +13,18 @@ import edu.temple.beatbuddy.user_auth.screen.SignUpScreen
 fun Navigation(
     navController: NavHostController,
 ) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val isUserSignedIn = (currentUser != null)
+
+    var startDestination = "sign_in"
+
+    if (isUserSignedIn) {
+        startDestination = "home"
+    }
+
     NavHost(
         navController = navController,
-        startDestination = "sign_in"
+        startDestination = startDestination
     ) {
         composable(route = "sign_in") {
             SignInScreen(

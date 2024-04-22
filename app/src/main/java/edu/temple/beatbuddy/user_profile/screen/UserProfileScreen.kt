@@ -17,16 +17,17 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import edu.temple.beatbuddy.user_auth.model.AuthResult.*
-import edu.temple.beatbuddy.user_auth.repository.ProfileViewModel
-import edu.temple.beatbuddy.utils.Helpers
+import edu.temple.beatbuddy.user_auth.view_model.ProfileViewModel
 
 @Composable
 fun UserProfileScreen(
@@ -34,6 +35,7 @@ fun UserProfileScreen(
     onSignOut: () -> Unit,
 ) {
     val context = LocalContext.current
+    val userState by remember { mutableStateOf(profileViewModel.userState.value) }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -66,39 +68,32 @@ fun UserProfileScreen(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                when (profileViewModel.currentUserResponse) {
-                    is Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.White.copy(alpha = 0.3f))
-                                .wrapContentSize(Alignment.Center)
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-
-                    is Success -> {
-                        val user = (profileViewModel.currentUserResponse as Success).data
-                        Text(
-                            text = user.fullName,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(
-                            text = user.id,
-                            style = MaterialTheme.typography.bodyMedium
+                if (userState.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White.copy(alpha = 0.3f))
+                            .wrapContentSize(Alignment.Center)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
-
-                    is Error -> {
-                        Helpers.showMessage(context, (profileViewModel.currentUserResponse as Error).exception.localizedMessage)
-                    }
-
-                    else -> {}
                 }
+
+                if (userState.user != null) {
+                    val user = userState.user!!
+                    Text(
+                        text = user.username,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = user.fullName,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
@@ -131,9 +126,3 @@ fun UserProfileScreen(
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewHomeScreen() {
-//    HomeScreen{}
-//}
