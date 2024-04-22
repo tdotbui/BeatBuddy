@@ -17,7 +17,8 @@ data class SongPost(
     val artistPicture: String = "",
     val songImage: String = "",
 
-    val user: User? = null
+    var user: User? = null,
+    var didLike: Boolean? = false
 )
 
 object MockPost {

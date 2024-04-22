@@ -49,6 +49,7 @@ class SongPostViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
+                        checkIfUserLikedPost()
                     }
                 }
                 is Resource.Error -> {
@@ -73,5 +74,14 @@ class SongPostViewModel @Inject constructor(
     fun makePost(songPost: SongPost) = viewModelScope.launch {
         repository.shareAPost(songPost)
         fetchSongPosts()
+    }
+
+    private fun checkIfUserLikedPost() {
+        for (post in songPostState.value.posts) {
+            viewModelScope.launch {
+                post.didLike = repository.checkIfUserLikePost(post).data
+                Log.d("Post ${post.title}", "Did like is ${post.didLike}")
+            }
+        }
     }
 }

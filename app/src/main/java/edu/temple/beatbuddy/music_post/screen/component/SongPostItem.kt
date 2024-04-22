@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,20 +56,24 @@ import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
 import edu.temple.beatbuddy.discover.screen.component.ProfilePicture
 import edu.temple.beatbuddy.music_post.model.MockPost
 import edu.temple.beatbuddy.music_post.model.SongPost
+import edu.temple.beatbuddy.music_post.view_model.SongPostItemViewModel
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.utils.ImageSize
+import kotlinx.coroutines.launch
 
 @Composable
 fun SongPostItem(
     songPost: SongPost,
     player: ExoPlayer,
-    likePost: () -> Unit,
-    songPostViewModel: SongPostViewModel
+    songPostViewModel: SongPostViewModel,
+    songPostItemViewModel: SongPostItemViewModel
 ) {
     val context = LocalContext.current
-    val user = songPost.user
+    val scope = rememberCoroutineScope()
 
-    var didLike by remember { mutableStateOf(false) }
+    val user = songPost.user
+    val didLike by remember { mutableStateOf(songPost.didLike) }
+
     var isPlaying by remember { mutableStateOf(false) }
 
     val imageOpacity = if (isPlaying) 1f else 0.5f
@@ -208,12 +213,11 @@ fun SongPostItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        imageVector = if (didLike) Icons.Default.ThumbUp else Icons.Default.ThumbUpOffAlt,
+                        imageVector = if (didLike == true) Icons.Default.ThumbUp else Icons.Default.ThumbUpOffAlt,
                         contentDescription = null,
                         modifier = Modifier
                             .clickable {
-                                didLike = !didLike
-                                likePost()
+                                if (didLike == false) scope.launch { songPostItemViewModel.like(songPost) }
                             }
                     )
 
@@ -240,7 +244,7 @@ fun SongPostPV() {
     SongPostItem(
         songPost = MockPost.posts[2],
         player = ExoPlayer.Builder(LocalContext.current).build(),
-        {},
-        songPostViewModel = hiltViewModel()
+        songPostViewModel = hiltViewModel(),
+        songPostItemViewModel = hiltViewModel()
     )
 }

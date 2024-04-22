@@ -1,7 +1,10 @@
 package edu.temple.beatbuddy.music_post.repository
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.toObject
+import com.google.firebase.ktx.Firebase
 import edu.temple.beatbuddy.discover.repository.UsersRepository
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.user_auth.model.User
@@ -18,8 +21,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 import javax.inject.Inject
+import kotlin.Exception
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -58,11 +61,56 @@ class SongPostRepositoryImpl @Inject constructor(
         Resource.Error(e.localizedMessage!!)
     }
 
-    private suspend fun getUser(ownerUid: String): User? {
-        return withContext(Dispatchers.IO) {
-            val userDocument = userRef.document(ownerUid).get().await()
-            userDocument.toObject(User::class.java)
+    override suspend fun likePost(songPost: SongPost): Resource<Boolean> = try {
+        val userUid = FirebaseAuth.getInstance().currentUser?.uid
+        val postId = songPost.postId
+
+        if (userUid != null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val likePostDeferred = async {
+                    postRef
+                        .document(postId)
+                        .collection("post-likes")
+                        .document(userUid)
+                        .set(mapOf<String, Any>())
+                }
+
+                val updateLikesDeferred = async {
+                    postRef
+                        .document(postId)
+                        .update("likes", songPost.likes)
+                }
+
+                val userLikeDeferred = async {
+                    userRef
+                        .document(userUid)
+                        .collection("user-likes")
+                        .document(postId)
+                        .set(mapOf<String, Any>())
+                }
+
+                likePostDeferred.await()
+                updateLikesDeferred.await()
+                userLikeDeferred.await()
+            }
         }
+
+        Resource.Success(true)
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!)
+    }
+
+    override suspend fun unlikePost(songPost: SongPost): Resource<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun checkIfUserLikePost(songPost: SongPost): Resource<Boolean> = try {
+        val userUid = FirebaseAuth.getInstance().currentUser?.uid
+        val postId = songPost.postId
+        val snapshot = userUid?.let { userRef.document(it).collection("user-likes").document(postId).get().await() }
+        Resource.Success(snapshot?.exists())
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!)
     }
 }
 

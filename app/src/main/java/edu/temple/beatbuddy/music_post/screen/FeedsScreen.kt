@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -17,14 +19,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.exoplayer.ExoPlayer
 import edu.temple.beatbuddy.music_post.model.MockPost
 import edu.temple.beatbuddy.music_post.screen.component.SongPostItem
+import edu.temple.beatbuddy.music_post.view_model.SongPostItemViewModel
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 
 @Composable
 fun FeedsScreen(
     songPostViewModel: SongPostViewModel,
-    player: ExoPlayer
+    player: ExoPlayer,
+    songPostItemViewModel: SongPostItemViewModel = hiltViewModel()
 ) {
     val posts by songPostViewModel.songPostState.collectAsState()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            player.stop()
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -34,8 +44,8 @@ fun FeedsScreen(
                 SongPostItem(
                     songPost = posts.posts[index],
                     player = player,
-                    likePost = { },
-                    songPostViewModel = songPostViewModel
+                    songPostViewModel = songPostViewModel,
+                    songPostItemViewModel = songPostItemViewModel
                 )
             }
         }
