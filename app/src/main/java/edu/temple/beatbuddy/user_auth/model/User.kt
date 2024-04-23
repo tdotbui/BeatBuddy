@@ -6,7 +6,9 @@ data class User(
     val email: String = "",
     val username: String = "",
     val profileImage: String? = null,
-    val bio: String? = null
+    val bio: String? = null,
+
+    val isFollowed: Boolean? = false
 )
 
 data object MockUser {

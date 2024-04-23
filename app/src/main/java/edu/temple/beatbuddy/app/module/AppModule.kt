@@ -76,8 +76,9 @@ class AppModule {
 
     @Provides
     fun provideUsersRepository(
+        auth: FirebaseAuth,
         @Named("UsersRef") usersRef: CollectionReference
-    ): UsersRepository = UsersRepositoryImpl(usersRef)
+    ): UsersRepository = UsersRepositoryImpl(auth, usersRef)
 
     @Provides
     @Named("PostRef")

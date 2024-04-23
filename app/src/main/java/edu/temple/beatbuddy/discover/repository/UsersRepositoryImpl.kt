@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.discover.repository
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.toObject
 import edu.temple.beatbuddy.user_auth.model.User
@@ -12,12 +13,16 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class UsersRepositoryImpl @Inject constructor(
+    private val auth: FirebaseAuth,
     private val usersRef: CollectionReference,
 ): UsersRepository {
     override fun fetchAllUsersFromFireStore() = callbackFlow {
+        val userUid = auth.currentUser?.uid
         val snapshotListener = usersRef.addSnapshotListener { snapshot, e ->
             val response = if (snapshot != null) {
-                val users = snapshot.toObjects(User::class.java)
+                val users = snapshot.toObjects(User::class.java).filter {
+                    it.id != userUid
+                }
                 Resource.Success(users)
             } else {
                 Resource.Error(e?.message!!)
@@ -29,10 +34,10 @@ class UsersRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchUser(uid: String): Resource<User> = try {
-        val user = usersRef.document(uid).get().await().toObject(User::class.java)
-        Resource.Success(user)
-    } catch (e: Exception) {
-        Resource.Error(e.message!!)
-    }
+//    override suspend fun fetchUser(uid: String): Resource<User> = try {
+//        val user = usersRef.document(uid).get().await().toObject(User::class.java)
+//        Resource.Success(user)
+//    } catch (e: Exception) {
+//        Resource.Error(e.message!!)
+//    }
 }

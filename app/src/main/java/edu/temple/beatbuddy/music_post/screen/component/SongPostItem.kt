@@ -112,12 +112,10 @@ fun SongPostItem(
                         size = ImageSize.xSmall
                     )
 
-                    (user?.username ?: user?.email)?.let {
-                        Text(
-                            text = it,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+                    Text(
+                        text = user?.username ?: "username",
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
 
@@ -179,12 +177,10 @@ fun SongPostItem(
             Row(
                 modifier = Modifier.padding(16.dp)
             ) {
-                (user?.username ?: user?.email)?.let {
-                    Text(
-                        text = it,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+                Text(
+                    text = user?.username ?: "username",
+                    fontWeight = FontWeight.SemiBold
+                )
 
                 val caption = songPost.caption
                 caption?.run {

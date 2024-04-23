@@ -32,14 +32,14 @@ import edu.temple.beatbuddy.music_browse.screen.MusicBrowseScreen
 import edu.temple.beatbuddy.discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
-import edu.temple.beatbuddy.user_auth.view_model.ProfileViewModel
-import edu.temple.beatbuddy.user_profile.screen.UserProfileScreen
+import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
+import edu.temple.beatbuddy.user_profile.screen.CurrentUserProfileScreen
 import edu.temple.beatbuddy.utils.Helpers
 
 @Composable
 fun HomeScreen(
     songPostViewModel: SongPostViewModel = hiltViewModel(),
-    profileViewModel: ProfileViewModel = hiltViewModel(),
+    profileViewModel: CurrentUserProfileViewModel = hiltViewModel(),
     goToSignInScreen: () -> Unit
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(1) }
@@ -114,7 +114,7 @@ fun HomeScreen(
                     player = musicPlayer
                 )
                 3 -> ProfileListScreen()
-                4 -> UserProfileScreen(
+                4 -> CurrentUserProfileScreen(
                     profileViewModel = profileViewModel,
                     onSignOut = { goToSignInScreen() }
                 )

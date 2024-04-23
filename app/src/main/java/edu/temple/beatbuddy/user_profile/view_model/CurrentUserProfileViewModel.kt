@@ -1,9 +1,10 @@
-package edu.temple.beatbuddy.user_auth.view_model
+package edu.temple.beatbuddy.user_profile.view_model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.user_auth.repository.AuthRepository
+import edu.temple.beatbuddy.user_auth.view_model.UserState
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -11,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(
+class CurrentUserProfileViewModel @Inject constructor(
     private val repository: AuthRepository
 ): ViewModel() {
     var userState = MutableStateFlow(UserState())

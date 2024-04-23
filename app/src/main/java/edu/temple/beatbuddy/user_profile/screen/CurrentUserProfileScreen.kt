@@ -17,7 +17,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,16 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import edu.temple.beatbuddy.user_auth.view_model.ProfileViewModel
+import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 
 @Composable
-fun UserProfileScreen(
-    profileViewModel: ProfileViewModel,
+fun CurrentUserProfileScreen(
+    profileViewModel: CurrentUserProfileViewModel,
     onSignOut: () -> Unit,
 ) {
-    val context = LocalContext.current
     val userState by remember { mutableStateOf(profileViewModel.userState.value) }
 
     Column(

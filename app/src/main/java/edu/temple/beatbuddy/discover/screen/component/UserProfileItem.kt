@@ -29,7 +29,7 @@ import edu.temple.beatbuddy.utils.ImageSize
 @Composable
 fun UserProfileItem(
     user: User,
-    onClick: () -> Unit,
+    onClick: (User) -> Unit,
     follow: () -> Unit
 ) {
     Card(
@@ -37,7 +37,7 @@ fun UserProfileItem(
             .padding(8.dp)
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
-            .clickable { onClick() },
+            .clickable { onClick(user) },
         elevation = CardDefaults.cardElevation(8.dp),
     ) {
         Row(
