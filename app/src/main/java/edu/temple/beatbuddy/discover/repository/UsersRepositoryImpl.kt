@@ -33,11 +33,4 @@ class UsersRepositoryImpl @Inject constructor(
             snapshotListener.remove()
         }
     }
-
-//    override suspend fun fetchUser(uid: String): Resource<User> = try {
-//        val user = usersRef.document(uid).get().await().toObject(User::class.java)
-//        Resource.Success(user)
-//    } catch (e: Exception) {
-//        Resource.Error(e.message!!)
-//    }
 }

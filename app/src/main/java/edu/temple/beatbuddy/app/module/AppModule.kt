@@ -12,6 +12,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import edu.temple.beatbuddy.discover.repository.FollowRepository
+import edu.temple.beatbuddy.discover.repository.FollowRepositoryImpl
 import edu.temple.beatbuddy.music_browse.model.local.SongDatabase
 import edu.temple.beatbuddy.music_browse.model.remote.SongApi
 import edu.temple.beatbuddy.discover.repository.UsersRepository
@@ -89,4 +91,19 @@ class AppModule {
         @Named("PostRef") postRef: CollectionReference,
         @Named("UsersRef") usersRef: CollectionReference
     ): SongPostRepository = SongPostRepositoryImpl(postRef, usersRef)
+
+    @Provides
+    @Named("FollowingRef")
+    fun provideFollowingRef() = Firebase.firestore.collection("following")
+
+    @Provides
+    @Named("FollowersRef")
+    fun provideFollowersRef() = Firebase.firestore.collection("followers")
+
+    @Provides
+    fun provideFollowRepository(
+        auth: FirebaseAuth,
+        @Named("FollowingRef") followingRef: CollectionReference,
+        @Named("FollowersRef") followersRef: CollectionReference
+    ): FollowRepository = FollowRepositoryImpl(auth, followersRef = followersRef, followingRef = followingRef)
 }

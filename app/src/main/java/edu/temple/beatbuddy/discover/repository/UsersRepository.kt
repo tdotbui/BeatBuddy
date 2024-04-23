@@ -6,5 +6,4 @@ import kotlinx.coroutines.flow.Flow
 
 interface UsersRepository {
     fun fetchAllUsersFromFireStore(): Flow<Resource<List<User>>>
-
 }

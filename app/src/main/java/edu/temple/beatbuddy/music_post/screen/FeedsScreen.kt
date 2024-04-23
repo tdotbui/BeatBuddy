@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,6 +26,12 @@ fun FeedsScreen(
     player: ExoPlayer
 ) {
     val posts by songPostViewModel.songPostState.collectAsState()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (player.isPlaying) player.stop()
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),

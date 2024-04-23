@@ -23,6 +23,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +49,11 @@ fun UserProfileScreen(
     user: User,
     back: () -> Unit
 ) {
-    var isFollowed by remember { mutableStateOf(user.isFollowed) }
+    LaunchedEffect(user) {
+        profileViewModel.checkIfUserIsFollowed(user)
+    }
+
+    val isFollowed by profileViewModel.isFollowing.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -107,23 +113,23 @@ fun UserProfileScreen(
 
             Button(
                 onClick = {
-                    if (isFollowed == true) {
-                        profileViewModel.unfollow()
+                    if (isFollowed) {
+                        profileViewModel.unfollow(user)
                     } else {
-                        profileViewModel.follow()
+                        profileViewModel.follow(user)
                     }
-                    isFollowed = !isFollowed!!
+                    profileViewModel.handleFollow()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .padding(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isFollowed == true) Color.White else MaterialTheme.colorScheme.primary,
-                    contentColor = if (isFollowed == true) Color.Black else MaterialTheme.colorScheme.onPrimary
+                    containerColor = if (isFollowed) Color.White else MaterialTheme.colorScheme.primary,
+                    contentColor = if (isFollowed) Color.Black else MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(text = if (isFollowed == true) "Unfollow" else "Follow")
+                Text(text = if (isFollowed) "Unfollow" else "Follow")
             }
         }
 
@@ -148,14 +154,6 @@ fun UserProfileScreen(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun UserProfilePV() {
-//    UserProfileScreen(
-//        user = MockUser.users[2],
-//        {}
-//    )
-//}
 
 @Composable
 fun ProfileHeader(
