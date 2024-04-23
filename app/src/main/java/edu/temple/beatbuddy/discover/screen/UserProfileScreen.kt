@@ -47,13 +47,15 @@ import edu.temple.beatbuddy.utils.ImageSize
 fun UserProfileScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     user: User,
-    back: () -> Unit
+    back: (User) -> Unit
 ) {
-    LaunchedEffect(user) {
-        profileViewModel.checkIfUserIsFollowed(user)
-    }
+    var isFollowing by remember { mutableStateOf(false) }
 
-    val isFollowed by profileViewModel.isFollowing.collectAsState()
+    LaunchedEffect(user) {
+        profileViewModel.checkIfUserIsFollowed(user) {
+            isFollowing = it
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -113,23 +115,23 @@ fun UserProfileScreen(
 
             Button(
                 onClick = {
-                    if (isFollowed) {
+                    if (isFollowing) {
                         profileViewModel.unfollow(user)
                     } else {
                         profileViewModel.follow(user)
                     }
-                    profileViewModel.handleFollow()
+                    isFollowing = !isFollowing
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .padding(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isFollowed) Color.White else MaterialTheme.colorScheme.primary,
-                    contentColor = if (isFollowed) Color.Black else MaterialTheme.colorScheme.onPrimary
+                    containerColor = if (isFollowing) Color.White else MaterialTheme.colorScheme.primary,
+                    contentColor = if (isFollowing) Color.Black else MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(text = if (isFollowed) "Unfollow" else "Follow")
+                Text(text = if (isFollowing) "Unfollow" else "Follow")
             }
         }
 
@@ -142,7 +144,7 @@ fun UserProfileScreen(
         ) {
             Button(
                 onClick = {
-                    back()
+                    back(user)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

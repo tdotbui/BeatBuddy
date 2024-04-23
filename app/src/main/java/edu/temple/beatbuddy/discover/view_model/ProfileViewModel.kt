@@ -28,10 +28,11 @@ class ProfileViewModel @Inject constructor(
         repository.unfollow(userId = user.id)
     }
 
-    fun checkIfUserIsFollowed(user: User) = viewModelScope.launch {
-        repository.checkIfUserIsFollowed(userId = user.id).let {
-            isFollowing.value = it.data == true
-            Log.d("Result", it.data.toString())
+    fun checkIfUserIsFollowed(user: User, callback: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val result = repository.checkIfUserIsFollowed(user.id)
+//            isFollowing.value = result.data!!
+            callback(result.data!!)
         }
     }
 

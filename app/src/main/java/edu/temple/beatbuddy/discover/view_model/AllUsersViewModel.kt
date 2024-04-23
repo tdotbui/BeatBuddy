@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.discover.repository.UsersRepository
+import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,7 +24,7 @@ class AllUsersViewModel @Inject constructor(
         fetchAllUsers()
     }
 
-    private fun fetchAllUsers() = viewModelScope.launch {
+    fun fetchAllUsers() = viewModelScope.launch {
         allUsersState.update {
             it.copy(isLoading = true)
         }

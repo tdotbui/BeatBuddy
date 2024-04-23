@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.discover.screen.component
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,14 +8,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.user_auth.model.MockUser
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.ImageSize
@@ -30,8 +41,16 @@ import edu.temple.beatbuddy.utils.ImageSize
 fun UserProfileItem(
     user: User,
     onClick: (User) -> Unit,
-    follow: () -> Unit
+    profileViewModel: ProfileViewModel
 ) {
+    var isFollowing by remember { mutableStateOf(false) }
+
+    LaunchedEffect(user) {
+        profileViewModel.checkIfUserIsFollowed(user) {
+            isFollowing = it
+        }
+    }
+
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -60,13 +79,11 @@ fun UserProfileItem(
                         .padding(8.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    user.username?.let {
-                        Text(
-                            text = it,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
+                    Text(
+                        text = user.username,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
 
                     Text(
                         text = user.fullName,
@@ -77,20 +94,32 @@ fun UserProfileItem(
             }
 
             Button(
-                modifier = Modifier.padding(end = 8.dp),
-                colors = ButtonDefaults.buttonColors(Color.DarkGray),
-                onClick = { follow() }
+                modifier = Modifier
+                    .width(120.dp)
+                    .padding(end = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isFollowing) Color.White else MaterialTheme.colorScheme.primary,
+                    contentColor = if (isFollowing) Color.Black else MaterialTheme.colorScheme.onPrimary
+                ),
+                onClick = {
+                    if (isFollowing) {
+                        profileViewModel.unfollow(user)
+                    } else {
+                        profileViewModel.follow(user)
+                    }
+                    isFollowing = !isFollowing
+                }
             ) {
-                Text(text = "Follow")
+                Text(text = if (isFollowing) "Unfollow" else "Follow")
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ProfileItemPV() {
-    UserProfileItem(
-        user = MockUser.users[1],
-        onClick = {}) {}
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ProfileItemPV() {
+//    UserProfileItem(
+//        user = MockUser.users[1],
+//        onClick = {}) {}
+//}
