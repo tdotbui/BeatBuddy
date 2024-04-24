@@ -29,8 +29,11 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+// Composable function that creates a swipeable card with customizable content.
+// `onDismiss`: Callback function triggered when the card is dismissed in any direction.
 @Composable
 fun SwipeableCard(onDismiss: (String) -> Unit, content: @Composable () -> Unit) {
+    // State for tracking horizontal and vertical offset due to drag gestures.
     var offsetX by remember {
         mutableFloatStateOf(0f)
     }
@@ -38,7 +41,10 @@ fun SwipeableCard(onDismiss: (String) -> Unit, content: @Composable () -> Unit) 
         mutableFloatStateOf(0f)
     }
 
+    // Threshold for swipe action to be considered as a dismissal.
     val swipeThreshold: Float = 400f
+
+    // Sensitivity factor to adjust the reaction speed of the swipe gesture.
     val sensitivityFactor: Float = 3f
 
     ElevatedCard(
@@ -52,6 +58,7 @@ fun SwipeableCard(onDismiss: (String) -> Unit, content: @Composable () -> Unit) 
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragEnd = {
+                        // Determine swipe direction and call onDismiss if the swipe exceeds threshold.
                         when {
                             offsetX > swipeThreshold -> onDismiss("right")
                             offsetX < -swipeThreshold -> onDismiss("left")
@@ -71,6 +78,7 @@ fun SwipeableCard(onDismiss: (String) -> Unit, content: @Composable () -> Unit) 
                 }
             }
             .graphicsLayer {
+                // Gradually change the card's alpha and rotation based on offset to give visual feedback.
                 alpha = 1 - (0.5f * (maxOf(abs(offsetX), abs(offsetY)) / swipeThreshold))
                 rotationZ = (offsetX / swipeThreshold) * 30
             }

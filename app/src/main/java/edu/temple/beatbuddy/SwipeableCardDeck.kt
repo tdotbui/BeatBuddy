@@ -17,11 +17,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+// Composable function that sets up a deck of swipeable cards.
+// `cardViewModel`: ViewModel that provides and manages the card data and the current index.
 @Composable
 fun SwipeableCardDeck(cardViewModel: CardViewModel) {
+    // Collects and observes the current index state from the ViewModel.
     val currentIndex by cardViewModel.currentIndex.collectAsState()
 
+    // SwipeableCard component that handles the card swipe interaction.
     SwipeableCard(
+        // Update the card's index based on the swipe direction when dismissed.
         onDismiss = { direction -> cardViewModel.moveToNextCard(direction) }
     ) {
         Column(
