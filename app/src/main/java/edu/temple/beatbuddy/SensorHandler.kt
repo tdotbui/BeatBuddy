@@ -7,10 +7,9 @@
     import android.hardware.SensorManager
     import android.util.Log
 
-    class SensorHandler(context: Context) : SensorEventListener {
+    class SensorHandler(private val context: Context, private val cardViewModel: CardViewModel) : SensorEventListener {
         private var sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         private var accelerometerSensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        private var cardViewModel = CardViewModel()
 
         init {
             if (accelerometerSensor == null) {

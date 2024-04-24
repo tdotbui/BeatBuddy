@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var sensorHandler: SensorHandler
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sensorHandler = SensorHandler(this)
+        sensorHandler = SensorHandler(this, cardViewModel)
 
         setContent {
             BeatBuddyTheme {
