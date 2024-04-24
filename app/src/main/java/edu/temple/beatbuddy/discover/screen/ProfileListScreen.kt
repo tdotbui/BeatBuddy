@@ -86,7 +86,6 @@ fun ProfileListScreen(
                             bottomSheetState.expand()
                         }
                     },
-                    profileViewModel = profileViewModel
                 )
             }
         }

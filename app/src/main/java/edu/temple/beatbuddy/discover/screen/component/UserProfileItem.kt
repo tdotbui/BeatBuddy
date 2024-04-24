@@ -41,16 +41,7 @@ import edu.temple.beatbuddy.utils.ImageSize
 fun UserProfileItem(
     user: User,
     onClick: (User) -> Unit,
-    profileViewModel: ProfileViewModel
 ) {
-    var isFollowing by remember { mutableStateOf(false) }
-
-    LaunchedEffect(user) {
-        profileViewModel.checkIfUserIsFollowed(user) {
-            isFollowing = it
-        }
-    }
-
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -91,26 +82,6 @@ fun UserProfileItem(
                         fontWeight = FontWeight.Light
                     )
                 }
-            }
-
-            Button(
-                modifier = Modifier
-                    .width(120.dp)
-                    .padding(end = 8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isFollowing) Color.White else MaterialTheme.colorScheme.primary,
-                    contentColor = if (isFollowing) Color.Black else MaterialTheme.colorScheme.onPrimary
-                ),
-                onClick = {
-                    if (isFollowing) {
-                        profileViewModel.unfollow(user)
-                    } else {
-                        profileViewModel.follow(user)
-                    }
-                    isFollowing = !isFollowing
-                }
-            ) {
-                Text(text = if (isFollowing) "Unfollow" else "Follow")
             }
         }
     }

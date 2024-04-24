@@ -45,8 +45,8 @@ import edu.temple.beatbuddy.music_browse.model.local.Song
 @Composable
 fun SongRowItem(
     song: Song,
-    onMusicClick: () -> Unit,
-    shareClick: () -> Unit,
+    onMusicClick: (Song) -> Unit,
+    shareClick: (Song) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -62,7 +62,8 @@ fun SongRowItem(
     Card(
         modifier = Modifier
             .wrapContentSize()
-            .padding(bottom = 8.dp),
+            .padding(bottom = 8.dp)
+            .clickable { onMusicClick(song) },
         elevation = CardDefaults.cardElevation(5.dp),
     ) {
         Box(
@@ -77,7 +78,7 @@ fun SongRowItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .clickable { onMusicClick() },
+                    .clickable { onMusicClick(song) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
@@ -145,10 +146,13 @@ fun SongRowItem(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    MenuItem("Play") { /* Handle Option 1 click */ }
+                    MenuItem("Play") {
+                        onMusicClick(song)
+                        expanded = false
+                    }
                     MenuItem("Add to playlist") { /* Handle Option 2 click */ }
                     MenuItem("Share") {
-                        shareClick()
+                        shareClick(song)
                         expanded = false
                     }
                 }
