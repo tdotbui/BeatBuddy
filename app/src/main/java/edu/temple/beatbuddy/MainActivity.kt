@@ -1,59 +1,18 @@
 package edu.temple.beatbuddy
 
-import android.app.DownloadManager
-import android.content.Context
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.widget.MediaController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.OptIn
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.net.toUri
-import androidx.media3.common.MediaItem
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 import edu.temple.beatbuddy.ui.theme.BeatBuddyTheme
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val songViewModel = SongViewModel(this)
 
         val playlist: List<Song> = listOf(
             Song(
@@ -78,8 +37,6 @@ class MainActivity : ComponentActivity() {
             )
         )
 
-        val musicPlayer = ExoPlayer.Builder(this).build()
-
         setContent {
             BeatBuddyTheme {
                 // A surface container using the 'background' color from the theme
@@ -87,109 +44,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SongList(musicPlayer, playlist)
-                    MediaController(musicPlayer)
+                    SongList(songViewModel, playlist)
+                    MediaController(songViewModel)
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun SongList(player: ExoPlayer, playlist: List<Song>) {
-    LazyColumn {
-        items(playlist) { song ->
-            SongCard(player, song)
-        }
-    }
-}
-
-@Composable
-fun SongCard(player: ExoPlayer ,song: Song) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .wrapContentHeight()
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-        ) {
-            Column {
-                Text(song.title)
-                Text(song.artist)
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = {
-                Log.d("SongCard", "QUEUED: ${song.title}, ${song.artist}")
-                player.addMediaItem(MediaItem.fromUri(song.media))
-
-                if (!player.isPlaying) {
-                    player.prepare()
-                    player.play()
-                }
-            }) {
-                Text("Queue")
-            }
-        }
-    }
-}
-
-@OptIn(UnstableApi::class) @Composable
-fun MediaController(player: ExoPlayer) {
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.SpaceEvenly,
-    ) {
-        Button(onClick = {
-            Log.d("MediaController", "BACKWARD")
-            if (player.hasPreviousMediaItem()) {
-                Log.d("MediaController", "Going to previous song")
-                player.seekToPreviousMediaItem()
-            } else {
-                Log.d("MediaController", "Restarting current song")
-                player.seekToPrevious()
-            }
-        }) {
-            Text("Backward")
-        }
-        Button(onClick = {
-            if (player.currentMediaItem != null) {
-                if (player.isPlaying) {
-                    Log.d("MediaController", "PAUSED")
-                    player.pause()
-                } else {
-                    Log.d("MediaController", "PLAYING: ${player.currentMediaItem!!.mediaId}")
-                    player.prepare()
-                    player.play()
-                }
-            } else {
-                Log.d("MediaController", "No media item to play")
-            }
-        }) {
-            Text("Play/Pause")
-        }
-        Button(onClick = {
-            Log.d("MediaController", "FORWARD")
-            if (player.hasNextMediaItem()) {
-                Log.d("MediaController", "Going to next song")
-                player.seekToNextMediaItem()
-            } else {
-                Log.d("MediaController", "No next song in queue")
-            }
-        }) {
-            Text("Forward")
-        }
-        Button(onClick = {
-            Log.d("MediaController", "QUEUE CLEARED")
-            player.clearMediaItems()
-        }) {
-            Text("Clear")
         }
     }
 }
