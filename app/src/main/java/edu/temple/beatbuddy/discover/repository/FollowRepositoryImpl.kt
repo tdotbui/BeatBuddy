@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
+import edu.temple.beatbuddy.discover.model.local.UserStatsDatabase
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_auth.model.UserStats
 import edu.temple.beatbuddy.utils.Resource
@@ -11,6 +12,8 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -18,7 +21,8 @@ class FollowRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val followersRef: CollectionReference,
     private val followingRef: CollectionReference,
-    private val postRef: CollectionReference
+    private val postRef: CollectionReference,
+    private val userStatsDb: UserStatsDatabase
 ): FollowRepository {
     override suspend fun follow(userId: String): Resource<Boolean> = try {
         val currentUserId = auth.currentUser?.uid
@@ -83,7 +87,16 @@ class FollowRepositoryImpl @Inject constructor(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    override suspend fun fetchUserStats(userId: String): Resource<UserStats> = try {
+    override suspend fun fetchUserStats(userId: String, fetchFromRemote: Boolean): Flow<Resource<UserStats>> = flow {
+        emit(Resource.Loading(true))
+        val localUserStats = userStatsDb.userStatsDao.getUserStatsById(userId)
+
+        if (!fetchFromRemote && localUserStats != null) {
+            emit(Resource.Success(localUserStats))
+            emit(Resource.Loading(false))
+            return@flow
+        }
+
         val followingCountDeferred = GlobalScope.async {
             runCatching {
                 followingRef.document(userId)
@@ -114,10 +127,10 @@ class FollowRepositoryImpl @Inject constructor(
         val followingCount = followingCountDeferred.await()
         val followerCount = followerCountDeferred.await()
         val postCount = postCountDeferred.await()
+        val userStats = UserStats(userId, followingCount, followerCount, postCount)
 
-        Resource.Success(UserStats(followingCount, followerCount, postCount))
-
-    } catch (e: Exception) {
-        Resource.Error(e.localizedMessage!!, UserStats(0,0,0))
+        userStatsDb.userStatsDao.upsertUser(listOf(userStats))
+        emit(Resource.Success(userStats))
+        emit(Resource.Loading(false))
     }
 }

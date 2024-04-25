@@ -8,8 +8,10 @@ import edu.temple.beatbuddy.discover.repository.FollowRepository
 import edu.temple.beatbuddy.discover.repository.UsersRepository
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_auth.model.UserStats
+import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,14 +30,14 @@ class ProfileViewModel @Inject constructor(
     fun setCurrentUser(user: User) {
         _currentUser.value = user
         checkIfCurrentUserIsFollowed()
-        fetchCurrentUserStats()
+        fetchCurrentUserStats(false)
     }
     fun followCurrent() {
         _isFollowing.value = true
         _currentUser.value.let { user ->
             viewModelScope.launch {
                 repository.follow(userId = user.id)
-                fetchCurrentUserStats()
+                fetchCurrentUserStats(true)
             }
         }
     }
@@ -44,7 +46,7 @@ class ProfileViewModel @Inject constructor(
         _currentUser.value.let { user ->
             viewModelScope.launch {
                 repository.unfollow(userId = user.id)
-                fetchCurrentUserStats()
+                fetchCurrentUserStats(true)
             }
         }
     }
@@ -58,10 +60,19 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun fetchCurrentUserStats() {
+    private fun fetchCurrentUserStats(fetchFromRemote: Boolean) {
         viewModelScope.launch {
-            _currentUser.update {
-                it.copy(stats = repository.fetchUserStats(userId = _currentUser.value.id).data)
+            repository.fetchUserStats(
+                userId = _currentUser.value.id,
+                fetchFromRemote = fetchFromRemote
+            ).collectLatest {result ->
+                if (result is Resource.Success) {
+                    result.data?.let {stats ->
+                        _currentUser.update {
+                            it.copy(stats = stats)
+                        }
+                    }
+                }
             }
         }
     }
