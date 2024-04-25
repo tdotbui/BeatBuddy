@@ -32,7 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import edu.temple.beatbuddy.discover.screen.ProfileHeader
+import edu.temple.beatbuddy.discover.screen.component.UserProfileHeader
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.utils.ImageSize
@@ -97,7 +97,7 @@ fun CurrentUserProfileScreen(
                     }
                 }
 
-                ProfileHeader(user = userState.user ?: User())
+                UserProfileHeader(user = userState.user ?: User())
             }
 
             Button(

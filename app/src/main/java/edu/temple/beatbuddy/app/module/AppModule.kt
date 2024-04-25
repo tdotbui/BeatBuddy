@@ -104,6 +104,13 @@ class AppModule {
     fun provideFollowRepository(
         auth: FirebaseAuth,
         @Named("FollowingRef") followingRef: CollectionReference,
-        @Named("FollowersRef") followersRef: CollectionReference
-    ): FollowRepository = FollowRepositoryImpl(auth, followersRef = followersRef, followingRef = followingRef)
+        @Named("FollowersRef") followersRef: CollectionReference,
+        @Named("PostRef") postRef: CollectionReference,
+    ): FollowRepository =
+        FollowRepositoryImpl(
+            auth,
+            followersRef = followersRef,
+            followingRef = followingRef,
+            postRef = postRef
+        )
 }

@@ -7,7 +7,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.discover.repository.FollowRepository
 import edu.temple.beatbuddy.discover.repository.UsersRepository
 import edu.temple.beatbuddy.user_auth.model.User
+import edu.temple.beatbuddy.user_auth.model.UserStats
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,26 +19,50 @@ class ProfileViewModel @Inject constructor(
     private val repository: FollowRepository
 ): ViewModel() {
 
-    var isFollowing = MutableStateFlow(false)
-        private set
+    private val _currentUser = MutableStateFlow(User())
+    val currentUser: StateFlow<User> = _currentUser
 
-    fun follow(user: User) = viewModelScope.launch {
-        repository.follow(userId = user.id)
+    private val _isFollowing = MutableStateFlow(false)
+    val isFollowing = _isFollowing
+
+    fun setCurrentUser(user: User) {
+        _currentUser.value = user
+        checkIfCurrentUserIsFollowed()
+        fetchCurrentUserStats()
     }
-
-    fun unfollow(user: User) = viewModelScope.launch {
-        repository.unfollow(userId = user.id)
+    fun followCurrent() {
+        _isFollowing.value = true
+        _currentUser.value.let { user ->
+            viewModelScope.launch {
+                repository.follow(userId = user.id)
+                fetchCurrentUserStats()
+            }
+        }
     }
-
-    fun checkIfUserIsFollowed(user: User, callback: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            val result = repository.checkIfUserIsFollowed(user.id)
-//            isFollowing.value = result.data!!
-            callback(result.data!!)
+    fun unfollowCurrent() {
+        _isFollowing.value = false
+        _currentUser.value.let { user ->
+            viewModelScope.launch {
+                repository.unfollow(userId = user.id)
+                fetchCurrentUserStats()
+            }
         }
     }
 
-    fun handleFollow() {
-        isFollowing.value = !isFollowing.value
+    private fun checkIfCurrentUserIsFollowed() {
+        viewModelScope.launch {
+            _isFollowing.value = repository.checkIfUserIsFollowed(userId = _currentUser.value.id).data == true
+            _currentUser.update {
+                it.copy(isFollowed = _isFollowing.value)
+            }
+        }
+    }
+
+    private fun fetchCurrentUserStats() {
+        viewModelScope.launch {
+            _currentUser.update {
+                it.copy(stats = repository.fetchUserStats(userId = _currentUser.value.id).data)
+            }
+        }
     }
 }

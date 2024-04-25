@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.discover.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,24 +40,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import edu.temple.beatbuddy.discover.screen.component.UserProfileHeader
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.user_auth.model.MockUser
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.ImageSize
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun UserProfileScreen(
-    profileViewModel: ProfileViewModel = hiltViewModel(),
-    user: User,
+    profileViewModel: ProfileViewModel,
     back: (User) -> Unit
 ) {
-    var isFollowing by remember { mutableStateOf(false) }
-
-    LaunchedEffect(user) {
-        profileViewModel.checkIfUserIsFollowed(user) {
-            isFollowing = it
-        }
-    }
+    val currentUser by profileViewModel.currentUser.collectAsState()
+    val isFollowing = profileViewModel.isFollowing.asStateFlow()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -98,40 +98,39 @@ fun UserProfileScreen(
                         horizontalAlignment = Alignment.Start
                     ) {
                         Text(
-                            text = user.username,
+                            text = currentUser.username,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp
                         )
                         Text(
-                            text = user.fullName,
+                            text = currentUser.fullName,
                             fontWeight = FontWeight.Light,
                             fontSize = 12.sp
                         )
                     }
                 }
 
-                ProfileHeader(user = user)
+                UserProfileHeader(user = currentUser)
             }
 
             Button(
                 onClick = {
-                    if (isFollowing) {
-                        profileViewModel.unfollow(user)
+                    if (isFollowing.value) {
+                        profileViewModel.unfollowCurrent()
                     } else {
-                        profileViewModel.follow(user)
+                        profileViewModel.followCurrent()
                     }
-                    isFollowing = !isFollowing
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .padding(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isFollowing) Color.White else MaterialTheme.colorScheme.primary,
-                    contentColor = if (isFollowing) Color.Black else MaterialTheme.colorScheme.onPrimary
+                    containerColor = if (isFollowing.value) Color.White else MaterialTheme.colorScheme.primary,
+                    contentColor = if (isFollowing.value) Color.Black else MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(text = if (isFollowing) "Unfollow" else "Follow")
+                Text(text = if (isFollowing.value) "Unfollow" else "Follow")
             }
         }
 
@@ -144,7 +143,7 @@ fun UserProfileScreen(
         ) {
             Button(
                 onClick = {
-                    back(user)
+                    back(currentUser)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -152,62 +151,6 @@ fun UserProfileScreen(
             ) {
                 Text(text = "Back")
             }
-        }
-    }
-}
-
-
-@Composable
-fun ProfileHeader(
-    user: User
-) {
-    Row(
-        modifier = Modifier.wrapContentSize(),
-        horizontalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "320",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(
-                text = "posts",
-                fontWeight = FontWeight.Light,
-                fontSize = 12.sp
-            )
-        }
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "320",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(
-                text = "followers",
-                fontWeight = FontWeight.Light,
-                fontSize = 12.sp
-            )
-        }
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "320",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(
-                text = "following",
-                fontWeight = FontWeight.Light,
-                fontSize = 12.sp
-            )
         }
     }
 }

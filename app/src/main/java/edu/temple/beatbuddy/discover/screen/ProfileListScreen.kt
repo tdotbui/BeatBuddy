@@ -56,7 +56,7 @@ fun ProfileListScreen(
     BottomSheetScaffold(
         sheetContent = {
             UserProfileScreen(
-                user = selectedUser,
+                profileViewModel = profileViewModel,
                 back = {
                     scope.launch {
                         allUsersViewModel.fetchAllUsers()
@@ -82,6 +82,7 @@ fun ProfileListScreen(
                     onClick = { user ->
                         selectedUserIndex = index
                         selectedUser = user
+                        profileViewModel.setCurrentUser(selectedUser)
                         scope.launch {
                             bottomSheetState.expand()
                         }
