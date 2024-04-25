@@ -1,7 +1,6 @@
 package edu.temple.beatbuddy.music_browse.screen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,15 +29,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
 import com.google.firebase.Timestamp
-import com.google.firebase.ktx.Firebase
-import edu.temple.beatbuddy.discover.screen.UserProfileScreen
 import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.music_browse.screen.component.GenreItem
 import edu.temple.beatbuddy.music_browse.screen.component.SongRowItem
 import edu.temple.beatbuddy.music_browse.view_model.SongListViewModel
-import edu.temple.beatbuddy.music_player.MusicPlayerFullScreen
-import edu.temple.beatbuddy.music_player.MusicPlayerSmallScreen
+import edu.temple.beatbuddy.music_player.screen.MusicPlayerScreen
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.screen.component.NewPostDialog
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
@@ -51,7 +49,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MusicBrowseScreen(
     songListViewModel: SongListViewModel = hiltViewModel(),
-    songPostViewModel: SongPostViewModel
+    songPostViewModel: SongPostViewModel,
+    player: ExoPlayer
 ) {
     val context = LocalContext.current
     val songs by songListViewModel.songListState.collectAsState()
@@ -60,7 +59,6 @@ fun MusicBrowseScreen(
     var songTitle by remember { mutableStateOf("") }
     var selectedSong by remember { mutableStateOf<Song?>(null) }
 
-    var isFullScreen by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val bottomSheetState = rememberStandardBottomSheetState(
@@ -72,23 +70,10 @@ fun MusicBrowseScreen(
     BottomSheetScaffold(
         sheetContent = {
             selectedSong?.let {
-                if (isFullScreen) {
-                    MusicPlayerFullScreen(
-                        song = it,
-                        close = {
-                            isFullScreen = false
-//                            scope.launch {
-//                                bottomSheetState.hide()
-//                            }
-                        }
-                    )
-                } else {
-                    MusicPlayerSmallScreen(
-                        expand = {
-                            isFullScreen = true
-                        }
-                    )
-                }
+                MusicPlayerScreen(
+                    song = it,
+                    player = player
+                )
             }
         },
         scaffoldState = bottomSheetScaffoldState,
@@ -136,6 +121,7 @@ fun MusicBrowseScreen(
                                 scope.launch {
                                     bottomSheetState.expand()
                                     selectedSong = song
+                                    player.setMediaItem(MediaItem.fromUri(song.preview))
                                 }
                             },
                             shareClick = { song ->

@@ -108,7 +108,10 @@ fun HomeScreen(
         ) {
             when (selectedTabIndex) {
                 0 -> TabScreen1()
-                1 -> MusicBrowseScreen(songPostViewModel = songPostViewModel)
+                1 -> MusicBrowseScreen(
+                    songPostViewModel = songPostViewModel,
+                    player = musicPlayer
+                )
                 2 -> FeedsScreen(
                     songPostViewModel = songPostViewModel,
                     player = musicPlayer

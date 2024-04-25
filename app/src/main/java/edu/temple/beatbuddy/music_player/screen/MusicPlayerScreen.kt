@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.music_player
+package edu.temple.beatbuddy.music_player.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,20 +7,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Forward5
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material.icons.filled.Replay5
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -28,16 +27,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -47,44 +51,175 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
+import edu.temple.beatbuddy.component.VinylAlbumCover
 import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
-import edu.temple.beatbuddy.music_browse.model.local.MockSong
-import edu.temple.beatbuddy.music_browse.model.local.MockSongList
 import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.utils.toTime
 
 @Composable
-fun MusicPlayerFullScreen(
+fun MusicPlayerScreen(
     song: Song,
-    close: () -> Unit
+    player: ExoPlayer
 ) {
     val context = LocalContext.current
+    var isFullScreen by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        PlayerContent(
+    val playerView = PlayerView(context)
+    val playWhenReady by rememberSaveable { mutableStateOf(true) }
+
+    LaunchedEffect(song) {
+        playerView.player = player
+        player.prepare()
+        player.playWhenReady = playWhenReady
+    }
+
+    var isPlaying by remember { mutableStateOf(player.isPlaying) }
+
+    if (isFullScreen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            FullPlayerContent(
+                song = song,
+                currentTime = 2L,
+                isPlaying = isPlaying,
+                playToggle = {},
+                rewind = {},
+                forward = {},
+                playBack = {},
+                playNext = {},
+                sliderChanged = {},
+                slideDown = {
+                    isFullScreen = false
+                }
+            )
+        }
+    } else {
+        BriefPlayerContent(
             song = song,
-            currentTime = 2L,
-            isPlaying = true,
-            playToggle = {},
-            rewind = {},
-            forward = {},
-            playBack = {},
-            playNext = {},
-            sliderChanged = {},
-            close = close
+            isPlaying = isPlaying,
+            playToggle = {  },
+            playNext = { },
+            slideUp = {
+                isFullScreen = true
+            },
+            player = player
         )
     }
 }
 
 @Composable
-fun PlayerContent(
+fun BriefPlayerContent(
+    song: Song,
+    isPlaying: Boolean,
+    playToggle: () -> Unit,
+    playNext: () -> Unit,
+    slideUp: () -> Unit,
+    player: ExoPlayer
+) {
+    Box(
+        modifier = Modifier
+            .height(64.dp)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color.LightGray, Color.Gray, Color.DarkGray),
+                    endY = LocalConfiguration.current.screenHeightDp.toFloat() * LocalDensity.current.density
+                )
+            )
+            .clickable { slideUp() }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            if (player.isPlaying) {
+                VinylAlbumCoverAnimation(
+                    imageUrl = song.album.cover_medium ?: "",
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .padding(start = 12.dp)
+                )
+            } else {
+                VinylAlbumCover(
+                    imageUrL = song.album.cover_medium ?: "",
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .padding(start = 12.dp)
+                )
+            }
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(vertical = 8.dp, horizontal = 32.dp),
+            ) {
+                Text(
+                    text = song.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+
+                Text(
+                    text = song.artist.name ?: "artist name",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .alpha(0.5f)
+                )
+            }
+
+            Icon(
+                imageVector = if (player.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                contentDescription = if (isPlaying) "pause" else "play",
+                tint = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .size(48.dp)
+                    .clickable { playToggle() }
+            )
+
+            Icon(
+                imageVector = Icons.Default.SkipNext,
+                contentDescription = "play next song",
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable { playNext() }
+                    .padding(end = 12.dp)
+                    .size(32.dp)
+            )
+        }
+    }
+}
+
+//@Preview(showBackground = true)
+//@Composable
+//fun PlayerPV() {
+//    BriefPlayerContent(
+//        song = MockSongList.songs[0],
+//        isPlaying = false,
+//        playToggle = {},
+//        playNext = {},
+//        slideUp = {}
+//    )
+//}
+
+
+@Composable
+fun FullPlayerContent(
     song: Song,
     currentTime: Long,
     isPlaying: Boolean,
@@ -94,7 +229,7 @@ fun PlayerContent(
     playBack: () -> Unit,
     playNext: () -> Unit,
     sliderChanged: (Float) -> Unit,
-    close: () -> Unit
+    slideDown: () -> Unit
 ) {
     val sliderColor = SliderDefaults.colors(
         thumbColor = MaterialTheme.colorScheme.onBackground,
@@ -124,7 +259,7 @@ fun PlayerContent(
                         horizontalArrangement = Arrangement.End
                     ) {
                         IconButton(
-                            onClick = close
+                            onClick = slideDown
                         ) {
                             Image(
                                 imageVector = Icons.Default.KeyboardArrowDown,
@@ -227,8 +362,8 @@ fun PlayerContent(
                             )
 
                             Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = "play",
+                                imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                contentDescription = if (isPlaying) "pause" else "play",
                                 tint = MaterialTheme.colorScheme.background,
                                 modifier = Modifier
                                     .clip(CircleShape)
@@ -265,11 +400,3 @@ fun PlayerContent(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PlayerPV() {
-//    MusicPlayerFullScreen(
-//        song = MockSongList.songs[0],
-//        close = {}
-//    )
-//}
