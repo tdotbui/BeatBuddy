@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileListScreen(
     allUsersViewModel: AllUsersViewModel = hiltViewModel(),
-    profileViewModel: ProfileViewModel = hiltViewModel()
+    profileViewModel: ProfileViewModel
 ) {
     val users by allUsersViewModel.allUsersState.collectAsState()
     var selectedUser by remember { mutableStateOf(User()) }
@@ -93,8 +93,8 @@ fun ProfileListScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ProfileListPV() {
-    ProfileListScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ProfileListPV() {
+//    ProfileListScreen()
+//}

@@ -3,6 +3,7 @@ package edu.temple.beatbuddy.user_profile.view_model
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import edu.temple.beatbuddy.discover.repository.FollowRepository
 import edu.temple.beatbuddy.user_auth.repository.AuthRepository
 import edu.temple.beatbuddy.user_auth.view_model.UserState
 import edu.temple.beatbuddy.utils.Resource
@@ -13,21 +14,47 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CurrentUserProfileViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val auth: AuthRepository,
+//    private val repository: FollowRepository
 ): ViewModel() {
     var userState = MutableStateFlow(UserState())
         private set
 
     init {
         fetchCurrentUser()
+//        fetchCurrentUserStats()
     }
+
+//    private fun fetchCurrentUserStats() {
+//        viewModelScope.launch {
+//            userState.update { currentState ->
+//                val currentUser = currentState.user
+//                if (currentUser != null) {
+//                    when (val statsResult = repository.fetchUserStats(currentUser.id)) {
+//                        is Resource.Success -> {
+//                            val updatedUser = currentUser.copy(stats = statsResult.data)
+//                            currentState.copy(user = updatedUser)
+//                        }
+//                        is Resource.Error -> {
+//                            currentState
+//                        }
+//                        else -> {
+//                            currentState
+//                        }
+//                    }
+//                } else {
+//                    currentState
+//                }
+//            }
+//        }
+//    }
 
     private fun fetchCurrentUser() {
         viewModelScope.launch {
             userState.update {
                 it.copy(isLoading = true)
             }
-            repository.fetchCurrentUser().let { result->
+            auth.fetchCurrentUser().let { result->
                 when(result) {
                     is Resource.Success -> {
                         result.data?.let { user ->
@@ -59,5 +86,5 @@ class CurrentUserProfileViewModel @Inject constructor(
         }
     }
 
-    fun signOut() = repository.signOut()
+    fun signOut() = auth.signOut()
 }

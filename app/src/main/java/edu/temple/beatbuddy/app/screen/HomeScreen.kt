@@ -30,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.exoplayer.ExoPlayer
 import edu.temple.beatbuddy.music_browse.screen.MusicBrowseScreen
 import edu.temple.beatbuddy.discover.screen.ProfileListScreen
+import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
@@ -39,13 +40,14 @@ import edu.temple.beatbuddy.utils.Helpers
 @Composable
 fun HomeScreen(
     songPostViewModel: SongPostViewModel = hiltViewModel(),
-    profileViewModel: CurrentUserProfileViewModel = hiltViewModel(),
+    currentUserProfileViewModel: CurrentUserProfileViewModel = hiltViewModel(),
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     goToSignInScreen: () -> Unit
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
 
-    val userState by profileViewModel.userState.collectAsState()
+    val userState by currentUserProfileViewModel.userState.collectAsState()
 
     if (userState.user != null) {
         Helpers.saveUidToSharedPreferences(context, userState.user!!.id)
@@ -116,11 +118,17 @@ fun HomeScreen(
                     songPostViewModel = songPostViewModel,
                     player = musicPlayer
                 )
-                3 -> ProfileListScreen()
-                4 -> CurrentUserProfileScreen(
-                    profileViewModel = profileViewModel,
-                    onSignOut = { goToSignInScreen() }
+                3 -> ProfileListScreen(
+                    profileViewModel = profileViewModel
                 )
+                4 -> {
+                    profileViewModel.setCurrentUser(userState.user!!)
+                    CurrentUserProfileScreen(
+                        profileViewModel = profileViewModel,
+                        currentUserProfileViewModel = currentUserProfileViewModel,
+                        onSignOut = { goToSignInScreen() }
+                    )
+                }
             }
         }
     }

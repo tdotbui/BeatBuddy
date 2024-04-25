@@ -5,23 +5,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,17 +29,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import edu.temple.beatbuddy.discover.screen.component.UserProfileHeader
+import edu.temple.beatbuddy.discover.screen.component.UserProfileStatsHeader
+import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.utils.ImageSize
 
 @Composable
 fun CurrentUserProfileScreen(
-    profileViewModel: CurrentUserProfileViewModel,
+    profileViewModel: ProfileViewModel,
+    currentUserProfileViewModel: CurrentUserProfileViewModel,
     onSignOut: () -> Unit,
 ) {
-    val userState by remember { mutableStateOf(profileViewModel.userState.value) }
+    val currentUser by profileViewModel.currentUser.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -85,19 +84,19 @@ fun CurrentUserProfileScreen(
                         horizontalAlignment = Alignment.Start
                     ) {
                         Text(
-                            text = userState.user?.username ?: "Username",
+                            text = currentUser.username,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp
                         )
                         Text(
-                            text = userState.user?.fullName ?: "User full name",
+                            text = currentUser.fullName,
                             fontWeight = FontWeight.Light,
                             fontSize = 12.sp
                         )
                     }
                 }
 
-                UserProfileHeader(user = userState.user ?: User())
+                UserProfileStatsHeader(user = currentUser)
             }
 
             Button(
@@ -130,7 +129,7 @@ fun CurrentUserProfileScreen(
 
             Button(
                 onClick = {
-                    profileViewModel.signOut()
+                    currentUserProfileViewModel.signOut()
                     onSignOut()
                 },
                 modifier = Modifier

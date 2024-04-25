@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
 import edu.temple.beatbuddy.user_auth.model.User
 
 @Composable
-fun UserProfileHeader(
+fun UserProfileStatsHeader(
     user: User
 ) {
     Row(
