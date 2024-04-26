@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.music_post.screen.component
+package edu.temple.beatbuddy.music_swipe.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.ImageNotSupported
@@ -23,9 +23,10 @@ import androidx.compose.material.icons.filled.ThumbUpOffAlt
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,31 +40,68 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.size.Size
-import edu.temple.beatbuddy.app.screen.HomeScreen
 import edu.temple.beatbuddy.component.ImageFactory
-import edu.temple.beatbuddy.component.VinylAlbumCover
 import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
 import edu.temple.beatbuddy.discover.screen.component.ProfilePicture
-import edu.temple.beatbuddy.music_post.model.MockPost
 import edu.temple.beatbuddy.music_post.model.SongPost
+import edu.temple.beatbuddy.music_post.screen.component.SongPostItem
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
+import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 import edu.temple.beatbuddy.utils.ImageSize
 
 @Composable
-fun SongPostItem(
+fun SwipeScreen(
+    swipeSongViewModel: SwipeSongViewModel,
+    player: ExoPlayer
+) {
+    val posts by swipeSongViewModel.songPostState.collectAsState()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (player.isPlaying) player.stop()
+        }
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        LazyColumn {
+            items(posts.posts.size) { index ->
+                TempSongPostItem(
+                    songPost = posts.posts[index],
+                    player = player,
+                    likePost = { },
+                    swipeSongViewModel = swipeSongViewModel
+                )
+            }
+        }
+
+        if (posts.posts.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No posts yet",
+                    fontSize = 36.sp,
+                    color = Color.Gray
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TempSongPostItem(
     songPost: SongPost,
     player: ExoPlayer,
     likePost: () -> Unit,
-    songPostViewModel: SongPostViewModel
+    swipeSongViewModel: SwipeSongViewModel
 ) {
     val context = LocalContext.current
     val user = songPost.user
@@ -76,7 +114,7 @@ fun SongPostItem(
     val playerView = PlayerView(context)
     val playWhenReady by rememberSaveable { mutableStateOf(true) }
 
-    val currentSong by songPostViewModel.currentSongPost.collectAsState()
+    val currentSong by swipeSongViewModel.currentSongPost.collectAsState()
 
     LaunchedEffect(currentSong) {
         if (currentSong?.postId != songPost.postId) {
@@ -97,8 +135,26 @@ fun SongPostItem(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            if (user != null) {
-                UserPostHeader(user = user)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier.wrapContentSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ProfilePicture(
+                        userProfile = songPost.user?.profileImage ?: "",
+                        size = ImageSize.xSmall
+                    )
+
+                    Text(
+                        text = user?.username ?: "username",
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
 
             Box(
@@ -124,7 +180,7 @@ fun SongPostItem(
                             .size(200.dp)
                             .alpha(0.3f)
                             .clickable {
-                                songPostViewModel.setCurrentSong(songPost)
+                                swipeSongViewModel.setCurrentSong(songPost)
                                 player.setMediaItem(MediaItem.fromUri(songPost.preview))
                                 playerView.player = player
                                 isPlaying = true
@@ -210,15 +266,4 @@ fun SongPostItem(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SongPostPV() {
-    SongPostItem(
-        songPost = MockPost.posts[2],
-        player = ExoPlayer.Builder(LocalContext.current).build(),
-        {},
-        songPostViewModel = hiltViewModel()
-    )
 }

@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.music_post.repository
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.toObject
 import edu.temple.beatbuddy.discover.repository.UsersRepository
@@ -24,11 +25,13 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class SongPostRepositoryImpl @Inject constructor(
+    private val auth: FirebaseAuth,
     private val postRef: CollectionReference,
     private val userRef: CollectionReference,
+    private val followersRef: CollectionReference
 ): SongPostRepository {
 
-    override fun fetchPostsFromFirestore(): Flow<Resource<List<SongPost>>> = flow {
+    override fun fetchAllPostsFromFirestore(): Flow<Resource<List<SongPost>>> = flow {
         emit(Resource.Loading(true))
         try {
             val posts = postRef.get().await().toObjects(SongPost::class.java).map {
@@ -46,22 +49,60 @@ class SongPostRepositoryImpl @Inject constructor(
         val id = postRef.document().id
         val post = songPost.copy(postId = id)
         postRef.document(id).set(post).await()
+
+        updateUserFeedAfterPost(id)
+
         Resource.Success(true)
     } catch (e: Exception) {
         Resource.Error(e.localizedMessage!!)
     }
 
-    override suspend fun deleteAPost(postId: String): Resource<Boolean> = try {
-        postRef.document(postId).delete().await()
-        Resource.Success(true)
-    } catch (e: Exception) {
-        Resource.Error(e.localizedMessage!!)
+    override fun fetchPostsFromFollowing(): Flow<Resource<List<SongPost>>> = flow {
+        emit(Resource.Loading(true))
+        try {
+            val currentUid = auth.currentUser?.uid ?: ""
+            val postSnapshot = userRef
+                .document(currentUid)
+                .collection("user-feed")
+                .get()
+                .await()
+            val posts: MutableList<SongPost> = mutableListOf()
+
+            for (doc in postSnapshot.documents) {
+                val post = postRef.document(doc.id).get().await().toObject(SongPost::class.java)?.let { it ->
+                    val user = userRef.document(it.ownerUid).get().await().toObject(User::class.java)
+                    it.copy(user = user)
+                }
+                if (post != null) {
+                    posts.add(post)
+                }
+            }
+
+            emit(Resource.Success(posts))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An unknown error occurred"))
+        }
+        emit(Resource.Loading(false))
     }
 
-    private suspend fun getUser(ownerUid: String): User? {
-        return withContext(Dispatchers.IO) {
-            val userDocument = userRef.document(ownerUid).get().await()
-            userDocument.toObject(User::class.java)
+
+
+    private suspend fun updateUserFeedAfterPost(postId: String) {
+        val currentUid = auth.currentUser?.uid ?: ""
+
+        val followersSnapshot = followersRef
+            .document(currentUid)
+            .collection("user-followers")
+            .get()
+            .await()
+
+        for (doc in followersSnapshot.documents) {
+            userRef
+                .document(doc.id)
+                .collection("user-feed")
+                .document(postId)
+                .set(mapOf<String, Any>())
+                .await()
         }
     }
 }

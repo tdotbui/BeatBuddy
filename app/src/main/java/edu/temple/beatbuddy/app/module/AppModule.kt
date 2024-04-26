@@ -89,9 +89,12 @@ class AppModule {
 
     @Provides
     fun provideSongPostRepository(
+        auth: FirebaseAuth,
         @Named("PostRef") postRef: CollectionReference,
-        @Named("UsersRef") usersRef: CollectionReference
-    ): SongPostRepository = SongPostRepositoryImpl(postRef, usersRef)
+        @Named("UsersRef") usersRef: CollectionReference,
+        @Named("FollowersRef") followersRef: CollectionReference,
+    ): SongPostRepository =
+        SongPostRepositoryImpl(auth, postRef, usersRef, followersRef)
 
     @Provides
     @Named("FollowingRef")

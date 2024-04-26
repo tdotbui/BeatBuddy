@@ -33,6 +33,9 @@ import edu.temple.beatbuddy.discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
+import edu.temple.beatbuddy.music_swipe.screen.SwipeScreen
+import edu.temple.beatbuddy.music_swipe.screen.SwipeSongCardScreen
+import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.user_profile.screen.CurrentUserProfileScreen
 import edu.temple.beatbuddy.utils.Helpers
@@ -42,6 +45,7 @@ fun HomeScreen(
     songPostViewModel: SongPostViewModel = hiltViewModel(),
     currentUserProfileViewModel: CurrentUserProfileViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
+    swipeSongViewModel: SwipeSongViewModel = hiltViewModel(),
     goToSignInScreen: () -> Unit
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(1) }
@@ -109,7 +113,9 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Center
         ) {
             when (selectedTabIndex) {
-                0 -> TabScreen1()
+                0 -> SwipeSongCardScreen(
+                    swipeSongViewModel = swipeSongViewModel
+                )
                 1 -> MusicBrowseScreen(
                     songPostViewModel = songPostViewModel,
                     player = musicPlayer
@@ -143,14 +149,4 @@ data class TabItem(
 @Composable
 fun HomeScreenPV() {
     HomeScreen(goToSignInScreen =  {})
-}
-
-@Composable
-fun TabScreen1() {
-    Text(text = "This is Tab 1")
-}
-
-@Composable
-fun TabScreen3() {
-    Text(text = "This is Tab 3")
 }
