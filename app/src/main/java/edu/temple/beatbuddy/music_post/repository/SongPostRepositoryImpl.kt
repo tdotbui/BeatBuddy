@@ -2,6 +2,7 @@ package edu.temple.beatbuddy.music_post.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
 import edu.temple.beatbuddy.discover.repository.UsersRepository
 import edu.temple.beatbuddy.music_post.model.SongPost
@@ -34,7 +35,7 @@ class SongPostRepositoryImpl @Inject constructor(
     override fun fetchAllPostsFromFirestore(): Flow<Resource<List<SongPost>>> = flow {
         emit(Resource.Loading(true))
         try {
-            val posts = postRef.get().await().toObjects(SongPost::class.java).map {
+            val posts = postRef.orderBy("timestamp", Query.Direction.DESCENDING).get().await().toObjects(SongPost::class.java).map {
                 val user = userRef.document(it.ownerUid).get().await().toObject(User::class.java)
                 it.copy(user = user)
             }

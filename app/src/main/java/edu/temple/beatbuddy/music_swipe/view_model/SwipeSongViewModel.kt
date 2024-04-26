@@ -33,6 +33,16 @@ class SwipeSongViewModel @Inject constructor(
         currentSongPost.value = songPost
     }
 
+    fun removeSongFromList() {
+        val remainingPosts = songPostState.value.posts.toMutableList().apply {
+            removeFirst()
+        }
+        songPostState.value = songPostState.value.copy(posts = remainingPosts)
+        for (song in songPostState.value.posts) {
+            Log.d("The remaining post is", song.title)
+        }
+    }
+
     private fun fetchSwipeSongPosts() = viewModelScope.launch {
         songPostState.update {
             it.copy(isLoading = true)

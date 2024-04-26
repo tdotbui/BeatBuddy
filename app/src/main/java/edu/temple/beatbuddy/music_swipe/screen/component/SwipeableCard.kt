@@ -76,7 +76,7 @@ fun SwipeableCard(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.wrapContentSize()
         ) {
             content()
         }

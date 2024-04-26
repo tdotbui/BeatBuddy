@@ -33,7 +33,6 @@ import edu.temple.beatbuddy.discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
-import edu.temple.beatbuddy.music_swipe.screen.SwipeScreen
 import edu.temple.beatbuddy.music_swipe.screen.SwipeSongCardScreen
 import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
