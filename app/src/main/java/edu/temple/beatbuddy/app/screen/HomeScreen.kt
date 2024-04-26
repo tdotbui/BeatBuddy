@@ -1,9 +1,14 @@
 package edu.temple.beatbuddy.app.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -12,11 +17,16 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Swipe
 import androidx.compose.material.icons.filled.Widgets
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +41,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import edu.temple.beatbuddy.music_browse.screen.MusicBrowseScreen
 import edu.temple.beatbuddy.discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
+import edu.temple.beatbuddy.music_player.screen.MusicPlayerScreen
+import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.music_swipe.screen.SwipeSongCardScreen
@@ -38,25 +50,36 @@ import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.user_profile.screen.CurrentUserProfileScreen
 import edu.temple.beatbuddy.utils.Helpers
+import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     songPostViewModel: SongPostViewModel = hiltViewModel(),
     currentUserProfileViewModel: CurrentUserProfileViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
     swipeSongViewModel: SwipeSongViewModel = hiltViewModel(),
+    songViewModel: SongViewModel = hiltViewModel(),
     goToSignInScreen: () -> Unit
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
 
     val userState by currentUserProfileViewModel.userState.collectAsState()
-
     if (userState.user != null) {
         Helpers.saveUidToSharedPreferences(context, userState.user!!.id)
     }
 
     val musicPlayer = ExoPlayer.Builder(context).build()
+
+    val scope = rememberCoroutineScope()
+    val bottomSheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        skipHiddenState = false
+    )
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
+    val isPlaying by songViewModel.isPlaying.collectAsState()
 
     val tabs = listOf(
         TabItem(Icons.Default.Swipe, "Top's pick"),
@@ -102,14 +125,13 @@ fun HomeScreen(
                     )
                 }
             }
-        }
-    ) { paddingValue ->
-        Column(
+        },
+    ) { scaffoldPadding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValue),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(scaffoldPadding),
+            contentAlignment = Alignment.BottomCenter
         ) {
             when (selectedTabIndex) {
                 0 -> SwipeSongCardScreen(
@@ -117,7 +139,12 @@ fun HomeScreen(
                 )
                 1 -> MusicBrowseScreen(
                     songPostViewModel = songPostViewModel,
-                    player = musicPlayer
+                    songViewModel = songViewModel,
+                    sheetOpen = {
+                        scope.launch {
+                            bottomSheetScaffoldState.bottomSheetState.expand()
+                        }
+                    }
                 )
                 2 -> FeedsScreen(
                     songPostViewModel = songPostViewModel,
@@ -134,6 +161,16 @@ fun HomeScreen(
                         onSignOut = { goToSignInScreen() }
                     )
                 }
+            }
+
+            if (isPlaying) {
+                MusicPlayerScreen(
+                    songs = songViewModel.currentSongList,
+                    song = songViewModel.selectedSong,
+                    isPlaying = isPlaying,
+                    playerEvent = songViewModel,
+                    playbackState = songViewModel.playbackState,
+                )
             }
         }
     }

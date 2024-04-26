@@ -1,12 +1,15 @@
 package edu.temple.beatbuddy.music_player.view_model
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.music_player.player.CustomPlayer
@@ -18,6 +21,7 @@ import edu.temple.beatbuddy.utils.launchPlaybackStateJob
 import edu.temple.beatbuddy.utils.toMediaItemList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,24 +30,26 @@ class SongViewModel @Inject constructor(
     val player: CustomPlayer,
 ) : ViewModel(), PlayerEvent {
 
-    var currentSongList = mutableStateListOf<Song>()
-        private set
+    private val _currentSongList = mutableStateListOf<Song>()
+    val currentSongList: List<Song> get() = _currentSongList
 
     var selectedSong: Song? by mutableStateOf(null)
         private set
 
     var selectedSongIndex: Int by mutableStateOf(-1)
 
-    private var isPlaying = mutableStateOf(false)
+    var isPlaying = MutableStateFlow(false)
+        private set
 
     private var playbackStateJob: Job? = null
 
-    var playbackState = MutableStateFlow(PlaybackState(0L, 0L))
-        private set
+    private val _playbackState = MutableStateFlow(PlaybackState(0L, 0L))
+    val playbackState: StateFlow<PlaybackState> get() = _playbackState
 
     private var isAuto: Boolean = false
 
     fun setUpSongLists(songList: List<Song>) {
+        _currentSongList.addAll(songList)
         player.initPlayer(songList.toMediaItemList())
         observePlayerState()
     }
@@ -78,7 +84,7 @@ class SongViewModel @Inject constructor(
 
     private fun updatePlaybackState(state: PlayerState) {
         playbackStateJob?.cancel()
-        playbackStateJob = viewModelScope.launchPlaybackStateJob(playbackState, state, player)
+        playbackStateJob = viewModelScope.launchPlaybackStateJob(_playbackState, state, player)
     }
 
     override fun onPlayPauseClick() = player.playPause()
@@ -107,7 +113,7 @@ class SongViewModel @Inject constructor(
         }
     }
 
-    override fun onSongClick(song: Song) = onSongSelected(currentSongList.indexOf(song))
+    override fun onSongClick(index: Int) = onSongSelected(index)
 
     override fun onSeekBarPositionChanged(position: Long) {
         viewModelScope.launch {

@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.utils
 
+import android.util.Log
 import androidx.media3.common.MediaItem
 import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.music_player.player.CustomPlayer
@@ -25,7 +26,9 @@ fun Long.toTime(): String {
     return stringBuffer.toString()
 }
 
-fun List<Song>.toMediaItemList(): MutableList<MediaItem> = this.map { MediaItem.fromUri(it.preview) }.toMutableList()
+fun List<Song>.toMediaItemList(): MutableList<MediaItem> = this.map {
+    MediaItem.fromUri(it.preview)
+}.toMutableList()
 
 fun CoroutineScope.collectPlayerState(
     player: CustomPlayer, updateState: (PlayerState) -> Unit

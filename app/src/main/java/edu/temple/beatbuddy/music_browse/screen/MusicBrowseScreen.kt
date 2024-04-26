@@ -1,6 +1,7 @@
 package edu.temple.beatbuddy.music_browse.screen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,11 +34,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import com.google.firebase.Timestamp
+import edu.temple.beatbuddy.music_browse.model.local.MockSongList
 import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.music_browse.screen.component.GenreItem
 import edu.temple.beatbuddy.music_browse.screen.component.SongRowItem
 import edu.temple.beatbuddy.music_browse.view_model.SongListViewModel
+import edu.temple.beatbuddy.music_player.player.PlayerEvent
 import edu.temple.beatbuddy.music_player.screen.MusicPlayerScreen
+import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.screen.component.NewPostDialog
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
@@ -50,7 +55,8 @@ import kotlinx.coroutines.launch
 fun MusicBrowseScreen(
     songListViewModel: SongListViewModel = hiltViewModel(),
     songPostViewModel: SongPostViewModel,
-    player: ExoPlayer
+    songViewModel: SongViewModel,
+    sheetOpen: () -> Unit
 ) {
     val context = LocalContext.current
     val songs by songListViewModel.songListState.collectAsState()
@@ -59,116 +65,96 @@ fun MusicBrowseScreen(
     var songTitle by remember { mutableStateOf("") }
     var selectedSong by remember { mutableStateOf<Song?>(null) }
 
+    var songListState by remember { mutableStateOf(songs.currentSongList) }
 
-    val scope = rememberCoroutineScope()
-    val bottomSheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Hidden,
-        skipHiddenState = false
-    )
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
-
-    BottomSheetScaffold(
-        sheetContent = {
-            selectedSong?.let {
-                MusicPlayerScreen(
-                    song = it,
-                    player = player
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
+        LazyRow(
+            modifier = Modifier
+                .padding(horizontal = 16.dp),
+            userScrollEnabled = true
+        ) {
+            items(Genre.entries.size) { index ->
+                val genre = Genre.entries[index]
+                GenreItem(
+                    genre = genre,
+                    onClick = { songListViewModel.getSongsByGenre(genre.id) }
                 )
             }
-        },
-        scaffoldState = bottomSheetScaffoldState,
-        sheetShadowElevation = 5.dp,
-        sheetContainerColor = Color.White,
-        sheetPeekHeight = 0.dp,
-        modifier = Modifier
-            .fillMaxSize()
-    ) { paddingValue ->
-        Column(
+        }
+
+        Box(
             modifier = Modifier
-                .padding(paddingValue)
-                .fillMaxWidth()
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            LazyRow(
+            LazyColumn(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp),
-                userScrollEnabled = true
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp),
             ) {
-                items(Genre.entries.size) { index ->
-                    val genre = Genre.entries[index]
-                    GenreItem(
-                        genre = genre,
-                        onClick = { songListViewModel.getSongsByGenre(genre.id) }
+                val songList = songs.currentSongList
+                items(songList.size) { index ->
+                    SongRowItem(
+                        song = songList[index],
+                        onMusicClick = { song ->
+                            songViewModel.onSongClick(index)
+                            selectedSong = song
+                            sheetOpen()
+                        },
+                        shareClick = { song ->
+                            openDialog = true
+                            songImage = song.album.cover_medium ?: ""
+                            songTitle = song.title
+                            selectedSong = song
+                        }
                     )
                 }
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(16.dp),
+            if (songs.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    val songList = songs.currentSongList
-                    items(songList.size) { index ->
-                        SongRowItem(
-                            song = songList[index],
-                            onMusicClick = { song ->
-                                scope.launch {
-                                    bottomSheetState.expand()
-                                    selectedSong = song
-                                    player.setMediaItem(MediaItem.fromUri(song.preview))
-                                }
-                            },
-                            shareClick = { song ->
-                                openDialog = true
-                                songImage = song.album.cover_medium ?: ""
-                                songTitle = song.title
-                                selectedSong = song
-                            }
-                        )
-                    }
-                }
-
-                if (songs.isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    CircularProgressIndicator()
                 }
             }
 
-            if (openDialog) {
-                NewPostDialog(
-                    context = context,
-                    imageUrl = songImage,
-                    title = songTitle,
-                    dismissDialog = { openDialog = false },
-                    makePost = { caption ->
-                        val songPost = SongPost(
-                            postId = "",
-                            ownerUid = Helpers.getUidFromSharedPreferences(context) ?: "",
-                            caption = caption,
-                            likes = 0,
-                            timestamp = Timestamp.now(),
-                            songId = selectedSong?.id ?: 0L,
-                            title = selectedSong?.title ?: "",
-                            preview = selectedSong?.preview ?: "",
-                            artistName = selectedSong?.artist?.name ?: "",
-                            artistPicture = selectedSong?.artist?.picture_medium ?: "",
-                            songImage = selectedSong?.album?.cover_medium ?: "",
-                            user = null
-                        )
-                        songPostViewModel.makePost(songPost)
-                    }
-                )
+            LaunchedEffect(songListState) {
+//                if (songListState.isNotEmpty())
+                    songViewModel.setUpSongLists(songListState)
             }
+        }
+
+        if (openDialog) {
+            NewPostDialog(
+                context = context,
+                imageUrl = songImage,
+                title = songTitle,
+                dismissDialog = { openDialog = false },
+                makePost = { caption ->
+                    val songPost = SongPost(
+                        postId = "",
+                        ownerUid = Helpers.getUidFromSharedPreferences(context) ?: "",
+                        caption = caption,
+                        likes = 0,
+                        timestamp = Timestamp.now(),
+                        songId = selectedSong?.id ?: 0L,
+                        title = selectedSong?.title ?: "",
+                        preview = selectedSong?.preview ?: "",
+                        artistName = selectedSong?.artist?.name ?: "",
+                        artistPicture = selectedSong?.artist?.picture_medium ?: "",
+                        songImage = selectedSong?.album?.cover_medium ?: "",
+                        user = null
+                    )
+                    songPostViewModel.makePost(songPost)
+                }
+            )
         }
     }
 }

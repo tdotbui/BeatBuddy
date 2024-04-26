@@ -1,6 +1,8 @@
 package edu.temple.beatbuddy.app.module
 
 import android.app.Application
+import android.content.Context
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -19,6 +21,7 @@ import edu.temple.beatbuddy.music_browse.model.local.SongDatabase
 import edu.temple.beatbuddy.music_browse.model.remote.SongApi
 import edu.temple.beatbuddy.discover.repository.UsersRepository
 import edu.temple.beatbuddy.discover.repository.UsersRepositoryImpl
+import edu.temple.beatbuddy.music_player.player.CustomPlayer
 import edu.temple.beatbuddy.music_post.repository.SongPostRepository
 import edu.temple.beatbuddy.music_post.repository.SongPostRepositoryImpl
 import edu.temple.beatbuddy.user_auth.repository.AuthRepository
@@ -129,4 +132,16 @@ class AppModule {
             postRef = postRef,
             userStatsDb = userStatsDatabase
         )
+
+    @Provides
+    @Singleton
+    fun provideContext(application: Application): Context {
+        return application.applicationContext
+    }
+    @Provides
+    @Singleton
+    fun provideCustomPLayer(context: Context): CustomPlayer {
+        val player = ExoPlayer.Builder(context).build()
+        return CustomPlayer(player)
+    }
 }
