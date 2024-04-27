@@ -9,6 +9,6 @@ interface PlayerEvent {
 
     fun onRewindClick()
     fun onForwardClick()
-    fun onSongClick(index: Int)
+    fun onSongClick(song: Song)
     fun onSeekBarPositionChanged(position: Long)
 }

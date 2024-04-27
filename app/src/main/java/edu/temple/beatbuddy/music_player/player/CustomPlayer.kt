@@ -10,7 +10,6 @@ import javax.inject.Inject
 class CustomPlayer @Inject constructor(
     private val player: ExoPlayer
 ): Player.Listener {
-
     var playerState = MutableStateFlow(PlayerState.STATE_IDLE)
         private set
 
@@ -32,7 +31,7 @@ class CustomPlayer @Inject constructor(
         if (isTrackPlay) player.playWhenReady = true
     }
 
-    fun playPause() {
+    fun playToggle() {
         if (player.playbackState == Player.STATE_IDLE) player.prepare()
         player.playWhenReady = !player.playWhenReady
     }

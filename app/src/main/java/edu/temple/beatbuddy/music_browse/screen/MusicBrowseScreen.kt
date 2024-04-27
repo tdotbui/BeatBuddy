@@ -65,8 +65,6 @@ fun MusicBrowseScreen(
     var songTitle by remember { mutableStateOf("") }
     var selectedSong by remember { mutableStateOf<Song?>(null) }
 
-    var songListState by remember { mutableStateOf(songs.currentSongList) }
-
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -102,7 +100,8 @@ fun MusicBrowseScreen(
                     SongRowItem(
                         song = songList[index],
                         onMusicClick = { song ->
-                            songViewModel.onSongClick(index)
+                            songViewModel.setUpSongLists(songList)
+                            songViewModel.onSongClick(song)
                             selectedSong = song
                             sheetOpen()
                         },
@@ -123,11 +122,6 @@ fun MusicBrowseScreen(
                 ) {
                     CircularProgressIndicator()
                 }
-            }
-
-            LaunchedEffect(songListState) {
-//                if (songListState.isNotEmpty())
-                    songViewModel.setUpSongLists(songListState)
             }
         }
 

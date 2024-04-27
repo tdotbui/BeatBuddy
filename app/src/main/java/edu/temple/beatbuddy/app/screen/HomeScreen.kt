@@ -79,7 +79,7 @@ fun HomeScreen(
         skipHiddenState = false
     )
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
-    val isPlaying by songViewModel.isPlaying.collectAsState()
+    val currentSong by songViewModel.selectedSong.collectAsState()
 
     val tabs = listOf(
         TabItem(Icons.Default.Swipe, "Top's pick"),
@@ -163,13 +163,10 @@ fun HomeScreen(
                 }
             }
 
-            if (isPlaying) {
+            if (currentSong != null) {
                 MusicPlayerScreen(
-                    songs = songViewModel.currentSongList,
-                    song = songViewModel.selectedSong,
-                    isPlaying = isPlaying,
+                    songViewModel = songViewModel,
                     playerEvent = songViewModel,
-                    playbackState = songViewModel.playbackState,
                 )
             }
         }

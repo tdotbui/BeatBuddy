@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.discover.repository.FollowRepository
 import edu.temple.beatbuddy.discover.repository.UsersRepository
+import edu.temple.beatbuddy.music_player.player.PlayerState
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_auth.model.UserStats
 import edu.temple.beatbuddy.utils.Resource
@@ -26,6 +27,9 @@ class ProfileViewModel @Inject constructor(
 
     private val _isFollowing = MutableStateFlow(false)
     val isFollowing = _isFollowing
+
+    var playerState = MutableStateFlow(PlayerState.STATE_IDLE)
+        private set
 
     fun setCurrentUser(user: User) {
         _currentUser.value = user

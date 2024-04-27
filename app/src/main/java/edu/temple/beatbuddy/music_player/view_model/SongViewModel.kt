@@ -33,7 +33,7 @@ class SongViewModel @Inject constructor(
     private val _currentSongList = mutableStateListOf<Song>()
     val currentSongList: List<Song> get() = _currentSongList
 
-    var selectedSong: Song? by mutableStateOf(null)
+    var selectedSong = MutableStateFlow<Song?>(null)
         private set
 
     var selectedSongIndex: Int by mutableStateOf(-1)
@@ -51,7 +51,6 @@ class SongViewModel @Inject constructor(
     fun setUpSongLists(songList: List<Song>) {
         _currentSongList.addAll(songList)
         player.initPlayer(songList.toMediaItemList())
-        observePlayerState()
     }
 
     private fun onSongSelected(index: Int) {
@@ -67,34 +66,25 @@ class SongViewModel @Inject constructor(
         isAuto = false
     }
 
-    private fun updateState(state: PlayerState) {
-        if (selectedSongIndex != -1) {
-            isPlaying.value = state == PlayerState.STATE_PLAYING
-            selectedSong = currentSongList[selectedSongIndex]
+    override fun onPlayPauseClick() {
+        player.playToggle()
+        isPlaying.value = !isPlaying.value
 
-            updatePlaybackState(state)
-            if (state == PlayerState.STATE_NEXT_TRACK) {
-                isAuto = true
-                onNextClick()
-            }
-            if (state == PlayerState.STATE_END) onSongSelected(0)
+        if (player.playerState.value == PlayerState.STATE_NEXT_TRACK) {
+            selectedSongIndex += 1
+            selectedSong.value = _currentSongList[selectedSongIndex]
         }
     }
-    private fun observePlayerState() = viewModelScope.collectPlayerState(player, ::updateState)
-
-    private fun updatePlaybackState(state: PlayerState) {
-        playbackStateJob?.cancel()
-        playbackStateJob = viewModelScope.launchPlaybackStateJob(_playbackState, state, player)
-    }
-
-    override fun onPlayPauseClick() = player.playPause()
 
     override fun onPreviousClick() {
         if (selectedSongIndex > 0) onSongSelected(selectedSongIndex - 1)
     }
 
     override fun onNextClick() {
-        if (selectedSongIndex < currentSongList.size - 1) onSongSelected(selectedSongIndex + 1)
+        if (selectedSongIndex < currentSongList.size - 1) {
+            onSongSelected(selectedSongIndex + 1)
+            selectedSong.value = _currentSongList[selectedSongIndex]
+        }
     }
 
     override fun onRewindClick() {
@@ -113,7 +103,10 @@ class SongViewModel @Inject constructor(
         }
     }
 
-    override fun onSongClick(index: Int) = onSongSelected(index)
+    override fun onSongClick(song: Song) {
+        selectedSong.value = song
+        onSongSelected(index = _currentSongList.indexOf(song))
+    }
 
     override fun onSeekBarPositionChanged(position: Long) {
         viewModelScope.launch {

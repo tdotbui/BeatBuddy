@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.music_player.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,16 +62,18 @@ import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
 import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.music_player.player.PlaybackState
 import edu.temple.beatbuddy.music_player.player.PlayerEvent
+import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.utils.toTime
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun MusicPlayerScreen(
-    songs: List<Song>,
-    song: Song?,
-    isPlaying: Boolean,
+//    songs: List<Song>,
+//    song: Song?,
+    songViewModel: SongViewModel,
+//    isPlaying: Boolean,
     playerEvent: PlayerEvent,
-    playbackState: StateFlow<PlaybackState>,
+//    playbackState: StateFlow<PlaybackState>,
 ) {
     var isFullScreen by remember { mutableStateOf(false) }
 
@@ -81,9 +85,7 @@ fun MusicPlayerScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             FullPlayerContent(
-                song = song,
-                currentTime = 2L,
-                isPlaying = isPlaying,
+                songViewModel = songViewModel,
                 playToggle = { playerEvent.onPlayPauseClick() },
                 rewind = { playerEvent.onRewindClick() },
                 forward = { playerEvent.onForwardClick() },
@@ -97,10 +99,9 @@ fun MusicPlayerScreen(
         }
     } else {
         BriefPlayerContent(
-            song = song,
-            isPlaying = isPlaying,
-            playToggle = {  },
-            playNext = { },
+            songViewModel = songViewModel,
+            playToggle = { playerEvent.onPlayPauseClick() },
+            playNext = { playerEvent.onNextClick() },
             slideUp = {
                 isFullScreen = true
             },
@@ -110,12 +111,18 @@ fun MusicPlayerScreen(
 
 @Composable
 fun BriefPlayerContent(
-    song: Song?,
-    isPlaying: Boolean,
+    songViewModel: SongViewModel,
     playToggle: () -> Unit,
     playNext: () -> Unit,
     slideUp: () -> Unit,
 ) {
+    val isPlaying by songViewModel.isPlaying.collectAsState()
+    val currentSong by songViewModel.selectedSong.collectAsState()
+
+    LaunchedEffect(currentSong, isPlaying) {
+        Log.d("", "something changed")
+    }
+
     Box(
         modifier = Modifier
             .height(64.dp)
@@ -135,14 +142,14 @@ fun BriefPlayerContent(
         ) {
             if (isPlaying) {
                 VinylAlbumCoverAnimation(
-                    imageUrl = song?.album?.cover_medium ?: "",
+                    imageUrl = currentSong?.album?.cover_medium ?: "",
                     modifier = Modifier
                         .padding(4.dp)
                         .padding(start = 12.dp)
                 )
             } else {
                 VinylAlbumCover(
-                    imageUrL = song?.album?.cover_medium ?: "",
+                    imageUrL = currentSong?.album?.cover_medium ?: "",
                     modifier = Modifier
                         .padding(4.dp)
                         .padding(start = 12.dp)
@@ -157,7 +164,7 @@ fun BriefPlayerContent(
                     .padding(vertical = 8.dp, horizontal = 32.dp),
             ) {
                 Text(
-                    text = song?.title ?: "",
+                    text = currentSong?.title ?: "",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
@@ -165,7 +172,7 @@ fun BriefPlayerContent(
                 )
 
                 Text(
-                    text = song?.artist?.name ?: "artist name",
+                    text = currentSong?.artist?.name ?: "artist name",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
@@ -200,9 +207,7 @@ fun BriefPlayerContent(
 
 @Composable
 fun FullPlayerContent(
-    song: Song?,
-    currentTime: Long,
-    isPlaying: Boolean,
+    songViewModel: SongViewModel,
     playToggle: () -> Unit,
     rewind: () -> Unit,
     forward: () -> Unit,
@@ -211,6 +216,14 @@ fun FullPlayerContent(
     sliderChanged: (Float) -> Unit,
     slideDown: () -> Unit
 ) {
+    val isPlaying by songViewModel.isPlaying.collectAsState()
+    val currentSong by songViewModel.selectedSong.collectAsState()
+    val currentTime = songViewModel.player.currentPlaybackPosition.toFloat()
+
+    LaunchedEffect(currentSong, isPlaying) {
+        Log.d("", "something changed")
+    }
+
     val sliderColor = SliderDefaults.colors(
         thumbColor = MaterialTheme.colorScheme.onBackground,
         activeTrackColor = MaterialTheme.colorScheme.onBackground,
@@ -261,11 +274,15 @@ fun FullPlayerContent(
                                 .aspectRatio(1f),
                             contentAlignment = Alignment.Center
                         ) {
-                            VinylAlbumCoverAnimation(imageUrl = song?.album?.cover_medium ?: "")
+                            if (isPlaying) {
+                                VinylAlbumCoverAnimation(imageUrl = currentSong?.album?.cover_medium ?: "")
+                            } else {
+                                VinylAlbumCover(imageUrL = currentSong?.album?.cover_medium ?: "")
+                            }
                         }
 
                         Text(
-                            text = song?.title ?: "",
+                            text = currentSong?.title ?: "",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 1,
@@ -273,7 +290,7 @@ fun FullPlayerContent(
                         )
 
                         Text(
-                            text = song?.artist?.name ?: "",
+                            text = currentSong?.artist?.name ?: "",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 1,
@@ -302,7 +319,7 @@ fun FullPlayerContent(
                             ) {
                                 CompositionLocalProvider {
                                     Text(
-                                        text = currentTime.toTime(),
+                                        text = currentTime.toLong().toTime(),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
