@@ -140,7 +140,7 @@ fun HomeScreen(
                     songViewModel.minimizeScreen()
                     FeedsScreen(
                         songPostViewModel = songPostViewModel,
-                        player = musicPlayer
+                        songViewModel = songViewModel
                     )
                 }
                 3 -> {

@@ -27,6 +27,12 @@ class CustomPlayer @Inject constructor(
         player.prepare()
     }
 
+    fun initSinglePlayer(item: MediaItem) {
+        player.addListener(this)
+        player.setMediaItem(item)
+        player.prepare()
+    }
+
     fun setUpTrack(index: Int, isTrackPlay: Boolean) {
         if (player.playbackState == Player.STATE_IDLE) player.prepare()
         player.seekTo(index, 0)

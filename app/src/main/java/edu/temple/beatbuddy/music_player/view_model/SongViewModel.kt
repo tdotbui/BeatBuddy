@@ -16,6 +16,7 @@ import edu.temple.beatbuddy.music_player.player.CustomPlayer
 import edu.temple.beatbuddy.music_player.player.PlaybackState
 import edu.temple.beatbuddy.music_player.player.PlayerEvent
 import edu.temple.beatbuddy.music_player.player.PlayerState
+import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.utils.collectPlayerState
 import edu.temple.beatbuddy.utils.launchPlaybackStateJob
 import edu.temple.beatbuddy.utils.toMediaItemList
@@ -73,14 +74,18 @@ class SongViewModel @Inject constructor(
 
     private fun updateState(state: PlayerState) {
         if (selectedSongIndex != -1) {
-            isPlaying.value = state == PlayerState.STATE_PLAYING
+//            isPlaying.value = state == PlayerState.STATE_PLAYING
 
             updatePlaybackState(state)
 //            if (state == STATE_NEXT_TRACK) {
 //                isAuto = true
 //                onNextClick()
 //            }
-            if (state == PlayerState.STATE_END) onSongSelected(0)
+            if (state == PlayerState.STATE_END) {
+                onSongSelected(0)
+//                isPlaying.value = false
+                isAuto = false
+            }
         }
     }
 
@@ -89,6 +94,15 @@ class SongViewModel @Inject constructor(
     fun setUpSongLists(songList: List<Song>) {
         _currentSongList.addAll(songList)
         player.initPlayer(songList.toMediaItemList())
+    }
+
+    fun setUpSongPost(songPost: SongPost) {
+        if (isPlaying.value && currentSongList.size > 1) {
+            onPlayPauseClick()
+            _currentSongList.clear()
+        }
+        player.initSinglePlayer(MediaItem.fromUri(songPost.preview))
+        onPlayPauseClick()
     }
 
     private fun onSongSelected(index: Int) {
@@ -122,7 +136,7 @@ class SongViewModel @Inject constructor(
 
     override fun onPlayPauseClick() {
         player.playToggle()
-//        isPlaying.value = !isPlaying.value
+        isPlaying.value = !isPlaying.value
     }
 
     override fun onPreviousClick() {

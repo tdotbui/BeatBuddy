@@ -53,6 +53,7 @@ import edu.temple.beatbuddy.component.ImageFactory
 import edu.temple.beatbuddy.component.VinylAlbumCover
 import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
 import edu.temple.beatbuddy.discover.screen.component.ProfilePicture
+import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.music_post.model.MockPost
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
@@ -61,33 +62,27 @@ import edu.temple.beatbuddy.utils.ImageSize
 @Composable
 fun SongPostItem(
     songPost: SongPost,
-    player: ExoPlayer,
     likePost: () -> Unit,
-    songPostViewModel: SongPostViewModel
+    songPostViewModel: SongPostViewModel,
+    songViewModel: SongViewModel
 ) {
     val context = LocalContext.current
     val user = songPost.user
 
     var didLike by remember { mutableStateOf(false) }
-    var isPlaying by remember { mutableStateOf(false) }
+    val isPlaying by songViewModel.isPlaying.collectAsState()
 
     val imageOpacity = if (isPlaying) 1f else 0.5f
 
-    val playerView = PlayerView(context)
-    val playWhenReady by rememberSaveable { mutableStateOf(true) }
-
     val currentSong by songPostViewModel.currentSongPost.collectAsState()
-
-    LaunchedEffect(currentSong) {
-        if (currentSong?.postId != songPost.postId) {
-            isPlaying = false
-        }
-    }
 
     Card(
         modifier = Modifier
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .clickable {
+
+            },
         elevation = CardDefaults.cardElevation(5.dp)
     ) {
         Column(
@@ -106,7 +101,24 @@ fun SongPostItem(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                if (!isPlaying) {
+                if (isPlaying && currentSong == songPost) {
+                    VinylAlbumCoverAnimation(
+                        imageUrl = songPost.songImage,
+                        isPlaying = isPlaying
+                    )
+
+                    Icon(
+                        imageVector = Icons.Default.PauseCircleOutline,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .alpha(0.5f)
+                            .clickable {
+                                songViewModel.onPlayPauseClick()
+                            },
+                    )
+                } else {
                     ImageFactory(
                         context = context,
                         imageUrl = songPost.songImage,
@@ -124,35 +136,9 @@ fun SongPostItem(
                             .size(200.dp)
                             .alpha(0.3f)
                             .clickable {
-                                songPostViewModel.setCurrentSong(songPost)
-                                player.setMediaItem(MediaItem.fromUri(songPost.preview))
-                                playerView.player = player
-                                isPlaying = true
+                                songViewModel.setUpSongPost(songPost)
                             }
                     )
-                } else {
-                    VinylAlbumCoverAnimation(
-                        imageUrl = songPost.songImage,
-                        isPlaying = isPlaying
-                    )
-
-                    Icon(
-                        imageVector = Icons.Default.PauseCircleOutline,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier
-                            .size(120.dp)
-                            .alpha(0.5f)
-                            .clickable {
-                                player.pause()
-                                isPlaying = false
-                            },
-                    )
-
-                    LaunchedEffect(player) {
-                        player.prepare()
-                        player.playWhenReady = playWhenReady
-                    }
                 }
             }
 
@@ -212,13 +198,13 @@ fun SongPostItem(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SongPostPV() {
-    SongPostItem(
-        songPost = MockPost.posts[2],
-        player = ExoPlayer.Builder(LocalContext.current).build(),
-        {},
-        songPostViewModel = hiltViewModel()
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun SongPostPV() {
+//    SongPostItem(
+//        songPost = MockPost.posts[2],
+//        player = ExoPlayer.Builder(LocalContext.current).build(),
+//        {},
+//        songPostViewModel = hiltViewModel()
+//    )
+//}
