@@ -6,6 +6,7 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 class CustomPlayer @Inject constructor(
@@ -35,16 +36,6 @@ class CustomPlayer @Inject constructor(
     fun playToggle() {
         if (player.playbackState == Player.STATE_IDLE) player.prepare()
         player.playWhenReady = !player.playWhenReady
-    }
-
-    fun playNext() {
-        player.seekToNextMediaItem()
-        player.play()
-    }
-
-    fun playPrevious() {
-        player.seekToPreviousMediaItem()
-        player.play()
     }
 
     fun seekToPosition(position: Long) {

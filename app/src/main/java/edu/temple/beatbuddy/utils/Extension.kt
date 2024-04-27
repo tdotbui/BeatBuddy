@@ -30,24 +30,33 @@ fun List<Song>.toMediaItemList(): MutableList<MediaItem> = this.map {
     MediaItem.fromUri(it.preview)
 }.toMutableList()
 
-fun CoroutineScope.collectPlayerState(
-    player: CustomPlayer, updateState: (PlayerState) -> Unit
-) = launch {
-    player.playerState.collect {
-        updateState(it)
-    }
+fun Long.formatTime(): String {
+    val totalSeconds = this / 1000
+    val minutes = totalSeconds / 60
+    val remainingSeconds = totalSeconds % 60
+    return String.format("%02d:%02d", minutes, remainingSeconds)
 }
 
 fun CoroutineScope.launchPlaybackStateJob(
-    playbackStateFlow: MutableStateFlow<PlaybackState>, state: PlayerState, player: CustomPlayer
+    playbackStateFlow: MutableStateFlow<PlaybackState>, state: PlayerState, myPlayer: CustomPlayer
 ) = launch {
     do {
         playbackStateFlow.emit(
             PlaybackState(
-                currentPlaybackPosition = player.currentPlaybackPosition,
-                currentTrackDuration = player.currentTrackDuration
+                currentPlaybackPosition = myPlayer.currentPlaybackPosition,
+                currentTrackDuration = myPlayer.currentTrackDuration
             )
         )
-        delay(1000) // delay for 1 second
+        delay(50) // delay for 1 second
     } while (state == PlayerState.STATE_PLAYING && isActive)
+}
+
+fun CoroutineScope.collectPlayerState(
+    myPlayer: CustomPlayer, updateState: (PlayerState) -> Unit
+) {
+    this.launch {
+        myPlayer.playerState.collect {
+            updateState(it)
+        }
+    }
 }

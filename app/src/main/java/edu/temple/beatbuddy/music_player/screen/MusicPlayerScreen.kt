@@ -1,6 +1,8 @@
 package edu.temple.beatbuddy.music_player.screen
 
+import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.SeekBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +39,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -57,9 +61,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import edu.temple.beatbuddy.component.VinylAlbumCover
 import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
+import edu.temple.beatbuddy.music_player.player.PlaybackState
 import edu.temple.beatbuddy.music_player.player.PlayerEvent
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.utils.toTime
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun MusicPlayerScreen(
@@ -82,7 +89,6 @@ fun MusicPlayerScreen(
                 forward = { playerEvent.onForwardClick() },
                 playBack = { playerEvent.onPreviousClick() },
                 playNext = { playerEvent.onNextClick() },
-                sliderChanged = { position-> playerEvent.onSeekBarPositionChanged(position.toLong()) },
                 slideDown = {
                     songViewModel.minimizeScreen()
                 }
@@ -196,6 +202,7 @@ fun BriefPlayerContent(
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun FullPlayerContent(
     songViewModel: SongViewModel,
@@ -204,12 +211,10 @@ fun FullPlayerContent(
     forward: () -> Unit,
     playBack: () -> Unit,
     playNext: () -> Unit,
-    sliderChanged: (Float) -> Unit,
     slideDown: () -> Unit
 ) {
     val isPlaying by songViewModel.isPlaying.collectAsState()
     val currentSong by songViewModel.selectedSong.collectAsState()
-    val currentTime = songViewModel.player.currentPlaybackPosition.toFloat()
 
     LaunchedEffect(currentSong, isPlaying) {
         Log.d("", "something changed")
@@ -220,6 +225,12 @@ fun FullPlayerContent(
         activeTrackColor = MaterialTheme.colorScheme.onBackground,
         inactiveTrackColor = MaterialTheme.colorScheme.onBackground
     )
+
+    val playbackStateValue = songViewModel.playbackState.collectAsState(
+        initial = PlaybackState(0L, 0L)
+    ).value
+    var currentMediaProgress = playbackStateValue.currentPlaybackPosition.toFloat()
+    var currentPosTemp by rememberSaveable { mutableStateOf(0f) }
 
     Box(
         modifier =  Modifier
@@ -272,53 +283,64 @@ fun FullPlayerContent(
                             }
                         }
 
-                        Text(
-                            text = currentSong?.title ?: "",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        ) {
+                            Text(
+                                text = currentSong?.title ?: "",
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
 
-                        Text(
-                            text = currentSong?.artist?.name ?: "",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.graphicsLayer {
-                                alpha = 0.60f
-                            }
-                        )
+                            Text(
+                                text = currentSong?.artist?.name ?: "",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.graphicsLayer {
+                                    alpha = 0.60f
+                                }
+                            )
+                        }
 
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 16.dp)
+                                .padding(vertical = 16.dp, horizontal = 8.dp)
                         ) {
                             Slider(
-                                value = currentTime.toFloat(),
-                                modifier = Modifier.fillMaxWidth(),
-                                valueRange = 0f..100f,
+                                value = if (currentPosTemp == 0f) currentMediaProgress else currentPosTemp,
+                                onValueChange = { currentPosTemp = it },
+                                onValueChangeFinished = {
+                                    currentMediaProgress = currentPosTemp
+                                    currentPosTemp = 0f
+                                    songViewModel.onSeekBarPositionChanged(currentMediaProgress.toLong())
+                                },
+                                valueRange = 0f..playbackStateValue.currentTrackDuration.toFloat(),
+                                modifier = Modifier
+                                    .fillMaxWidth(),
                                 colors = sliderColor,
-                                onValueChange = sliderChanged,
+                                enabled = true
                             )
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                CompositionLocalProvider {
-                                    Text(
-                                        text = currentTime.toLong().toTime(),
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-                                CompositionLocalProvider {
-                                    Text(
-                                        30000L.toTime(), style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
+                                Text(
+                                    text = playbackStateValue.currentPlaybackPosition.toTime(),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+
+                                Text(
+                                    text = songViewModel.getCurrentTrackDuration().toTime(),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
                             }
                         }
 

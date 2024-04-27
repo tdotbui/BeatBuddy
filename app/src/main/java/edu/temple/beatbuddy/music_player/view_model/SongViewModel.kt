@@ -20,8 +20,10 @@ import edu.temple.beatbuddy.utils.collectPlayerState
 import edu.temple.beatbuddy.utils.launchPlaybackStateJob
 import edu.temple.beatbuddy.utils.toMediaItemList
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,12 +46,12 @@ class SongViewModel @Inject constructor(
     var isFullScreen = MutableStateFlow(false)
         private set
 
+    private var isAuto: Boolean = false
+
     private var playbackStateJob: Job? = null
 
-//    private val _playbackState = MutableStateFlow(PlaybackState(0L, 0L))
-//    val playbackState: StateFlow<PlaybackState> get() = _playbackState
-
-    private var isAuto: Boolean = false
+    private val _playbackState = MutableStateFlow(PlaybackState(0L, 0L))
+    val playbackState: StateFlow<PlaybackState> get() = _playbackState
 
     init {
         viewModelScope.launch {
@@ -57,7 +59,32 @@ class SongViewModel @Inject constructor(
                 if (state == PlayerState.STATE_NEXT_SONG) onNextTrack()
             }
         }
+        observePlayerState()
     }
+
+    private fun updatePlaybackState(state: PlayerState) {
+        playbackStateJob?.cancel()
+        playbackStateJob = viewModelScope.launchPlaybackStateJob(_playbackState, state, player)
+    }
+
+    private fun observePlayerState() {
+        viewModelScope.collectPlayerState(player, ::updateState)
+    }
+
+    private fun updateState(state: PlayerState) {
+        if (selectedSongIndex != -1) {
+            isPlaying.value = state == PlayerState.STATE_PLAYING
+
+            updatePlaybackState(state)
+//            if (state == STATE_NEXT_TRACK) {
+//                isAuto = true
+//                onNextClick()
+//            }
+            if (state == PlayerState.STATE_END) onSongSelected(0)
+        }
+    }
+
+    fun getCurrentTrackDuration() = player.currentTrackDuration
 
     fun setUpSongLists(songList: List<Song>) {
         _currentSongList.addAll(songList)
@@ -79,6 +106,7 @@ class SongViewModel @Inject constructor(
 
     private fun onNextTrack() {
         if (selectedSongIndex < currentSongList.size - 1) {
+            isAuto = true
             selectedSongIndex++
             selectedSong.value = _currentSongList[selectedSongIndex]
         }
@@ -94,7 +122,7 @@ class SongViewModel @Inject constructor(
 
     override fun onPlayPauseClick() {
         player.playToggle()
-        isPlaying.value = !isPlaying.value
+//        isPlaying.value = !isPlaying.value
     }
 
     override fun onPreviousClick() {
