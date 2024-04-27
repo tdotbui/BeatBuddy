@@ -20,7 +20,7 @@ import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -53,7 +53,6 @@ import edu.temple.beatbuddy.utils.Helpers
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     songPostViewModel: SongPostViewModel = hiltViewModel(),
@@ -73,13 +72,8 @@ fun HomeScreen(
 
     val musicPlayer = ExoPlayer.Builder(context).build()
 
-    val scope = rememberCoroutineScope()
-    val bottomSheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Hidden,
-        skipHiddenState = false
-    )
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
     val currentSong by songViewModel.selectedSong.collectAsState()
+    val currentSongList by remember { mutableStateOf(songViewModel.currentSongList) }
 
     val tabs = listOf(
         TabItem(Icons.Default.Swipe, "Top's pick"),
@@ -134,26 +128,29 @@ fun HomeScreen(
             contentAlignment = Alignment.BottomCenter
         ) {
             when (selectedTabIndex) {
-                0 -> SwipeSongCardScreen(
-                    swipeSongViewModel = swipeSongViewModel
-                )
+                0 -> {
+                    SwipeSongCardScreen(swipeSongViewModel = swipeSongViewModel)
+                    songViewModel.minimizeScreen()
+                }
                 1 -> MusicBrowseScreen(
                     songPostViewModel = songPostViewModel,
-                    songViewModel = songViewModel,
-                    sheetOpen = {
-                        scope.launch {
-                            bottomSheetScaffoldState.bottomSheetState.expand()
-                        }
-                    }
+                    songViewModel = songViewModel
                 )
-                2 -> FeedsScreen(
-                    songPostViewModel = songPostViewModel,
-                    player = musicPlayer
-                )
-                3 -> ProfileListScreen(
-                    profileViewModel = profileViewModel
-                )
+                2 -> {
+                    songViewModel.minimizeScreen()
+                    FeedsScreen(
+                        songPostViewModel = songPostViewModel,
+                        player = musicPlayer
+                    )
+                }
+                3 -> {
+                    songViewModel.minimizeScreen()
+                    ProfileListScreen(
+                        profileViewModel = profileViewModel
+                    )
+                }
                 4 -> {
+                    songViewModel.minimizeScreen()
                     profileViewModel.setCurrentUser(userState.user!!)
                     CurrentUserProfileScreen(
                         profileViewModel = profileViewModel,
@@ -163,7 +160,7 @@ fun HomeScreen(
                 }
             }
 
-            if (currentSong != null) {
+            if (currentSong != null && currentSongList.size > 1) {
                 MusicPlayerScreen(
                     songViewModel = songViewModel,
                     playerEvent = songViewModel,

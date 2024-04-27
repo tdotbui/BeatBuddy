@@ -8,7 +8,7 @@ enum class PlayerState {
     STATE_END,
     STATE_PLAYING,
     STATE_PAUSE,
-    STATE_NEXT_TRACK,
+    STATE_NEXT_SONG,
 }
 
 data class PlaybackState(

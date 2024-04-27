@@ -28,9 +28,6 @@ class ProfileViewModel @Inject constructor(
     private val _isFollowing = MutableStateFlow(false)
     val isFollowing = _isFollowing
 
-    var playerState = MutableStateFlow(PlayerState.STATE_IDLE)
-        private set
-
     fun setCurrentUser(user: User) {
         _currentUser.value = user
         checkIfCurrentUserIsFollowed()

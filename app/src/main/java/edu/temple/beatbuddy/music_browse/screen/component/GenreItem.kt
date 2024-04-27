@@ -7,12 +7,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import edu.temple.beatbuddy.utils.Genre
@@ -20,7 +24,8 @@ import edu.temple.beatbuddy.utils.Genre
 @Composable
 fun GenreItem(
     genre: Genre,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isSelected: Boolean
 ) {
     Box(
         modifier = Modifier
@@ -32,11 +37,12 @@ fun GenreItem(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            imageVector = genre.image,
+            imageVector = if (isSelected) Icons.Default.LibraryMusic else genre.image,
             contentDescription = genre.title,
             modifier = Modifier
                 .size(100.dp)
-                .padding(8.dp),
+                .padding(8.dp)
+                .alpha(if (isSelected) 1f else 0.7f),
             contentScale = ContentScale.Crop,
         )
 
@@ -44,6 +50,7 @@ fun GenreItem(
             text = genre.title,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .alpha(if (isSelected) 1f else 0.7f)
                 .padding(bottom = 8.dp),
         )
     }

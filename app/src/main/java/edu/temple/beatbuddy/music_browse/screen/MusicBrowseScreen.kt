@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,7 +58,6 @@ fun MusicBrowseScreen(
     songListViewModel: SongListViewModel = hiltViewModel(),
     songPostViewModel: SongPostViewModel,
     songViewModel: SongViewModel,
-    sheetOpen: () -> Unit
 ) {
     val context = LocalContext.current
     val songs by songListViewModel.songListState.collectAsState()
@@ -64,6 +65,14 @@ fun MusicBrowseScreen(
     var songImage by remember { mutableStateOf("") }
     var songTitle by remember { mutableStateOf("") }
     var selectedSong by remember { mutableStateOf<Song?>(null) }
+
+    val scrollState = rememberLazyListState()
+    LaunchedEffect(songs.selectedGenre) {
+        val index = Genre.entries.indexOf(songs.selectedGenre)
+        if (index != -1) {
+            scrollState.scrollToItem(index)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -73,13 +82,15 @@ fun MusicBrowseScreen(
         LazyRow(
             modifier = Modifier
                 .padding(horizontal = 16.dp),
-            userScrollEnabled = true
+            userScrollEnabled = true,
+            state = scrollState
         ) {
             items(Genre.entries.size) { index ->
                 val genre = Genre.entries[index]
                 GenreItem(
                     genre = genre,
-                    onClick = { songListViewModel.getSongsByGenre(genre.id) }
+                    onClick = { songListViewModel.getSongsByGenre(genre) },
+                    isSelected = genre == songs.selectedGenre
                 )
             }
         }
@@ -103,7 +114,6 @@ fun MusicBrowseScreen(
                             songViewModel.setUpSongLists(songList)
                             songViewModel.onSongClick(song)
                             selectedSong = song
-                            sheetOpen()
                         },
                         shareClick = { song ->
                             openDialog = true

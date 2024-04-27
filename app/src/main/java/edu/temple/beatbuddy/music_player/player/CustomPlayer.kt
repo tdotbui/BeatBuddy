@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.music_player.player
 
+import android.annotation.SuppressLint
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
@@ -70,11 +71,27 @@ class CustomPlayer @Inject constructor(
         }
     }
 
+    @SuppressLint("SwitchIntDef")
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
-        if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
-            playerState.tryEmit(PlayerState.STATE_NEXT_TRACK)
-            playerState.tryEmit(PlayerState.STATE_PLAYING)
+        when (reason) {
+            Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> {
+                playerState.tryEmit(PlayerState.STATE_NEXT_SONG)
+                playerState.tryEmit(PlayerState.STATE_PLAYING)
+            }
+//            Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> {
+//                // Emit state for transitioning to the previous track
+//                playerState.tryEmit(PlayerState.STATE_PREVIOUS_SONG)
+//                playerState.tryEmit(PlayerState.STATE_PLAYING)
+//            }
+//
+//            Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> {
+//                TODO()
+//            }
+//
+//            Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> {
+//                TODO()
+//            }
         }
     }
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.music_browse.repository.SongListRepository
+import edu.temple.beatbuddy.utils.Genre
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -20,22 +21,23 @@ class SongListViewModel @Inject constructor(
         private set
 
     init {
-        getSongsByGenre(songListState.value.selectedGenre)
+        getSongsByGenre(Genre.POP)
     }
 
-    fun getSongsByGenre(genre: Int) {
+    fun getSongsByGenre(genre: Genre) {
         songListState.update {
             it.copy(isLoading = true)
         }
         viewModelScope.launch {
             songListRepository.getSongList(
-                fetchFromRemote = true,
-                genre = genre
+                fetchFromRemote = !songListState.value.genres.contains(genre),
+                genre = genre.id
             ).collectLatest { result ->
                 when(result) {
                     is Resource.Success -> {
                         result.data?.let { songList ->
                             songListState.update {
+                                if (!it.genres.contains(genre)) it.genres.add(genre)
                                 it.copy(
                                     currentSongList = songList,
                                     selectedGenre = genre,
@@ -52,11 +54,6 @@ class SongListViewModel @Inject constructor(
                             )
                         }
                     }
-//                    is Resource.Loading -> {
-//                        songListState.update {
-//                            it.copy(isLoading = true)
-//                        }
-//                    }
                     else -> {}
                 }
             }

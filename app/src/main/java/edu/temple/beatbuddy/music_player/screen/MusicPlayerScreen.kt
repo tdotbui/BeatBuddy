@@ -55,27 +55,18 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 import edu.temple.beatbuddy.component.VinylAlbumCover
 import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
-import edu.temple.beatbuddy.music_browse.model.local.Song
-import edu.temple.beatbuddy.music_player.player.PlaybackState
 import edu.temple.beatbuddy.music_player.player.PlayerEvent
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.utils.toTime
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun MusicPlayerScreen(
-//    songs: List<Song>,
-//    song: Song?,
     songViewModel: SongViewModel,
-//    isPlaying: Boolean,
     playerEvent: PlayerEvent,
-//    playbackState: StateFlow<PlaybackState>,
 ) {
-    var isFullScreen by remember { mutableStateOf(false) }
+    val isFullScreen by songViewModel.isFullScreen.collectAsState()
 
     if (isFullScreen) {
         Box(
@@ -93,7 +84,7 @@ fun MusicPlayerScreen(
                 playNext = { playerEvent.onNextClick() },
                 sliderChanged = { position-> playerEvent.onSeekBarPositionChanged(position.toLong()) },
                 slideDown = {
-                    isFullScreen = false
+                    songViewModel.minimizeScreen()
                 }
             )
         }
@@ -103,7 +94,7 @@ fun MusicPlayerScreen(
             playToggle = { playerEvent.onPlayPauseClick() },
             playNext = { playerEvent.onNextClick() },
             slideUp = {
-                isFullScreen = true
+                songViewModel.maximizeScreen()
             },
         )
     }

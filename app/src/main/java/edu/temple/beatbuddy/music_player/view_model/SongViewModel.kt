@@ -41,12 +41,23 @@ class SongViewModel @Inject constructor(
     var isPlaying = MutableStateFlow(false)
         private set
 
+    var isFullScreen = MutableStateFlow(false)
+        private set
+
     private var playbackStateJob: Job? = null
 
-    private val _playbackState = MutableStateFlow(PlaybackState(0L, 0L))
-    val playbackState: StateFlow<PlaybackState> get() = _playbackState
+//    private val _playbackState = MutableStateFlow(PlaybackState(0L, 0L))
+//    val playbackState: StateFlow<PlaybackState> get() = _playbackState
 
     private var isAuto: Boolean = false
+
+    init {
+        viewModelScope.launch {
+            player.playerState.collect { state ->
+                if (state == PlayerState.STATE_NEXT_SONG) onNextTrack()
+            }
+        }
+    }
 
     fun setUpSongLists(songList: List<Song>) {
         _currentSongList.addAll(songList)
@@ -66,18 +77,31 @@ class SongViewModel @Inject constructor(
         isAuto = false
     }
 
-    override fun onPlayPauseClick() {
-        player.playToggle()
-        isPlaying.value = !isPlaying.value
-
-        if (player.playerState.value == PlayerState.STATE_NEXT_TRACK) {
-            selectedSongIndex += 1
+    private fun onNextTrack() {
+        if (selectedSongIndex < currentSongList.size - 1) {
+            selectedSongIndex++
             selectedSong.value = _currentSongList[selectedSongIndex]
         }
     }
 
+    fun minimizeScreen() {
+        isFullScreen.value = false
+    }
+
+    fun maximizeScreen () {
+        isFullScreen.value = true
+    }
+
+    override fun onPlayPauseClick() {
+        player.playToggle()
+        isPlaying.value = !isPlaying.value
+    }
+
     override fun onPreviousClick() {
-        if (selectedSongIndex > 0) onSongSelected(selectedSongIndex - 1)
+        if (selectedSongIndex > 0) {
+            onSongSelected(selectedSongIndex - 1)
+            selectedSong.value = _currentSongList[selectedSongIndex]
+        }
     }
 
     override fun onNextClick() {
