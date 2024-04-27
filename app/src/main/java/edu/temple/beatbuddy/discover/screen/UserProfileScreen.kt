@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import edu.temple.beatbuddy.discover.screen.component.UserProfileStatsHeader
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.user_auth.model.User
+import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.utils.ImageSize
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.asStateFlow
 @Composable
 fun UserProfileScreen(
     profileViewModel: ProfileViewModel,
+    currentUserProfileViewModel: CurrentUserProfileViewModel,
     back: (User) -> Unit
 ) {
     val currentUser by profileViewModel.currentUser.collectAsState()
@@ -106,6 +108,7 @@ fun UserProfileScreen(
                     } else {
                         profileViewModel.followCurrent()
                     }
+                    currentUserProfileViewModel.fetchCurrentUserStats(true)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

@@ -12,7 +12,7 @@ data class User(
     val bio: String? = null,
 
     var isFollowed: Boolean? = false,
-    var stats: UserStats? = UserStats("", 0,0,0)
+    var stats: UserStats? = null
 )
 
 @Entity

@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.user_profile.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,13 +36,13 @@ import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.utils.ImageSize
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun CurrentUserProfileScreen(
-    profileViewModel: ProfileViewModel,
     currentUserProfileViewModel: CurrentUserProfileViewModel,
     onSignOut: () -> Unit,
 ) {
-    val currentUser by profileViewModel.currentUser.collectAsState()
+    val currentUser by currentUserProfileViewModel.currentUser.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()

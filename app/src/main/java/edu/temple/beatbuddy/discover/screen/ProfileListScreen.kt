@@ -33,6 +33,7 @@ import edu.temple.beatbuddy.discover.view_model.AllUsersViewModel
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.user_auth.model.MockUser
 import edu.temple.beatbuddy.user_auth.model.User
+import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.launch
 
@@ -40,6 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileListScreen(
     allUsersViewModel: AllUsersViewModel = hiltViewModel(),
+    currentUserProfileViewModel: CurrentUserProfileViewModel,
     profileViewModel: ProfileViewModel
 ) {
     val users by allUsersViewModel.allUsersState.collectAsState()
@@ -57,6 +59,7 @@ fun ProfileListScreen(
         sheetContent = {
             UserProfileScreen(
                 profileViewModel = profileViewModel,
+                currentUserProfileViewModel = currentUserProfileViewModel,
                 back = {
                     scope.launch {
                         allUsersViewModel.fetchAllUsers()

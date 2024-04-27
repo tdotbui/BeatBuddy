@@ -70,8 +70,6 @@ fun HomeScreen(
         Helpers.saveUidToSharedPreferences(context, userState.user!!.id)
     }
 
-    val musicPlayer = ExoPlayer.Builder(context).build()
-
     val currentSong by songViewModel.selectedSong.collectAsState()
     val currentSongList by remember { mutableStateOf(songViewModel.currentSongList) }
 
@@ -146,14 +144,14 @@ fun HomeScreen(
                 3 -> {
                     songViewModel.minimizeScreen()
                     ProfileListScreen(
-                        profileViewModel = profileViewModel
+                        profileViewModel = profileViewModel,
+                        currentUserProfileViewModel = currentUserProfileViewModel
                     )
                 }
                 4 -> {
                     songViewModel.minimizeScreen()
-                    profileViewModel.setCurrentUser(userState.user!!)
+                    currentUserProfileViewModel.fetchCurrentUserStats(false)
                     CurrentUserProfileScreen(
-                        profileViewModel = profileViewModel,
                         currentUserProfileViewModel = currentUserProfileViewModel,
                         onSignOut = { goToSignInScreen() }
                     )
