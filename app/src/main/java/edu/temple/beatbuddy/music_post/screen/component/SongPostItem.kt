@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
@@ -23,15 +21,12 @@ import androidx.compose.material.icons.filled.ThumbUpOffAlt
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,42 +34,30 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.size.Size
-import edu.temple.beatbuddy.app.screen.HomeScreen
 import edu.temple.beatbuddy.component.ImageFactory
-import edu.temple.beatbuddy.component.VinylAlbumCover
 import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
-import edu.temple.beatbuddy.discover.screen.component.ProfilePicture
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
-import edu.temple.beatbuddy.music_post.model.MockPost
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
-import edu.temple.beatbuddy.utils.ImageSize
 
 @Composable
 fun SongPostItem(
     songPost: SongPost,
     likePost: () -> Unit,
     songPostViewModel: SongPostViewModel,
-    songViewModel: SongViewModel
+    songViewModel: SongViewModel,
 ) {
     val context = LocalContext.current
     val user = songPost.user
 
     var didLike by remember { mutableStateOf(false) }
+//    var isPlaying by remember { mutableStateOf(false) }
+
     val isPlaying by songViewModel.isPlaying.collectAsState()
 
-    val imageOpacity = if (isPlaying) 1f else 0.5f
-
     val currentSong by songPostViewModel.currentSongPost.collectAsState()
+    val imageOpacity = if (isPlaying && currentSong == songPost) 1f else 0.5f
 
     Card(
         modifier = Modifier
@@ -136,7 +119,10 @@ fun SongPostItem(
                             .size(200.dp)
                             .alpha(0.3f)
                             .clickable {
+                                if (!isPlaying) songViewModel.onPlayPauseClick()
+                                songPostViewModel.setCurrentSongPost(songPost)
                                 songViewModel.setUpSongPost(songPost)
+
                             }
                     )
                 }

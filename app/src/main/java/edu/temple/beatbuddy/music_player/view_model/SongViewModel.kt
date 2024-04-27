@@ -74,7 +74,7 @@ class SongViewModel @Inject constructor(
 
     private fun updateState(state: PlayerState) {
         if (selectedSongIndex != -1) {
-//            isPlaying.value = state == PlayerState.STATE_PLAYING
+            isPlaying.value = state == PlayerState.STATE_PLAYING
 
             updatePlaybackState(state)
 //            if (state == STATE_NEXT_TRACK) {
@@ -83,7 +83,7 @@ class SongViewModel @Inject constructor(
 //            }
             if (state == PlayerState.STATE_END) {
                 onSongSelected(0)
-//                isPlaying.value = false
+                isPlaying.value = false
                 isAuto = false
             }
         }
@@ -97,12 +97,12 @@ class SongViewModel @Inject constructor(
     }
 
     fun setUpSongPost(songPost: SongPost) {
-        if (isPlaying.value && currentSongList.size > 1) {
-            onPlayPauseClick()
+        if (isPlaying.value || currentSongList.size > 1) {
+            isPlaying.value = false
             _currentSongList.clear()
         }
         player.initSinglePlayer(MediaItem.fromUri(songPost.preview))
-        onPlayPauseClick()
+        selectedSongIndex = 0
     }
 
     private fun onSongSelected(index: Int) {
@@ -114,7 +114,7 @@ class SongViewModel @Inject constructor(
     }
 
     private fun setUpTrack() {
-        if (!isAuto) player.setUpTrack(selectedSongIndex, isPlaying.value)
+        if (!isAuto) player.setUpTrack(selectedSongIndex, true)
         isAuto = false
     }
 
@@ -136,7 +136,7 @@ class SongViewModel @Inject constructor(
 
     override fun onPlayPauseClick() {
         player.playToggle()
-        isPlaying.value = !isPlaying.value
+//        isPlaying.value = !isPlaying.value
     }
 
     override fun onPreviousClick() {

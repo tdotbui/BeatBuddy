@@ -31,6 +31,7 @@ class CustomPlayer @Inject constructor(
         player.addListener(this)
         player.setMediaItem(item)
         player.prepare()
+        player.playWhenReady = true
     }
 
     fun setUpTrack(index: Int, isTrackPlay: Boolean) {

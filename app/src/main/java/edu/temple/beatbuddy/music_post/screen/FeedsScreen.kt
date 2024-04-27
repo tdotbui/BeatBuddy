@@ -29,6 +29,13 @@ fun FeedsScreen(
 ) {
     val posts by songPostViewModel.songPostState.collectAsState()
 
+    DisposableEffect(Unit) {
+        onDispose {
+            songPostViewModel.clearCurrentSongPost()
+            if (songViewModel.isPlaying.value) songViewModel.onPlayPauseClick()
+        }
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
     ) {

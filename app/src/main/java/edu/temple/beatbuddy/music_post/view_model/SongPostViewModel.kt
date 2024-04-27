@@ -28,8 +28,12 @@ class SongPostViewModel @Inject constructor(
         fetchSongPosts()
     }
 
-    fun setCurrentSong(songPost: SongPost) {
+    fun setCurrentSongPost(songPost: SongPost) {
         currentSongPost.value = songPost
+    }
+
+    fun clearCurrentSongPost() {
+        currentSongPost.value = null
     }
 
     private fun fetchSongPosts() = viewModelScope.launch {

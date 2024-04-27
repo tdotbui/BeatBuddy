@@ -76,7 +76,7 @@ fun MusicBrowseScreen(
 
     Column(
         modifier = Modifier
-            .padding(16.dp)
+//            .padding(16.dp)
             .fillMaxWidth()
     ) {
         LazyRow(
