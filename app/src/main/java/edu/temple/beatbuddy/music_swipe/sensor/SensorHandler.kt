@@ -29,7 +29,6 @@ class SensorHandler(context: Context, private val viewModel: SwipeSongViewModel)
                     viewModel.removeSongFromList()
                     isNeutral = false
                 } else if (x > -1.0f && x < 1.0f) {
-                    Log.d("SensorHandler", "Neutral")
                     isNeutral = true
                 }
             }
