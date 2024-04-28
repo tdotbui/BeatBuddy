@@ -28,14 +28,6 @@ class SongPostViewModel @Inject constructor(
         fetchSongPosts()
     }
 
-    fun setCurrentSongPost(songPost: SongPost) {
-        currentSongPost.value = songPost
-    }
-
-    fun clearCurrentSongPost() {
-        currentSongPost.value = null
-    }
-
     private fun fetchSongPosts() = viewModelScope.launch {
         songPostState.update {
             it.copy(isLoading = true)
@@ -51,7 +43,6 @@ class SongPostViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
-                        checkIfUserLikedPost()
                     }
                 }
                 is Resource.Error -> {
@@ -73,17 +64,41 @@ class SongPostViewModel @Inject constructor(
         }
     }
 
+    fun likePost(songPost: SongPost) {
+        viewModelScope.launch {
+            repository.likePost(songPost).let {result ->
+                if (result is Resource.Success) fetchSongPosts()
+            }
+        }
+    }
+
+    fun unlikePost(songPost: SongPost) {
+        viewModelScope.launch {
+            repository.unlikePost(songPost).let {result ->
+                if (result is Resource.Success) fetchSongPosts()
+            }
+        }
+    }
+
     fun makePost(songPost: SongPost) = viewModelScope.launch {
         repository.shareAPost(songPost)
         fetchSongPosts()
     }
 
-    private fun checkIfUserLikedPost() {
-        for (post in songPostState.value.posts) {
-            viewModelScope.launch {
-                post.didLike = repository.checkIfUserLikePost(post).data
-                Log.d("Post ${post.title}", "Did like is ${post.didLike}")
-            }
-        }
+//    private fun checkIfUserLikedPost() {
+//        for (post in songPostState.value.posts) {
+//            viewModelScope.launch {
+//                post.didLike = repository.checkIfUserLikedPost(post).data
+//                Log.d("Post ${post.title}", "Did like is ${post.didLike}")
+//            }
+//        }
+//    }
+
+    fun setCurrentSongPost(songPost: SongPost) {
+        currentSongPost.value = songPost
+    }
+
+    fun clearCurrentSongPost() {
+        currentSongPost.value = null
     }
 }

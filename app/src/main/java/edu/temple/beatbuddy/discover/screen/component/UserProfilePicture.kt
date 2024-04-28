@@ -43,8 +43,8 @@ fun ProfilePicture(
     Card(
         shape = CircleShape,
         border = BorderStroke(
-            width = 1.dp,
-            color = Color.Green
+            width = 0.5.dp,
+            color = Color.White
         ),
         modifier = Modifier
             .padding(16.dp),

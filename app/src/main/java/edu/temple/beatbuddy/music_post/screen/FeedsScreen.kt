@@ -43,7 +43,6 @@ fun FeedsScreen(
             items(posts.posts.size) { index ->
                 SongPostItem(
                     songPost = posts.posts[index],
-                    likePost = { },
                     songPostViewModel = songPostViewModel,
                     songViewModel = songViewModel
                 )

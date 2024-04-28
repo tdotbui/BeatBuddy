@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Comment
+import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material.icons.filled.PauseCircleOutline
@@ -25,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,15 +47,14 @@ import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 @Composable
 fun SongPostItem(
     songPost: SongPost,
-    likePost: () -> Unit,
     songPostViewModel: SongPostViewModel,
     songViewModel: SongViewModel,
 ) {
     val context = LocalContext.current
     val user = songPost.user
 
-    var didLike by remember { mutableStateOf(false) }
-//    var isPlaying by remember { mutableStateOf(false) }
+    var didLike by remember { mutableStateOf(songPost.didLike) }
+    var likes by remember { mutableIntStateOf(songPost.likes) }
 
     val isPlaying by songViewModel.isPlaying.collectAsState()
 
@@ -158,20 +160,27 @@ fun SongPostItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        imageVector = if (didLike) Icons.Default.ThumbUp else Icons.Default.ThumbUpOffAlt,
+                        imageVector = if (didLike == true) Icons.Default.ThumbUp else Icons.Default.ThumbUpOffAlt,
                         contentDescription = null,
                         modifier = Modifier
                             .clickable {
-                                didLike = !didLike
-                                likePost()
+                                didLike = didLike != true
+                                if (didLike == true) {
+                                    songPostViewModel.likePost(songPost)
+                                    likes++
+                                } else {
+                                    songPostViewModel.unlikePost(songPost)
+                                    likes--
+                                }
                             }
                     )
-
-                    Text(text = "${songPost.likes}")
+                    if (likes > 0) {
+                        Text(text = "$likes")
+                    }
                 }
 
                 Icon(
-                    imageVector = Icons.Default.Comment,
+                    imageVector = Icons.AutoMirrored.Outlined.Comment,
                     contentDescription = null
                 )
 

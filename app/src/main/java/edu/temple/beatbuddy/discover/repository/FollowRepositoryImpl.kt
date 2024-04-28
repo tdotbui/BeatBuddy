@@ -33,6 +33,7 @@ class FollowRepositoryImpl @Inject constructor(
                     .collection("user-following")
                     .document(userId)
                     .set(mapOf<Any, String>())
+                    .await()
             }
 
             runCatching {
@@ -41,6 +42,7 @@ class FollowRepositoryImpl @Inject constructor(
                     .collection("user-followers")
                     .document(currentUserId)
                     .set(mapOf<Any, String>())
+                    .await()
             }
         }
         Resource.Success(true)

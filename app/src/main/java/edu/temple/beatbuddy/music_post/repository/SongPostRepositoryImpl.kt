@@ -37,7 +37,7 @@ class SongPostRepositoryImpl @Inject constructor(
         try {
             val posts = postRef.orderBy("timestamp", Query.Direction.DESCENDING).get().await().toObjects(SongPost::class.java).map {
                 val user = userRef.document(it.ownerUid).get().await().toObject(User::class.java)
-                it.copy(user = user)
+                it.copy(user = user, didLike = checkIfUserLikedPost(it).data)
             }
             emit(Resource.Success(posts))
         } catch (e: Exception) {
@@ -55,7 +55,7 @@ class SongPostRepositoryImpl @Inject constructor(
 
         Resource.Success(true)
     } catch (e: Exception) {
-        Resource.Error(e.localizedMessage!!)
+        Resource.Error(e.localizedMessage!!, false)
     }
 
     override fun fetchPostsFromFollowing(): Flow<Resource<List<SongPost>>> = flow {
@@ -70,7 +70,7 @@ class SongPostRepositoryImpl @Inject constructor(
             val posts: MutableList<SongPost> = mutableListOf()
 
             for (doc in postSnapshot.documents) {
-                val post = postRef.document(doc.id).get().await().toObject(SongPost::class.java)?.let { it ->
+                val post = postRef.document(doc.id).get().await().toObject(SongPost::class.java)?.let {
                     val user = userRef.document(it.ownerUid).get().await().toObject(User::class.java)
                     it.copy(user = user)
                 }
@@ -86,7 +86,76 @@ class SongPostRepositoryImpl @Inject constructor(
         emit(Resource.Loading(false))
     }
 
+    override suspend fun likePost(songPost: SongPost): Resource<Boolean> = try {
+        auth.currentUser?.uid?.let {uid ->
+            runCatching {
+                postRef
+                    .document(songPost.postId)
+                    .collection("post-likes")
+                    .document(uid)
+                    .set(mapOf<String, Any>())
+                    .await()
+            }
+            runCatching {
+                postRef
+                    .document(songPost.postId)
+                    .update("likes", songPost.likes + 1)
+                    .await()
+            }
+            runCatching {
+                userRef
+                    .document(uid)
+                    .collection("user-likes")
+                    .document(songPost.postId)
+                    .set(mapOf<String, Any>())
+                    .await()
+            }
+        }
+        Resource.Success(true)
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!, false)
+    }
 
+    override suspend fun unlikePost(songPost: SongPost): Resource<Boolean> = try {
+        auth.currentUser?.uid?.let {uid ->
+            runCatching {
+                postRef
+                    .document(songPost.postId)
+                    .collection("post-likes")
+                    .document(uid)
+                    .delete()
+            }
+            runCatching {
+                postRef
+                    .document(songPost.postId)
+                    .update("likes", songPost.likes - 1)
+                    .await()
+            }
+            runCatching {
+                userRef
+                    .document(uid)
+                    .collection("user-likes")
+                    .document(songPost.postId)
+                    .delete()
+            }
+        }
+        Resource.Success(true)
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!, false)
+    }
+
+    override suspend fun checkIfUserLikedPost(songPost: SongPost): Resource<Boolean> = try {
+        val userId = auth.currentUser?.uid ?: ""
+        val snapshot = userRef
+            .document(userId)
+            .collection("user-likes")
+            .document(songPost.postId)
+            .get()
+            .await()
+        Resource.Success(snapshot.exists())
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!, false)
+    }
 
     private suspend fun updateUserFeedAfterPost(postId: String) {
         val currentUid = auth.currentUser?.uid ?: ""
