@@ -1,7 +1,6 @@
 package edu.temple.beatbuddy.music_browse.model.mapping
 
-import androidx.media3.common.MediaItem
-import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.Song
 import edu.temple.beatbuddy.music_browse.model.remote.AlbumDto
 import edu.temple.beatbuddy.music_browse.model.remote.ArtistDto
 import edu.temple.beatbuddy.music_browse.model.remote.SongDto

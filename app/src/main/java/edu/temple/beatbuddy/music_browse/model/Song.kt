@@ -1,13 +1,10 @@
-package edu.temple.beatbuddy.music_browse.model.local
+package edu.temple.beatbuddy.music_browse.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.firebase.Timestamp
 import edu.temple.beatbuddy.music_browse.model.remote.AlbumDto
 import edu.temple.beatbuddy.music_browse.model.remote.ArtistDto
-import edu.temple.beatbuddy.music_browse.model.remote.SongDto
-import edu.temple.beatbuddy.music_post.model.SongPost
 
 @Entity("SongEntity")
 data class Song(

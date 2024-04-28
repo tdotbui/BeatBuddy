@@ -1,6 +1,6 @@
 package edu.temple.beatbuddy.music_player.player
 
-import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.Song
 
 interface PlayerEvent {
     fun onPlayPauseClick()

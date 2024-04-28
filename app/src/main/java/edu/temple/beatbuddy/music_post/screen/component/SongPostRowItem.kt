@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.ThumbUpOffAlt
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -52,13 +53,14 @@ fun SongPostRowItem(
 
     Card(
         modifier = Modifier
-            .padding(vertical = 6.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer),
+            .padding(vertical = 6.dp)
+            .clickable {  },
+        border = BorderStroke(1.dp, Color.White),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp,
-            hoveredElevation = 10.dp,
+            defaultElevation = 10.dp,
             pressedElevation = 20.dp
-        )
+        ),
+        colors = CardDefaults.cardColors(Color.White)
     ) {
         Row(
             modifier = Modifier
@@ -116,6 +118,7 @@ fun SongPostRowItem(
                                         songPostViewModel.unlikePost(songPost)
                                         likes--
                                     }
+                                    songPostViewModel.fetchSongPosts()
                                 }
                         )
 

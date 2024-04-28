@@ -1,7 +1,7 @@
 package edu.temple.beatbuddy.music_browse.repository
 
 import android.util.Log
-import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.Song
 import edu.temple.beatbuddy.music_browse.model.local.SongDatabase
 import edu.temple.beatbuddy.music_browse.model.mapping.toSong
 import edu.temple.beatbuddy.music_browse.model.remote.SongApi

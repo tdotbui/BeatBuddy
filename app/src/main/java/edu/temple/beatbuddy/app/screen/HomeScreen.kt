@@ -28,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -96,12 +97,14 @@ fun HomeScreen(
                 selectedTabIndex = selectedTabIndex,
                 contentColor = Color.Black,
                 modifier = Modifier
-                    .background(Color.White)
+                    .background(Color.Cyan)
             ) {
                 tabs.forEachIndexed { index, item ->
                     Tab(
                         selected = selectedTabIndex == index,
                         onClick = { selectedTabIndex = index },
+                        selectedContentColor = Color.Black,
+                        unselectedContentColor = Color.Gray,
                         text = {
                             Column(
                                 modifier = Modifier
@@ -114,7 +117,6 @@ fun HomeScreen(
                                     contentDescription = item.title,
                                     modifier = Modifier
                                         .size(24.dp),
-                                    tint = if (selectedTabIndex == index) Color.Black else Color.Gray
                                 )
                                 Text(
                                     text = item.title,

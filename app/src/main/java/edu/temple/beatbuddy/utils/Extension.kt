@@ -1,8 +1,7 @@
 package edu.temple.beatbuddy.utils
 
-import android.util.Log
 import androidx.media3.common.MediaItem
-import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.Song
 import edu.temple.beatbuddy.music_player.player.CustomPlayer
 import edu.temple.beatbuddy.music_player.player.PlayerState
 import kotlinx.coroutines.CoroutineScope
