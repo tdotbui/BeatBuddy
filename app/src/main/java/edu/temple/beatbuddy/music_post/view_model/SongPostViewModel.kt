@@ -1,11 +1,9 @@
 package edu.temple.beatbuddy.music_post.view_model
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.repository.SongPostRepository
 import edu.temple.beatbuddy.utils.Resource
@@ -30,15 +28,19 @@ class SongPostViewModel @Inject constructor(
         fetchSongPosts()
     }
 
-    fun setCurrentSong(songPost: SongPost) {
+    fun setCurrentSongPost(songPost: SongPost) {
         currentSongPost.value = songPost
+    }
+
+    fun clearCurrentSongPost() {
+        currentSongPost.value = null
     }
 
     private fun fetchSongPosts() = viewModelScope.launch {
         songPostState.update {
             it.copy(isLoading = true)
         }
-        repository.fetchPostsFromFirestore().collectLatest { result ->
+        repository.fetchAllPostsFromFirestore().collectLatest { result ->
             when(result) {
                 is Resource.Success -> {
                     Log.d("Success", "Success from Firestore")

@@ -6,7 +6,8 @@ import edu.temple.beatbuddy.utils.Genre
 data class SongListState(
     val isLoading: Boolean = false,
 
-    val selectedGenre: Int = Genre.POP.id,
+    val genres: MutableList<Genre> = mutableListOf(),
+    val selectedGenre: Genre = Genre.POP,
     val currentSongList: List<Song> = emptyList(),
 
     val errorMessage: String? = null

@@ -1,7 +1,12 @@
 package edu.temple.beatbuddy.app.module
 
 import android.app.Application
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,13 +16,17 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import edu.temple.beatbuddy.discover.model.local.UserStatsDatabase
+import edu.temple.beatbuddy.discover.repository.FollowRepository
+import edu.temple.beatbuddy.discover.repository.FollowRepositoryImpl
 import edu.temple.beatbuddy.music_browse.model.local.SongDatabase
 import edu.temple.beatbuddy.music_browse.model.remote.SongApi
 import edu.temple.beatbuddy.discover.repository.UsersRepository
 import edu.temple.beatbuddy.discover.repository.UsersRepositoryImpl
+import edu.temple.beatbuddy.music_player.player.CustomPlayer
 import edu.temple.beatbuddy.music_post.repository.SongPostRepository
 import edu.temple.beatbuddy.music_post.repository.SongPostRepositoryImpl
-import edu.temple.beatbuddy.user_auth.model.AuthRepository
+import edu.temple.beatbuddy.user_auth.repository.AuthRepository
 import edu.temple.beatbuddy.user_auth.repository.AuthRepositoryImpl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -29,12 +38,16 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+
     @Provides
     @Singleton
-    fun provideAuthRepository(): AuthRepository = AuthRepositoryImpl(
-        auth = Firebase.auth,
-        firestore = FirebaseFirestore.getInstance()
-    )
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        auth: FirebaseAuth,
+        @Named("UsersRef") usersRef: CollectionReference
+    ): AuthRepository = AuthRepositoryImpl(auth, usersRef)
 
     private val interceptor: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -71,8 +84,9 @@ class AppModule {
 
     @Provides
     fun provideUsersRepository(
+        auth: FirebaseAuth,
         @Named("UsersRef") usersRef: CollectionReference
-    ): UsersRepository = UsersRepositoryImpl(usersRef)
+    ): UsersRepository = UsersRepositoryImpl(auth, usersRef)
 
     @Provides
     @Named("PostRef")
@@ -80,7 +94,62 @@ class AppModule {
 
     @Provides
     fun provideSongPostRepository(
+        auth: FirebaseAuth,
         @Named("PostRef") postRef: CollectionReference,
-        @Named("UsersRef") usersRef: CollectionReference
-    ): SongPostRepository = SongPostRepositoryImpl(postRef, usersRef)
+        @Named("UsersRef") usersRef: CollectionReference,
+        @Named("FollowersRef") followersRef: CollectionReference,
+    ): SongPostRepository =
+        SongPostRepositoryImpl(auth, postRef, usersRef, followersRef)
+
+    @Provides
+    @Named("FollowingRef")
+    fun provideFollowingRef() = Firebase.firestore.collection("following")
+
+    @Provides
+    @Named("FollowersRef")
+    fun provideFollowersRef() = Firebase.firestore.collection("followers")
+
+    @Provides
+    @Singleton
+    fun providesUserStatsDatabase(app: Application): UserStatsDatabase {
+        return Room.databaseBuilder(
+            app,
+            UserStatsDatabase::class.java,
+            "userStats.db"
+        ).build()
+    }
+
+    @Provides
+    fun provideFollowRepository(
+        auth: FirebaseAuth,
+        @Named("FollowingRef") followingRef: CollectionReference,
+        @Named("FollowersRef") followersRef: CollectionReference,
+        @Named("PostRef") postRef: CollectionReference,
+        userStatsDatabase: UserStatsDatabase
+    ): FollowRepository =
+        FollowRepositoryImpl(
+            auth,
+            followersRef = followersRef,
+            followingRef = followingRef,
+            postRef = postRef,
+            userStatsDb = userStatsDatabase
+        )
+
+    @Provides
+    @Singleton
+    fun provideContext(application: Application): Context {
+        return application.applicationContext
+    }
+
+    @Provides
+    @Singleton
+    fun provideExoPLayer(context: Context): ExoPlayer {
+        return ExoPlayer.Builder(context).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMyPlayer(player: ExoPlayer): CustomPlayer {
+        return CustomPlayer(player)
+    }
 }

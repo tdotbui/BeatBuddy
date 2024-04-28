@@ -8,7 +8,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -17,22 +16,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.exoplayer.ExoPlayer
+import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.music_post.model.MockPost
 import edu.temple.beatbuddy.music_post.screen.component.SongPostItem
-import edu.temple.beatbuddy.music_post.view_model.SongPostItemViewModel
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 
 @Composable
 fun FeedsScreen(
     songPostViewModel: SongPostViewModel,
-    player: ExoPlayer,
-    songPostItemViewModel: SongPostItemViewModel = hiltViewModel()
+    songViewModel: SongViewModel
 ) {
     val posts by songPostViewModel.songPostState.collectAsState()
 
     DisposableEffect(Unit) {
         onDispose {
-            player.stop()
+            songPostViewModel.clearCurrentSongPost()
+            if (songViewModel.isPlaying.value) songViewModel.onPlayPauseClick()
         }
     }
 
@@ -43,9 +43,9 @@ fun FeedsScreen(
             items(posts.posts.size) { index ->
                 SongPostItem(
                     songPost = posts.posts[index],
-                    player = player,
+                    likePost = { },
                     songPostViewModel = songPostViewModel,
-                    songPostItemViewModel = songPostItemViewModel
+                    songViewModel = songViewModel
                 )
             }
         }

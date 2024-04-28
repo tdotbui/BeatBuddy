@@ -60,6 +60,8 @@ dependencies {
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation("com.google.firebase:firebase-storage-ktx")
+
 
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
@@ -98,6 +100,9 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.3.0")
     implementation("androidx.media3:media3-exoplayer-dash:1.3.0")
     implementation("androidx.media3:media3-ui:1.3.0")
+
+    // UI
+    implementation("androidx.compose.material:material:1.6.6")
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")

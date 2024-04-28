@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.music_browse.repository
 
+import android.util.Log
 import edu.temple.beatbuddy.music_browse.model.local.Song
 import edu.temple.beatbuddy.music_browse.model.local.SongDatabase
 import edu.temple.beatbuddy.music_browse.model.mapping.toSong
@@ -26,10 +27,12 @@ class SongListRepositoryImpl @Inject constructor(
         if (shouldCache) {
             emit(Resource.Success(localSongList))
             emit(Resource.Loading(false))
+            Log.d("Result", "Fetch locally")
             return@flow
         }
 
         val songListFromRemote = try {
+            Log.d("Result", "Fetch remotely")
             songApi.getSongList(genre)
         } catch (e: IOException) {
             e.printStackTrace()

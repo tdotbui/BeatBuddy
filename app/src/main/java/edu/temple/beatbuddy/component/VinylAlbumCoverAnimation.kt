@@ -51,6 +51,7 @@ fun VinylAlbumCoverAnimation(
 
     VinylAlbumCover(
         imageUrL = imageUrl,
-        rotationDegrees = rotation.value
+        rotationDegrees = rotation.value,
+        modifier = modifier
     )
 }

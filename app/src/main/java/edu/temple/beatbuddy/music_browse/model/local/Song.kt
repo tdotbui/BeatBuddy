@@ -3,8 +3,11 @@ package edu.temple.beatbuddy.music_browse.model.local
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.firebase.Timestamp
 import edu.temple.beatbuddy.music_browse.model.remote.AlbumDto
 import edu.temple.beatbuddy.music_browse.model.remote.ArtistDto
+import edu.temple.beatbuddy.music_browse.model.remote.SongDto
+import edu.temple.beatbuddy.music_post.model.SongPost
 
 @Entity("SongEntity")
 data class Song(
@@ -30,3 +33,29 @@ data class Song(
 
     val genre: Int
 )
+
+data class MockSong (
+    val songId: Long,
+    val preview: String,
+    val title: String,
+    val artist: String,
+    val songImage: String
+)
+object MockSongList {
+    val songs = listOf(
+        MockSong(
+            songId = 2444176345,
+            title = "greedy",
+            preview = "https://cdns-preview-d.dzcdn.net/stream/c-d3798b1f541af7a8886af7e8fec035b9-2.mp3",
+            artist = "Tate McRae",
+            songImage = "https://e-cdns-images.dzcdn.net/images/cover/ef25b6bec265332a059879f45d33cd7e/250x250-000000-80-0-0.jpg",
+        ),
+        MockSong(
+            songId = 463935645,
+            title = "What Was I Made For? [From The Motion Picture \\\"Barbie\\\"]",
+            preview = "https://cdns-preview-8.dzcdn.net/stream/c-840d9d9b9875e413cf5c00a5d6918626-6.mp3",
+            artist = "Billie Eilish",
+            songImage = "https://e-cdns-images.dzcdn.net/images/cover/2562b8d68b75635bb2d4b92dc7ed9ab5/250x250-000000-80-0-0.jpg",
+        ),
+    )
+}
