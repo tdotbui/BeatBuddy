@@ -43,7 +43,7 @@ class SwipeSongViewModel @Inject constructor(
         }
     }
 
-    private fun fetchSwipeSongPosts() = viewModelScope.launch {
+    fun fetchSwipeSongPosts() = viewModelScope.launch {
         songPostState.update {
             it.copy(isLoading = true)
         }

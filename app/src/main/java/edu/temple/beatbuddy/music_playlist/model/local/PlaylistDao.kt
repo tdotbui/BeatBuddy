@@ -1,14 +1,16 @@
 package edu.temple.beatbuddy.music_playlist.model.local
 
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import edu.temple.beatbuddy.music_playlist.model.Playlist
 import edu.temple.beatbuddy.music_playlist.model.PlaylistWithSongs
 
+@Dao
 interface PlaylistDao {
     @Insert
-    suspend fun insertPlaylist(playlist: Playlist)
+    suspend fun insertPlaylist(playlist: Playlist): Long
 
     @Delete
     suspend fun deletePlaylist(playlist: Playlist)
@@ -17,5 +19,8 @@ interface PlaylistDao {
     fun getAllPlaylists(): List<Playlist>
 
     @Query("SELECT * FROM Playlist WHERE id = :playlistId")
-    fun getPlaylistById(playlistId: Long): PlaylistWithSongs
+    suspend fun getPlaylistById(playlistId: Long): Playlist?
+
+    @Query("SELECT * FROM Playlist WHERE id = :name")
+    suspend fun getPlaylistByName(name: String): Playlist?
 }
