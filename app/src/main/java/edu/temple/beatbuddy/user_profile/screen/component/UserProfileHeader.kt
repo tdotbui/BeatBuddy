@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import edu.temple.beatbuddy.discover.screen.component.UserProfileStatsHeader
+import edu.temple.beatbuddy.user_discover.screen.component.UserProfileStatsHeader
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.ImageSize
 

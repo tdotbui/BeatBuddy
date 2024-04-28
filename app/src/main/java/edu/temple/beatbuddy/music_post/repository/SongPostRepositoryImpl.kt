@@ -3,27 +3,14 @@ package edu.temple.beatbuddy.music_post.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.toObject
-import edu.temple.beatbuddy.discover.repository.UsersRepository
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.Resource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.lang.Exception
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class SongPostRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,

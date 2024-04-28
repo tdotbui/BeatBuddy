@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.discover.view_model
+package edu.temple.beatbuddy.user_discover.view_model
 
 import edu.temple.beatbuddy.user_auth.model.User
 

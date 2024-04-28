@@ -9,12 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.DirectionsWalk
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Feed
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonSearch
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Swipe
 import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material.icons.outlined.AutoAwesome
@@ -37,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import edu.temple.beatbuddy.music_browse.screen.MusicBrowseScreen
-import edu.temple.beatbuddy.discover.screen.ProfileListScreen
-import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
+import edu.temple.beatbuddy.user_discover.screen.ProfileListScreen
+import edu.temple.beatbuddy.user_discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.music_player.screen.MusicPlayerScreen
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen

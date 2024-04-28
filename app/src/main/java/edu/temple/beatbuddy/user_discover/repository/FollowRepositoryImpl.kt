@@ -1,14 +1,10 @@
-package edu.temple.beatbuddy.discover.repository
+package edu.temple.beatbuddy.user_discover.repository
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FieldValue
-import edu.temple.beatbuddy.discover.model.local.UserStatsDatabase
-import edu.temple.beatbuddy.user_auth.model.User
+import edu.temple.beatbuddy.user_discover.model.local.UserStatsDatabase
 import edu.temple.beatbuddy.user_auth.model.UserStats
 import edu.temple.beatbuddy.utils.Resource
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async

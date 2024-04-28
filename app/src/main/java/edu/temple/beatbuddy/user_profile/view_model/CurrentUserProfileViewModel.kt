@@ -1,16 +1,11 @@
 package edu.temple.beatbuddy.user_profile.view_model
 
-import android.util.Log
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.temple.beatbuddy.discover.repository.FollowRepository
-import edu.temple.beatbuddy.discover.repository.UsersRepository
-import edu.temple.beatbuddy.music_player.player.CustomPlayer
+import edu.temple.beatbuddy.user_discover.repository.FollowRepository
+import edu.temple.beatbuddy.user_discover.repository.UsersRepository
 import edu.temple.beatbuddy.user_auth.model.User
-import edu.temple.beatbuddy.user_auth.model.UserStats
 import edu.temple.beatbuddy.user_auth.repository.AuthRepository
 import edu.temple.beatbuddy.user_auth.view_model.UserState
 import edu.temple.beatbuddy.utils.Resource

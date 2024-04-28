@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.discover.screen
+package edu.temple.beatbuddy.user_discover.screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,9 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import edu.temple.beatbuddy.discover.screen.component.UserProfileStatsHeader
-import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
-import edu.temple.beatbuddy.music_post.model.MockPost
+import edu.temple.beatbuddy.user_discover.screen.component.UserProfileStatsHeader
+import edu.temple.beatbuddy.user_discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.music_post.screen.component.SongPostRowItem
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.user_auth.model.User

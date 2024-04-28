@@ -9,8 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import edu.temple.beatbuddy.discover.screen.component.ProfilePicture
-import edu.temple.beatbuddy.music_post.model.SongPost
+import edu.temple.beatbuddy.user_discover.screen.component.ProfilePicture
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.ImageSize
 

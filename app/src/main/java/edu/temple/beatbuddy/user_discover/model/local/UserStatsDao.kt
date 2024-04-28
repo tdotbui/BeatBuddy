@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.discover.model.local
+package edu.temple.beatbuddy.user_discover.model.local
 
 import androidx.room.Dao
 import androidx.room.Query

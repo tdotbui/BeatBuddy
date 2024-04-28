@@ -1,6 +1,5 @@
-package edu.temple.beatbuddy.discover.repository
+package edu.temple.beatbuddy.user_discover.repository
 
-import android.net.Uri
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.Flow

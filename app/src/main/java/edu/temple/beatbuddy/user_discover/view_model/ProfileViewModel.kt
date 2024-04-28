@@ -1,14 +1,10 @@
-package edu.temple.beatbuddy.discover.view_model
+package edu.temple.beatbuddy.user_discover.view_model
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.temple.beatbuddy.discover.repository.FollowRepository
-import edu.temple.beatbuddy.discover.repository.UsersRepository
-import edu.temple.beatbuddy.music_player.player.PlayerState
+import edu.temple.beatbuddy.user_discover.repository.FollowRepository
 import edu.temple.beatbuddy.user_auth.model.User
-import edu.temple.beatbuddy.user_auth.model.UserStats
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

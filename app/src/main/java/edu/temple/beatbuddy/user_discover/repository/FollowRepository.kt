@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy.discover.repository
+package edu.temple.beatbuddy.user_discover.repository
 
 import edu.temple.beatbuddy.user_auth.model.UserStats
 import edu.temple.beatbuddy.utils.Resource
