@@ -5,39 +5,37 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.DirectionsWalk
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Feed
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Swipe
 import androidx.compose.material.icons.filled.Widgets
-import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.PersonSearch
+import androidx.compose.material.icons.outlined.Swipe
+import androidx.compose.material.icons.outlined.Widgets
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.exoplayer.ExoPlayer
 import edu.temple.beatbuddy.music_browse.screen.MusicBrowseScreen
 import edu.temple.beatbuddy.discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
@@ -50,7 +48,6 @@ import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.user_profile.screen.CurrentUserProfileScreen
 import edu.temple.beatbuddy.utils.Helpers
-import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -74,11 +71,26 @@ fun HomeScreen(
     val currentSongList by remember { mutableStateOf(songViewModel.currentSongList) }
 
     val tabs = listOf(
-        TabItem(Icons.Default.Swipe, "Top's pick"),
-        TabItem(Icons.Default.Widgets, "Browse"),
-        TabItem(Icons.Default.Feed, "Feeds"),
-        TabItem(Icons.Default.Search, "Explore"),
-        TabItem(Icons.Default.Person, "Profile"),
+        TabItem(
+            selectedIcon = Icons.Default.Swipe,
+            unselectedIcon = Icons.Outlined.Swipe,
+            title = "Top's pick"),
+        TabItem(
+            selectedIcon = Icons.Default.Widgets,
+            unselectedIcon = Icons.Outlined.Widgets,
+            title = "Browse"),
+        TabItem(
+            selectedIcon = Icons.Default.AutoAwesome,
+            unselectedIcon = Icons.Outlined.AutoAwesome,
+            title = "Newsfeed"),
+        TabItem(
+            selectedIcon = Icons.Default.PersonSearch,
+            unselectedIcon = Icons.Outlined.PersonSearch,
+            title = "Explore"),
+        TabItem(
+            selectedIcon = Icons.Default.Person,
+            unselectedIcon = Icons.Outlined.Person,
+            title = "Profile"),
     )
 
     Scaffold(
@@ -101,10 +113,11 @@ fun HomeScreen(
                                 verticalArrangement = Arrangement.Center,
                             ) {
                                 Icon(
-                                    imageVector = item.icon,
-                                    contentDescription = "Swipe icon",
-                                    modifier = Modifier.size(24.dp),
-                                    tint = Color.Black
+                                    imageVector = if (selectedTabIndex == index) item.selectedIcon else item.unselectedIcon,
+                                    contentDescription = item.title,
+                                    modifier = Modifier
+                                        .size(24.dp),
+                                    tint = if (selectedTabIndex == index) Color.Black else Color.Gray
                                 )
                                 Text(
                                     text = item.title,
@@ -170,12 +183,7 @@ fun HomeScreen(
 }
 
 data class TabItem(
-    val icon: ImageVector,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
     val title: String
 )
-
-//@Preview(showBackground = true)
-//@Composable
-//fun HomeScreenPV() {
-//    HomeScreen(goToSignInScreen =  {})
-//}

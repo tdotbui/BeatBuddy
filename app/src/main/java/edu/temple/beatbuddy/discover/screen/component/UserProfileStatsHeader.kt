@@ -3,6 +3,7 @@ package edu.temple.beatbuddy.discover.screen.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +19,8 @@ fun UserProfileStatsHeader(
     user: User
 ) {
     Row(
-        modifier = Modifier.wrapContentSize(),
+        modifier = Modifier
+            .wrapContentSize(),
         horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Column(

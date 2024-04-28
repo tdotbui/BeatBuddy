@@ -10,14 +10,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,15 +70,16 @@ fun CurrentUserProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if (currentUserProfileViewModel.userState.value.isLoading) {
-                CircularProgressIndicator()
-            }
-
             if (!isEditing) {
                 UserProfileHeader(
                     user = currentUser,
                     edit = {
                         isEditing = true
+                    },
+                    signOut = {
+                        songViewModel.releasePlayer()
+                        currentUserProfileViewModel.signOut()
+                        onSignOut()
                     }
                 )
             } else {
@@ -86,7 +93,7 @@ fun CurrentUserProfileScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxHeight()
+                .fillMaxSize()
                 .background(Color.White),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -96,19 +103,6 @@ fun CurrentUserProfileScreen(
                 modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp),
                 style = MaterialTheme.typography.titleSmall
             )
-
-            Button(
-                onClick = {
-                    songViewModel.releasePlayer()
-                    currentUserProfileViewModel.signOut()
-                    onSignOut()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 8.dp)
-            ) {
-                Text(text = "Sign Out")
-            }
         }
     }
 }

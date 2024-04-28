@@ -63,29 +63,35 @@ fun SwipeSongCardScreen(
 ) {
     val posts by swipeSongViewModel.songPostState.collectAsState()
 
-    if (posts.posts.isNotEmpty()) {
-        SwipeableCard(
-            onDismiss = {
-                swipeSongViewModel.removeSongFromList()
-            }
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .padding(bottom = 24.dp),
-                contentAlignment = Alignment.Center
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (posts.posts.isNotEmpty()) {
+            SwipeableCard(
+                onDismiss = {
+                    swipeSongViewModel.removeSongFromList()
+                }
             ) {
-                SongCard(
-                    songPost = posts.posts.first()
-                )
-            }
+                Box(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .padding(bottom = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SongCard(
+                        songPost = posts.posts.first()
+                    )
+                }
 
+            }
+        } else {
+            Text(
+                text = "No Recommendations Yet",
+                fontSize = 24.sp
+            )
         }
-    } else {
-        Text(
-            text = "No Recommendations Yet",
-            fontSize = 24.sp
-        )
     }
 }
 

@@ -2,6 +2,7 @@ package edu.temple.beatbuddy.user_profile.screen.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,85 +35,109 @@ import edu.temple.beatbuddy.utils.ImageSize
 @Composable
 fun UserProfileHeader(
     user: User,
-    edit: () -> Unit
+    edit: () -> Unit,
+    signOut: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column(
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(ImageSize.large)
-                        .clip(CircleShape)
-                        .background(color = Color.LightGray),
-                    contentAlignment = Alignment.Center
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    if (user.profileImage != "") {
-                        val painter = rememberAsyncImagePainter(
-                            ImageRequest
-                                .Builder(LocalContext.current)
-                                .data(data = user.profileImage)
-                                .build()
-                        )
+                    Box(
+                        modifier = Modifier
+                            .size(ImageSize.large)
+                            .clip(CircleShape)
+                            .background(color = Color.LightGray)
+                            .border(width = 0.5.dp, color = Color.White, shape = CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (user.profileImage != "") {
+                            val painter = rememberAsyncImagePainter(
+                                ImageRequest
+                                    .Builder(LocalContext.current)
+                                    .data(data = user.profileImage)
+                                    .build()
+                            )
 
-                        Image(
-                            painter = painter,
-                            contentDescription = "profile image",
-                            contentScale = ContentScale.FillHeight,
-                            modifier = Modifier.size(ImageSize.large)
-                        )
-                    } else {
-                        Text(
-                            text = "User Image",
-                            color = Color.Black,
-                            style = MaterialTheme.typography.titleSmall,
-                        )
+                            Image(
+                                painter = painter,
+                                contentDescription = "profile image",
+                                contentScale = ContentScale.FillHeight,
+                                modifier = Modifier.size(ImageSize.large)
+                            )
+                        } else {
+                            Text(
+                                text = "User Image",
+                                color = Color.Black,
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                        }
                     }
+
+                    UserProfileStatsHeader(user = user)
                 }
 
-                UserProfileStatsHeader(user = user)
-            }
-
-            Column(
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = user.username,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-                Text(
-                    text = user.bio ?: user.fullName,
-                    fontWeight = FontWeight.Light,
-                    fontSize = 12.sp
-                )
+                Column(
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = user.username,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = user.bio ?: user.fullName,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 12.sp
+                    )
+                }
             }
         }
-    }
 
-    Button(
-        onClick = edit,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .padding(8.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        )
-    ) {
-        Text(text = "Edit profile")
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(
+                onClick = edit,
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .padding(horizontal = 8.dp)
+                    .padding(top = 12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(text = "Edit Profile")
+            }
+
+            Button(
+                onClick = signOut,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .padding(horizontal = 8.dp)
+                    .padding(top = 12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(text = "Sign Out")
+            }
+        }
     }
 }
