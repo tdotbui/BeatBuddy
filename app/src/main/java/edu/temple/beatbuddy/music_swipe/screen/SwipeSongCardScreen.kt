@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +40,7 @@ import edu.temple.beatbuddy.component.ImageFactory
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.screen.component.UserPostHeader
 import edu.temple.beatbuddy.music_swipe.screen.component.SwipeableCard
+import edu.temple.beatbuddy.music_swipe.sensor.SensorHandler
 import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 import edu.temple.beatbuddy.user_auth.model.User
 
@@ -46,6 +48,16 @@ import edu.temple.beatbuddy.user_auth.model.User
 fun SwipeSongCardScreen(
     swipeSongViewModel: SwipeSongViewModel
 ) {
+    val context = LocalContext.current
+    val sensorHandler = remember { SensorHandler(context, swipeSongViewModel) }
+
+    DisposableEffect(key1 = sensorHandler) {
+        sensorHandler.register()
+        onDispose {
+            sensorHandler.unregister()
+        }
+    }
+
     val posts by swipeSongViewModel.songPostState.collectAsState()
 
     Column(
