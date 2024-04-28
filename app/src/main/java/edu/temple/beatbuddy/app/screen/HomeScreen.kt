@@ -158,16 +158,19 @@ fun HomeScreen(
                     songViewModel.minimizeScreen()
                     ProfileListScreen(
                         profileViewModel = profileViewModel,
-                        currentUserProfileViewModel = currentUserProfileViewModel
+                        currentUserProfileViewModel = currentUserProfileViewModel,
+                        songPostViewModel = songPostViewModel
                     )
                 }
                 4 -> {
                     songViewModel.minimizeScreen()
                     currentUserProfileViewModel.fetchCurrentUserStats(false)
+                    userState.user?.let { songPostViewModel.fetchPostForUser(it) }
                     CurrentUserProfileScreen(
                         currentUserProfileViewModel = currentUserProfileViewModel,
                         onSignOut = { goToSignInScreen() },
-                        songViewModel = songViewModel
+                        songViewModel = songViewModel,
+                        songPostViewModel = songPostViewModel
                     )
                 }
             }

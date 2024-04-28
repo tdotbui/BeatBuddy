@@ -42,8 +42,29 @@ class SongPostRepositoryImpl @Inject constructor(
             emit(Resource.Success(posts))
         } catch (e: Exception) {
             emit(Resource.Error(e.message ?: "An unknown error occurred"))
+        } finally {
+            emit(Resource.Loading(false))
         }
-        emit(Resource.Loading(false))
+    }
+
+    override fun fetchPostsForUser(user: User): Flow<Resource<List<SongPost>>> = flow {
+        emit(Resource.Loading(true))
+        try {
+            val posts = postRef
+                .whereEqualTo("ownerUid", user.id)
+//                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .await()
+                .toObjects(SongPost::class.java).map {
+                    it.copy(user = user, didLike = checkIfUserLikedPost(it).data)
+                }
+            emit(Resource.Success(posts))
+            emit(Resource.Loading(false))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An unknown error occurred"))
+        } finally {
+            emit(Resource.Loading(false))
+        }
     }
 
     override suspend fun shareAPost(songPost: SongPost): Resource<Boolean> = try {
@@ -82,8 +103,9 @@ class SongPostRepositoryImpl @Inject constructor(
             emit(Resource.Success(posts))
         } catch (e: Exception) {
             emit(Resource.Error(e.message ?: "An unknown error occurred"))
+        } finally {
+            emit(Resource.Loading(false))
         }
-        emit(Resource.Loading(false))
     }
 
     override suspend fun likePost(songPost: SongPost): Resource<Boolean> = try {

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.repository.SongPostRepository
+import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -21,6 +22,8 @@ class SongPostViewModel @Inject constructor(
     var songPostState = MutableStateFlow(SongPostState())
         private set
 
+    var userSongPostState = MutableStateFlow(SongPostState())
+        private set
     var currentSongPost = MutableStateFlow<SongPost?>(null)
         private set
 
@@ -63,6 +66,43 @@ class SongPostViewModel @Inject constructor(
             }
         }
     }
+
+    fun fetchPostForUser(user: User) = viewModelScope.launch {
+        Log.d("Fetching", "Now fetch for user ${user.fullName}")
+        userSongPostState.update {
+            it.copy(isLoading = true)
+        }
+        repository.fetchPostsForUser(user).collectLatest { result ->
+            when(result) {
+                is Resource.Success -> {
+                    result.data?.let {posts ->
+                        userSongPostState.update {
+                            it.copy(
+                                posts = posts,
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+                is Resource.Error -> {
+                    userSongPostState.update {
+                        it.copy(
+                            errorMessage = result.message,
+                            isLoading = false
+                        )
+                    }
+                }
+                is Resource.Loading -> {
+                    userSongPostState.update {
+                        it.copy(
+                            isLoading = true
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 
     fun likePost(songPost: SongPost) {
         viewModelScope.launch {

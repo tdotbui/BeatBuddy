@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import edu.temple.beatbuddy.discover.screen.component.UserProfileItem
 import edu.temple.beatbuddy.discover.view_model.AllUsersViewModel
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
+import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.user_auth.model.MockUser
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
@@ -42,7 +43,8 @@ import kotlinx.coroutines.launch
 fun ProfileListScreen(
     allUsersViewModel: AllUsersViewModel = hiltViewModel(),
     currentUserProfileViewModel: CurrentUserProfileViewModel,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    songPostViewModel: SongPostViewModel
 ) {
     val users by allUsersViewModel.allUsersState.collectAsState()
     var selectedUser by remember { mutableStateOf(User()) }
@@ -60,6 +62,7 @@ fun ProfileListScreen(
             UserProfileScreen(
                 profileViewModel = profileViewModel,
                 currentUserProfileViewModel = currentUserProfileViewModel,
+                songPostViewModel = songPostViewModel,
                 back = {
                     scope.launch {
                         allUsersViewModel.fetchAllUsers()
@@ -85,6 +88,7 @@ fun ProfileListScreen(
                     onClick = { user ->
                         selectedUserIndex = index
                         selectedUser = user
+                        songPostViewModel.fetchPostForUser(selectedUser)
                         profileViewModel.setCurrentUser(selectedUser)
                         scope.launch {
                             bottomSheetState.expand()

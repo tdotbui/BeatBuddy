@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +38,9 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import edu.temple.beatbuddy.discover.screen.component.UserProfileStatsHeader
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
+import edu.temple.beatbuddy.music_post.model.MockPost
+import edu.temple.beatbuddy.music_post.screen.component.SongPostRowItem
+import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.utils.ImageSize
@@ -46,10 +51,12 @@ import kotlinx.coroutines.flow.asStateFlow
 fun UserProfileScreen(
     profileViewModel: ProfileViewModel,
     currentUserProfileViewModel: CurrentUserProfileViewModel,
+    songPostViewModel: SongPostViewModel,
     back: (User) -> Unit
 ) {
     val currentUser by profileViewModel.currentUser.collectAsState()
     val isFollowing = profileViewModel.isFollowing.asStateFlow()
+    val posts by songPostViewModel.userSongPostState.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -176,11 +183,28 @@ fun UserProfileScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White),
-            verticalArrangement = Arrangement.Bottom,
+                .background(Color.White)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            if (posts.posts.isEmpty()) {
+                Text(
+                    text = "${currentUser.username} hasn't post anything yet.",
+                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp),
+                    style = MaterialTheme.typography.titleSmall
+                )
+            } else {
+                LazyColumn {
+                    items(posts.posts.size) {index ->
+                        val post = posts.posts[index]
+                        SongPostRowItem(
+                            songPost = post,
+                            songPostViewModel = songPostViewModel
+                        )
+                    }
+                }
+            }
         }
     }
 }

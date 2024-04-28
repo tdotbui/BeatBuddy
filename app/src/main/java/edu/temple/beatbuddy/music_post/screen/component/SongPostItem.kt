@@ -124,7 +124,6 @@ fun SongPostItem(
                                 if (!isPlaying) songViewModel.onPlayPauseClick()
                                 songPostViewModel.setCurrentSongPost(songPost)
                                 songViewModel.setUpSongPost(songPost)
-
                             }
                     )
                 }

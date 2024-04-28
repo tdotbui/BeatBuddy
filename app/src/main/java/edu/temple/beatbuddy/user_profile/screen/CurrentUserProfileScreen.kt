@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -42,6 +43,8 @@ import androidx.compose.ui.unit.sp
 import edu.temple.beatbuddy.discover.screen.component.UserProfileStatsHeader
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
+import edu.temple.beatbuddy.music_post.screen.component.SongPostRowItem
+import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_profile.screen.component.UserProfileEditingHeader
 import edu.temple.beatbuddy.user_profile.screen.component.UserProfileHeader
@@ -53,10 +56,12 @@ import edu.temple.beatbuddy.utils.ImageSize
 fun CurrentUserProfileScreen(
     songViewModel: SongViewModel,
     currentUserProfileViewModel: CurrentUserProfileViewModel,
+    songPostViewModel: SongPostViewModel,
     onSignOut: () -> Unit,
 ) {
     val currentUser by currentUserProfileViewModel.currentUser.collectAsState()
     var isEditing by remember { mutableStateOf(false) }
+    val posts by songPostViewModel.userSongPostState.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -94,15 +99,28 @@ fun CurrentUserProfileScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White),
-            verticalArrangement = Arrangement.SpaceBetween,
+                .background(Color.White)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Welcome to the App!",
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp),
-                style = MaterialTheme.typography.titleSmall
-            )
+            if (posts.posts.isEmpty()) {
+                Text(
+                    text = "Welcome to the App!",
+                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp),
+                    style = MaterialTheme.typography.titleSmall
+                )
+            } else {
+                LazyColumn {
+                    items(posts.posts.size) {index ->
+                        val post = posts.posts[index]
+                        SongPostRowItem(
+                            songPost = post,
+                            songPostViewModel = songPostViewModel
+                        )
+                    }
+                }
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package edu.temple.beatbuddy.music_post.repository
 
 import edu.temple.beatbuddy.music_post.model.SongPost
+import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
@@ -14,4 +15,6 @@ interface SongPostRepository {
     suspend fun unlikePost(songPost: SongPost): Resource<Boolean>
 
     suspend fun checkIfUserLikedPost(songPost: SongPost): Resource<Boolean>
+
+    fun fetchPostsForUser(user: User): Flow<Resource<List<SongPost>>>
 }
