@@ -10,6 +10,7 @@
     class SensorHandler(private val context: Context, private val cardViewModel: CardViewModel) : SensorEventListener {
         private var sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         private var accelerometerSensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        private var isNeutral = true
 
         init {
             if (accelerometerSensor == null) {
@@ -26,12 +27,16 @@
                     val xAxis = event.values[0]
 //                    Log.d("SensorHandler", "X-axis: $xAxis")
 
-                    if (xAxis > 1.0f) {
+                    if (xAxis > 5.0f && isNeutral) {
                         Log.d("SensorHandler", "Tilted left")
                         cardViewModel.moveToNextCard("left")
-                    } else if (xAxis < -1.0f) {
+                        isNeutral = false
+                    } else if (xAxis < -5.0f && isNeutral) {
                         Log.d("SensorHandler", "Tilted right")
                         cardViewModel.moveToNextCard("right")
+                        isNeutral = false
+                    } else if (xAxis > -0.5f && xAxis < 0.5f) {
+                        isNeutral = true
                     }
                 }
             }
