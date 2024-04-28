@@ -195,13 +195,17 @@ fun UserProfileScreen(
                     style = MaterialTheme.typography.titleSmall
                 )
             } else {
-                LazyColumn {
-                    items(posts.posts.size) {index ->
-                        val post = posts.posts[index]
-                        SongPostRowItem(
-                            songPost = post,
-                            songPostViewModel = songPostViewModel
-                        )
+                if (posts.isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    LazyColumn {
+                        items(posts.posts.size) {index ->
+                            val post = posts.posts[index]
+                            SongPostRowItem(
+                                songPost = post,
+                                songPostViewModel = songPostViewModel
+                            )
+                        }
                     }
                 }
             }

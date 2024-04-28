@@ -54,6 +54,10 @@ class CustomPlayer @Inject constructor(
         player.seekTo(position)
     }
 
+    fun stopPlayer() {
+        player.stop()
+    }
+
     fun releasePlayer() {
         player.removeListener(this)
         player.release()

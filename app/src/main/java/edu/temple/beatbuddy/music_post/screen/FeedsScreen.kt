@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ fun FeedsScreen(
 
     DisposableEffect(Unit) {
         onDispose {
+            songPostViewModel.fetchSongPosts()
             songPostViewModel.clearCurrentSongPost()
             if (songViewModel.isPlaying.value) songViewModel.onPlayPauseClick()
         }
@@ -39,16 +41,6 @@ fun FeedsScreen(
     Surface(
         modifier = Modifier.fillMaxSize(),
     ) {
-        LazyColumn {
-            items(posts.posts.size) { index ->
-                SongPostItem(
-                    songPost = posts.posts[index],
-                    songPostViewModel = songPostViewModel,
-                    songViewModel = songViewModel
-                )
-            }
-        }
-
         if (posts.posts.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -59,6 +51,20 @@ fun FeedsScreen(
                     fontSize = 36.sp,
                     color = Color.Gray
                 )
+            }
+        } else {
+            if (posts.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                LazyColumn {
+                    items(posts.posts.size) { index ->
+                        SongPostItem(
+                            songPost = posts.posts[index],
+                            songPostViewModel = songPostViewModel,
+                            songViewModel = songViewModel
+                        )
+                    }
+                }
             }
         }
     }

@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +64,10 @@ fun CurrentUserProfileScreen(
     var isEditing by remember { mutableStateOf(false) }
     val posts by songPostViewModel.userSongPostState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        songPostViewModel.fetchPostForUser(currentUser)
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -82,7 +87,7 @@ fun CurrentUserProfileScreen(
                         isEditing = true
                     },
                     signOut = {
-                        songViewModel.releasePlayer()
+                        songViewModel.stop()
                         currentUserProfileViewModel.signOut()
                         onSignOut()
                     }
@@ -111,13 +116,17 @@ fun CurrentUserProfileScreen(
                     style = MaterialTheme.typography.titleSmall
                 )
             } else {
-                LazyColumn {
-                    items(posts.posts.size) {index ->
-                        val post = posts.posts[index]
-                        SongPostRowItem(
-                            songPost = post,
-                            songPostViewModel = songPostViewModel
-                        )
+                if (posts.isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    LazyColumn {
+                        items(posts.posts.size) {index ->
+                            val post = posts.posts[index]
+                            SongPostRowItem(
+                                songPost = post,
+                                songPostViewModel = songPostViewModel
+                            )
+                        }
                     }
                 }
             }

@@ -31,7 +31,7 @@ class SongPostViewModel @Inject constructor(
         fetchSongPosts()
     }
 
-    private fun fetchSongPosts() = viewModelScope.launch {
+    fun fetchSongPosts() = viewModelScope.launch {
         songPostState.update {
             it.copy(isLoading = true)
         }
@@ -56,19 +56,12 @@ class SongPostViewModel @Inject constructor(
                         )
                     }
                 }
-                is Resource.Loading -> {
-                    songPostState.update {
-                        it.copy(
-                            isLoading = true
-                        )
-                    }
-                }
+                else -> {}
             }
         }
     }
 
     fun fetchPostForUser(user: User) = viewModelScope.launch {
-        Log.d("Fetching", "Now fetch for user ${user.fullName}")
         userSongPostState.update {
             it.copy(isLoading = true)
         }
@@ -92,13 +85,7 @@ class SongPostViewModel @Inject constructor(
                         )
                     }
                 }
-                is Resource.Loading -> {
-                    userSongPostState.update {
-                        it.copy(
-                            isLoading = true
-                        )
-                    }
-                }
+                else -> {}
             }
         }
     }
@@ -107,7 +94,7 @@ class SongPostViewModel @Inject constructor(
     fun likePost(songPost: SongPost) {
         viewModelScope.launch {
             repository.likePost(songPost).let {result ->
-                if (result is Resource.Success) fetchSongPosts()
+//                if (result is Resource.Success) fetchSongPosts()
             }
         }
     }
@@ -115,7 +102,7 @@ class SongPostViewModel @Inject constructor(
     fun unlikePost(songPost: SongPost) {
         viewModelScope.launch {
             repository.unlikePost(songPost).let {result ->
-                if (result is Resource.Success) fetchSongPosts()
+//                if (result is Resource.Success) fetchSongPosts()
             }
         }
     }

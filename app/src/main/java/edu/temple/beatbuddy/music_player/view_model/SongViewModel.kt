@@ -163,7 +163,7 @@ class SongViewModel @Inject constructor(
         viewModelScope.launch {
             val position = player.currentPlaybackPosition + 5000L
             if (position < player.currentTrackDuration) player.seekToPosition(position)
-            else player.seekToPosition(0L)
+            else onNextClick()
         }
     }
 
@@ -178,12 +178,5 @@ class SongViewModel @Inject constructor(
         }
     }
 
-    fun releasePlayer() = player.releasePlayer()
-    override fun onCleared() {
-        player.initPlayer(mutableListOf())
-        player.releasePlayer()
-        super.onCleared()
-
-
-    }
+    fun stop() = player.stopPlayer()
 }
