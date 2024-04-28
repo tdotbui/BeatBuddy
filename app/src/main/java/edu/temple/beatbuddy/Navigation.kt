@@ -6,12 +6,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.firebase.auth.FirebaseAuth
 import edu.temple.beatbuddy.app.screen.HomeScreen
+import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.user_auth.screen.SignInScreen
 import edu.temple.beatbuddy.user_auth.screen.SignUpScreen
 
 @Composable
 fun Navigation(
-    navController: NavHostController,
+    navController: NavHostController
 ) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     val isUserSignedIn = (currentUser != null)

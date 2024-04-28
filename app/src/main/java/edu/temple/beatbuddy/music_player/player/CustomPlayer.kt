@@ -1,6 +1,9 @@
 package edu.temple.beatbuddy.music_player.player
 
 import android.annotation.SuppressLint
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
@@ -10,10 +13,9 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 class CustomPlayer @Inject constructor(
-    private val player: ExoPlayer
+    private val player: ExoPlayer,
 ): Player.Listener {
     var playerState = MutableStateFlow(PlayerState.STATE_IDLE)
-        private set
 
     val currentPlaybackPosition: Long
         get() = if (player.currentPosition > 0) player.currentPosition else 0L
@@ -21,14 +23,16 @@ class CustomPlayer @Inject constructor(
     val currentTrackDuration: Long
         get() = if (player.duration > 0) player.duration else 0L
 
-    fun initPlayer(trackList: MutableList<MediaItem>) {
+    init {
         player.addListener(this)
+    }
+
+    fun initPlayer(trackList: MutableList<MediaItem>) {
         player.setMediaItems(trackList)
         player.prepare()
     }
 
     fun initSinglePlayer(item: MediaItem) {
-        player.addListener(this)
         player.setMediaItem(item)
         player.prepare()
         player.playWhenReady = true
@@ -45,11 +49,13 @@ class CustomPlayer @Inject constructor(
         player.playWhenReady = !player.playWhenReady
     }
 
+
     fun seekToPosition(position: Long) {
         player.seekTo(position)
     }
 
     fun releasePlayer() {
+        player.removeListener(this)
         player.release()
     }
 

@@ -7,9 +7,9 @@ data class User(
     val id: String = "",
     val fullName: String = "",
     val email: String = "",
-    val username: String = "",
-    val profileImage: String? = null,
-    val bio: String? = null,
+    var username: String = "",
+    var profileImage: String? = null,
+    var bio: String? = null,
 
     var isFollowed: Boolean? = false,
     var stats: UserStats? = null

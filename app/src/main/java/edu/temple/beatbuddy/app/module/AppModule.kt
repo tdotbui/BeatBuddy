@@ -2,6 +2,8 @@ package edu.temple.beatbuddy.app.module
 
 import android.app.Application
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
@@ -138,10 +140,16 @@ class AppModule {
     fun provideContext(application: Application): Context {
         return application.applicationContext
     }
+
     @Provides
     @Singleton
-    fun provideCustomPLayer(context: Context): CustomPlayer {
-        val player = ExoPlayer.Builder(context).build()
+    fun provideExoPLayer(context: Context): ExoPlayer {
+        return ExoPlayer.Builder(context).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMyPlayer(player: ExoPlayer): CustomPlayer {
         return CustomPlayer(player)
     }
 }

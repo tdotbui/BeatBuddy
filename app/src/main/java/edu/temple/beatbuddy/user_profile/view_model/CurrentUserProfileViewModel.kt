@@ -1,10 +1,14 @@
 package edu.temple.beatbuddy.user_profile.view_model
 
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.temple.beatbuddy.discover.repository.FollowRepository
+import edu.temple.beatbuddy.discover.repository.UsersRepository
+import edu.temple.beatbuddy.music_player.player.CustomPlayer
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.user_auth.model.UserStats
 import edu.temple.beatbuddy.user_auth.repository.AuthRepository
@@ -21,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CurrentUserProfileViewModel @Inject constructor(
     private val auth: AuthRepository,
-    private val repository: FollowRepository
+    private val repository: FollowRepository,
+    private val userRepo: UsersRepository,
 ): ViewModel() {
     var userState = MutableStateFlow(UserState())
         private set
@@ -31,6 +36,19 @@ class CurrentUserProfileViewModel @Inject constructor(
 
     init {
         fetchCurrentUser()
+    }
+
+    fun updateUserProfile(
+        imageUrl: String,
+        username: String,
+        bio: String,
+        shouldUpdate: Boolean
+    ) {
+        viewModelScope.launch {
+            userRepo.updateProfile(imageUrl, username, bio, shouldUpdate).let {result ->
+                if (result is Resource.Success) fetchCurrentUser()
+            }
+        }
     }
 
     fun fetchCurrentUserStats(fetchFromRemote: Boolean) {

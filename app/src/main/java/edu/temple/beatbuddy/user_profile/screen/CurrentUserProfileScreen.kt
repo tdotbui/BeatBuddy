@@ -1,6 +1,7 @@
 package edu.temple.beatbuddy.user_profile.screen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,17 +35,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.temple.beatbuddy.discover.screen.component.UserProfileStatsHeader
 import edu.temple.beatbuddy.discover.view_model.ProfileViewModel
+import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.user_auth.model.User
+import edu.temple.beatbuddy.user_profile.screen.component.UserProfileEditingHeader
+import edu.temple.beatbuddy.user_profile.screen.component.UserProfileHeader
 import edu.temple.beatbuddy.user_profile.view_model.CurrentUserProfileViewModel
 import edu.temple.beatbuddy.utils.ImageSize
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun CurrentUserProfileScreen(
+    songViewModel: SongViewModel,
     currentUserProfileViewModel: CurrentUserProfileViewModel,
     onSignOut: () -> Unit,
 ) {
     val currentUser by currentUserProfileViewModel.currentUser.collectAsState()
+    var isEditing by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -56,62 +64,23 @@ fun CurrentUserProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(ImageSize.large)
-                            .clip(CircleShape)
-                            .background(color = Color.LightGray),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "User Image",
-                            color = Color.Black,
-                            style = MaterialTheme.typography.titleSmall,
-                        )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(
-                            text = currentUser.username,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp
-                        )
-                        Text(
-                            text = currentUser.fullName,
-                            fontWeight = FontWeight.Light,
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-
-                UserProfileStatsHeader(user = currentUser)
+            if (currentUserProfileViewModel.userState.value.isLoading) {
+                CircularProgressIndicator()
             }
 
-            Button(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .padding(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+            if (!isEditing) {
+                UserProfileHeader(
+                    user = currentUser,
+                    edit = {
+                        isEditing = true
+                    }
                 )
-            ) {
-                Text(text = "Edit Profile")
+            } else {
+                UserProfileEditingHeader(user = currentUser) { image, username, bio, shouldUpdate ->
+                    Log.d("Image", image)
+                    currentUserProfileViewModel.updateUserProfile(image, username, bio, shouldUpdate)
+                    isEditing = false
+                }
             }
         }
 
@@ -130,6 +99,7 @@ fun CurrentUserProfileScreen(
 
             Button(
                 onClick = {
+                    songViewModel.releasePlayer()
                     currentUserProfileViewModel.signOut()
                     onSignOut()
                 },

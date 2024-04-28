@@ -153,7 +153,8 @@ fun HomeScreen(
                     currentUserProfileViewModel.fetchCurrentUserStats(false)
                     CurrentUserProfileScreen(
                         currentUserProfileViewModel = currentUserProfileViewModel,
-                        onSignOut = { goToSignInScreen() }
+                        onSignOut = { goToSignInScreen() },
+                        songViewModel = songViewModel
                     )
                 }
             }
@@ -173,8 +174,8 @@ data class TabItem(
     val title: String
 )
 
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPV() {
-    HomeScreen(goToSignInScreen =  {})
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeScreenPV() {
+//    HomeScreen(goToSignInScreen =  {})
+//}

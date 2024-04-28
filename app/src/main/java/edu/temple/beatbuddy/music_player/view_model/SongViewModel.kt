@@ -3,6 +3,7 @@ package edu.temple.beatbuddy.music_player.view_model
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,17 +21,19 @@ import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.utils.collectPlayerState
 import edu.temple.beatbuddy.utils.launchPlaybackStateJob
 import edu.temple.beatbuddy.utils.toMediaItemList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class SongViewModel @Inject constructor(
-    val player: CustomPlayer,
+    private val player: CustomPlayer,
 ) : ViewModel(), PlayerEvent {
 
     private val _currentSongList = mutableStateListOf<Song>()
@@ -39,7 +42,7 @@ class SongViewModel @Inject constructor(
     var selectedSong = MutableStateFlow<Song?>(null)
         private set
 
-    var selectedSongIndex: Int by mutableStateOf(-1)
+    private var selectedSongIndex: Int by mutableIntStateOf(-1)
 
     var isPlaying = MutableStateFlow(false)
         private set
@@ -77,10 +80,6 @@ class SongViewModel @Inject constructor(
             isPlaying.value = state == PlayerState.STATE_PLAYING
 
             updatePlaybackState(state)
-//            if (state == STATE_NEXT_TRACK) {
-//                isAuto = true
-//                onNextClick()
-//            }
             if (state == PlayerState.STATE_END) {
                 onSongSelected(0)
                 isPlaying.value = false
@@ -136,7 +135,6 @@ class SongViewModel @Inject constructor(
 
     override fun onPlayPauseClick() {
         player.playToggle()
-//        isPlaying.value = !isPlaying.value
     }
 
     override fun onPreviousClick() {
@@ -180,8 +178,12 @@ class SongViewModel @Inject constructor(
         }
     }
 
+    fun releasePlayer() = player.releasePlayer()
     override fun onCleared() {
-        super.onCleared()
+        player.initPlayer(mutableListOf())
         player.releasePlayer()
+        super.onCleared()
+
+
     }
 }

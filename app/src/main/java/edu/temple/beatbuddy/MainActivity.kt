@@ -3,14 +3,17 @@ package edu.temple.beatbuddy
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.ui.theme.BeatBuddyTheme
 
 @AndroidEntryPoint
@@ -27,7 +30,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
 
                     MyApp(
-                        navController = navController,
+                        navController = navController
                     )
                 }
             }
@@ -37,9 +40,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MyApp(
-    navController: NavHostController,
+    navController: NavHostController
 ) {
     Navigation(
-        navController = navController,
+        navController = navController
     )
 }
