@@ -14,4 +14,6 @@ interface PlaylistRepository {
     suspend fun deleteSongFromPlaylist(playlist: Playlist, song: PlaylistSong): Resource<Boolean>
 
     suspend fun deletePlaylist(playlist: Playlist): Resource<Boolean>
+
+    suspend fun insertSongToFavorite(song: PlaylistSong): Resource<Boolean>
 }

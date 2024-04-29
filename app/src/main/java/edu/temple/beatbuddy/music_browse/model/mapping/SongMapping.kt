@@ -5,6 +5,7 @@ import edu.temple.beatbuddy.music_browse.model.remote.AlbumDto
 import edu.temple.beatbuddy.music_browse.model.remote.ArtistDto
 import edu.temple.beatbuddy.music_browse.model.remote.SongDto
 import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
+import edu.temple.beatbuddy.music_post.model.SongPost
 
 fun SongDto.toSong(
     genre: Int
@@ -37,4 +38,13 @@ fun Song.toPlaylistSong(): PlaylistSong = PlaylistSong(
     artistName = artist.name ?: "",
     artistPicture = artist.picture_medium ?: "",
     songImage = album.cover_medium ?: ""
+)
+
+fun SongPost.toPlaylistSong(): PlaylistSong = PlaylistSong(
+    id = songId,
+    title = title,
+    preview = preview,
+    artistName = artistName,
+    artistPicture = artistPicture,
+    songImage = songImage
 )

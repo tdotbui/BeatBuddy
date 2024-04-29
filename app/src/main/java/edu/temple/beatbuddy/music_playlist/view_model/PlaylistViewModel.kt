@@ -36,10 +36,16 @@ class PlaylistViewModel @Inject constructor(
     }
 
     fun insertSong(playlist: Playlist) = viewModelScope.launch {
-        playlistRepository.insertSongToPlayList(playlist =  playlist, song = currentSong.value).let {result ->
+        playlistRepository.insertSongToPlayList(playlist = playlist, song = currentSong.value).let {result ->
             if (result is Resource.Success) {
                 fetchPlaylists()
             }
+        }
+    }
+
+    fun addToFavorite(song: PlaylistSong) = viewModelScope.launch {
+        playlistRepository.insertSongToFavorite(song).let {result ->
+            fetchSongsFromPlaylist(playlistState.value.playlists.first())
         }
     }
 

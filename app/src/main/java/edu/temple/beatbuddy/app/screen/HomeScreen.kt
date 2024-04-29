@@ -141,7 +141,10 @@ fun HomeScreen(
         ) {
             when (selectedTabIndex) {
                 0 -> {
-                    SwipeSongCardScreen(swipeSongViewModel = swipeSongViewModel)
+                    SwipeSongCardScreen(
+                        swipeSongViewModel = swipeSongViewModel,
+                        playlistViewModel = playlistViewModel
+                    )
                     songViewModel.minimizeScreen()
                 }
                 1 -> MusicBrowseScreen(

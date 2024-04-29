@@ -37,6 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.temple.beatbuddy.component.ImageFactory
+import edu.temple.beatbuddy.music_browse.model.mapping.toPlaylistSong
+import edu.temple.beatbuddy.music_playlist.view_model.PlaylistViewModel
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.screen.component.UserPostHeader
 import edu.temple.beatbuddy.music_swipe.screen.component.SwipeableCard
@@ -45,7 +47,8 @@ import edu.temple.beatbuddy.user_auth.model.User
 
 @Composable
 fun SwipeSongCardScreen(
-    swipeSongViewModel: SwipeSongViewModel
+    swipeSongViewModel: SwipeSongViewModel,
+    playlistViewModel: PlaylistViewModel
 ) {
     LaunchedEffect(Unit) {
         swipeSongViewModel.fetchSwipeSongPosts()
@@ -58,9 +61,13 @@ fun SwipeSongCardScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (posts.posts.isNotEmpty()) {
+            val song = posts.posts.first().toPlaylistSong()
             SwipeableCard(
-                onDismiss = {
+                onDismiss = {direction ->
                     swipeSongViewModel.removeSongFromList()
+                    if (direction == "right") {
+                        playlistViewModel.addToFavorite(song)
+                    }
                 }
             ) {
                 Box(
