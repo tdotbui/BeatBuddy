@@ -48,6 +48,7 @@ import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.music_playlist.view_model.PlaylistViewModel
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.screen.component.UserPostHeader
+import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.music_swipe.screen.component.SwipeableCard
 import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 import edu.temple.beatbuddy.ui.theme.Pink40
@@ -58,7 +59,7 @@ import edu.temple.beatbuddy.user_auth.model.User
 fun SwipeSongCardScreen(
     swipeSongViewModel: SwipeSongViewModel,
     playlistViewModel: PlaylistViewModel,
-    songViewModel: SongViewModel
+    songViewModel: SongViewModel,
 ) {
     LaunchedEffect(Unit) {
         swipeSongViewModel.fetchSwipeSongPosts()

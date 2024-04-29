@@ -36,6 +36,7 @@ class SwipeSongViewModel @Inject constructor(
     fun removeSongFromList() = viewModelScope.launch {
         val remainingPosts = songPostState.value.posts.toMutableList().apply {
             val post = removeFirst()
+            if (post.didLike == false) likePost(post)
             repository.deletePostFromFollowing(post)
         }
         songPostState.update {
@@ -44,6 +45,14 @@ class SwipeSongViewModel @Inject constructor(
 //        for (song in songPostState.value.posts) {
 //            Log.d("The remaining post is", song.title)
 //        }
+    }
+
+    fun likePost(songPost: SongPost) {
+        viewModelScope.launch {
+            repository.likePost(songPost).let {result ->
+//                if (result is Resource.Success) fetchSongPosts()
+            }
+        }
     }
 
     fun fetchSwipeSongPosts() = viewModelScope.launch {

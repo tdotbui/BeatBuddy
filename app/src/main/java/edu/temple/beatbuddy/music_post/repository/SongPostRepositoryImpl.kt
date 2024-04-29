@@ -102,7 +102,7 @@ class SongPostRepositoryImpl @Inject constructor(
             for (doc in postSnapshot.documents) {
                 val post = postRef.document(doc.id).get().await().toObject(SongPost::class.java)?.let {
                     val user = userRef.document(it.ownerUid).get().await().toObject(User::class.java)
-                    it.copy(user = user)
+                    it.copy(user = user, didLike = checkIfUserLikedPost(it).data)
                 }
                 if (post != null) {
                     posts.add(post)
