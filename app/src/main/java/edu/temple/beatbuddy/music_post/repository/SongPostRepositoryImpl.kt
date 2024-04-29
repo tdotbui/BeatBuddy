@@ -54,6 +54,16 @@ class SongPostRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteAPost(songPost: SongPost): Resource<Boolean> = try {
+        postRef
+            .document(songPost.postId)
+            .delete()
+            .await()
+        Resource.Success(true)
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!, false)
+    }
+
     override suspend fun shareAPost(songPost: SongPost): Resource<Boolean> = try {
         val id = postRef.document().id
         val post = songPost.copy(postId = id)

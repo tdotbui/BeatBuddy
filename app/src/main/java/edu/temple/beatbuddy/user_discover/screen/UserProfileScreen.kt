@@ -201,7 +201,8 @@ fun UserProfileScreen(
                             val post = posts.posts[index]
                             SongPostRowItem(
                                 songPost = post,
-                                songPostViewModel = songPostViewModel
+                                songPostViewModel = songPostViewModel,
+                                onLongPress = {}
                             )
                         }
                     }

@@ -108,18 +108,22 @@ class SongPostViewModel @Inject constructor(
     }
 
     fun makePost(songPost: SongPost) = viewModelScope.launch {
-        repository.shareAPost(songPost)
-        fetchSongPosts()
+        repository.shareAPost(songPost).let { result ->
+            if (result is Resource.Success) {
+                fetchSongPosts()
+            }
+        }
     }
 
-//    private fun checkIfUserLikedPost() {
-//        for (post in songPostState.value.posts) {
-//            viewModelScope.launch {
-//                post.didLike = repository.checkIfUserLikedPost(post).data
-//                Log.d("Post ${post.title}", "Did like is ${post.didLike}")
-//            }
-//        }
-//    }
+    fun deletePost(songPost: SongPost, user: User) = viewModelScope.launch {
+        repository.deleteAPost(songPost).let { result ->
+            if (result is Resource.Success) {
+                fetchPostForUser(user)
+                fetchSongPosts()
+            }
+        }
+
+    }
 
     fun setCurrentSongPost(songPost: SongPost) {
         currentSongPost.value = songPost

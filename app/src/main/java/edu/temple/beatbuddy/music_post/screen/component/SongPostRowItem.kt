@@ -3,6 +3,7 @@ package edu.temple.beatbuddy.music_post.screen.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +49,7 @@ import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 fun SongPostRowItem(
     songPost: SongPost,
     songPostViewModel: SongPostViewModel,
+    onLongPress: (SongPost) -> Unit
 ) {
     var didLike by remember { mutableStateOf(songPost.didLike) }
     var likes by remember { mutableIntStateOf(songPost.likes) }
@@ -54,7 +57,12 @@ fun SongPostRowItem(
     Card(
         modifier = Modifier
             .padding(vertical = 6.dp)
-            .clickable {  },
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { onLongPress(songPost) },
+                    onTap = {}
+                )
+            },
         border = BorderStroke(1.dp, Color.White),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp,

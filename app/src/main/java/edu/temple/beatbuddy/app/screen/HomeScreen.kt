@@ -171,7 +171,8 @@ fun HomeScreen(
                         currentUserProfileViewModel = currentUserProfileViewModel,
                         onSignOut = { goToSignInScreen() },
                         songViewModel = songViewModel,
-                        songPostViewModel = songPostViewModel
+                        songPostViewModel = songPostViewModel,
+                        playlistViewModel = playlistViewModel
                     )
                 }
             }

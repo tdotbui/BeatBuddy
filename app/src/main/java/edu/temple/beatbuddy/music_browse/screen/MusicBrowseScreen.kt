@@ -152,15 +152,23 @@ fun MusicBrowseScreen(
                     state = scrollState
                 ) {
                     val playlists = playlistSongs.playlists
+                    val currentPlaylist = playlistSongs.currentSongList
                     items(playlists.size) { index ->
                         val playlist = playlists[index]
                         PlaylistItem(
                             playlist = playlist,
                             onClick = { playlistViewModel.fetchSongsFromPlaylist(playlist) },
                             isSelected = playlist.id == playlistSongs.selectedPlaylist.id,
-                            onLongPress = {playlist ->
+                            onLongPress = {
+                                selectedPlaylist = it
+                                playlistViewModel.fetchSongsFromPlaylist(selectedPlaylist)
+                            },
+                            onPlayClick = {
+                                songViewModel.setUpSongLists(currentPlaylist)
+                                songViewModel.onSongClick(currentPlaylist[0])
+                            },
+                            openDialog = {result ->
                                 showDeleteDialog = true
-                                selectedPlaylist = playlist
                             }
                         )
                     }

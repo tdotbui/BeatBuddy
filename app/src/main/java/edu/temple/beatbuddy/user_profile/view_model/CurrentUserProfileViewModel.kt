@@ -29,8 +29,15 @@ class CurrentUserProfileViewModel @Inject constructor(
     private val _currentUser = MutableStateFlow(User())
     val currentUser: StateFlow<User> = _currentUser.asStateFlow()
 
+    var isViewingPosts = MutableStateFlow(true)
+        private set
+
     init {
         fetchCurrentUser()
+    }
+
+    fun viewingPosts(posts: String) {
+        isViewingPosts.value = posts == "Posts"
     }
 
     fun updateUserProfile(

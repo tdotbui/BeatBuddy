@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import edu.temple.beatbuddy.user_discover.screen.component.ProfilePicture
 import edu.temple.beatbuddy.user_auth.model.User
 import edu.temple.beatbuddy.utils.ImageSize
@@ -34,7 +35,8 @@ fun UserPostHeader(
 
             Text(
                 text = user.username,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp
             )
         }
     }
