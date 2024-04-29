@@ -139,14 +139,14 @@ fun BriefPlayerContent(
         ) {
             if (isPlaying) {
                 VinylAlbumCoverAnimation(
-                    imageUrl = currentSong?.album?.cover_medium ?: "",
+                    imageUrl = currentSong?.songImage ?: "",
                     modifier = Modifier
                         .padding(4.dp)
                         .padding(start = 12.dp)
                 )
             } else {
                 VinylAlbumCover(
-                    imageUrL = currentSong?.album?.cover_medium ?: "",
+                    imageUrL = currentSong?.songImage ?: "",
                     modifier = Modifier
                         .padding(4.dp)
                         .padding(start = 12.dp)
@@ -169,7 +169,7 @@ fun BriefPlayerContent(
                 )
 
                 Text(
-                    text = currentSong?.artist?.name ?: "artist name",
+                    text = currentSong?.artistName ?: "artist name",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
@@ -277,9 +277,9 @@ fun FullPlayerContent(
                             contentAlignment = Alignment.Center
                         ) {
                             if (isPlaying) {
-                                VinylAlbumCoverAnimation(imageUrl = currentSong?.album?.cover_medium ?: "")
+                                VinylAlbumCoverAnimation(imageUrl = currentSong?.songImage ?: "")
                             } else {
-                                VinylAlbumCover(imageUrL = currentSong?.album?.cover_medium ?: "")
+                                VinylAlbumCover(imageUrL = currentSong?.songImage ?: "")
                             }
                         }
 
@@ -297,7 +297,7 @@ fun FullPlayerContent(
                             )
 
                             Text(
-                                text = currentSong?.artist?.name ?: "",
+                                text = currentSong?.artistName ?: "",
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onBackground,
                                 maxLines = 1,

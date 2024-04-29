@@ -31,8 +31,8 @@ class PlaylistViewModel @Inject constructor(
         fetchPlaylists()
     }
 
-    fun setSong(song: Song) {
-        currentSong.value = song.toPlaylistSong()
+    fun setSong(song: PlaylistSong) {
+        currentSong.value = song
     }
 
     fun insertSong(playlist: Playlist) = viewModelScope.launch {

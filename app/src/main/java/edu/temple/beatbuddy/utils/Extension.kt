@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import edu.temple.beatbuddy.music_player.player.PlaybackState
+import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
 
 fun Long.toTime(): String {
     val stringBuffer = StringBuffer()
@@ -25,7 +26,7 @@ fun Long.toTime(): String {
     return stringBuffer.toString()
 }
 
-fun List<Song>.toMediaItemList(): MutableList<MediaItem> = this.map {
+fun List<PlaylistSong>.toMediaItemList(): MutableList<MediaItem> = this.map {
     MediaItem.fromUri(it.preview)
 }.toMutableList()
 

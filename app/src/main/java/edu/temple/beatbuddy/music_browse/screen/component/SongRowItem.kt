@@ -41,13 +41,14 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import edu.temple.beatbuddy.music_browse.model.Song
+import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
 
 @Composable
 fun SongRowItem(
-    song: Song,
-    onMusicClick: (Song) -> Unit,
-    shareClick: (Song) -> Unit,
-    addClick: (Song) -> Unit
+    song: PlaylistSong,
+    onMusicClick: (PlaylistSong) -> Unit,
+    shareClick: (PlaylistSong) -> Unit,
+    addClick: (PlaylistSong) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -55,7 +56,7 @@ fun SongRowItem(
 
     val imageState = rememberAsyncImagePainter(
         model = ImageRequest.Builder(context)
-            .data(song.album.cover_medium)
+            .data(song.songImage)
             .size(Size.ORIGINAL)
             .build()
     ).state
@@ -124,7 +125,7 @@ fun SongRowItem(
                     )
 
                     Text(
-                        text = song.artist.name!!,
+                        text = song.artistName,
                         maxLines = 1,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Light

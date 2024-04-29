@@ -116,7 +116,10 @@ class CustomPlayer @Inject constructor(
                     playerState.tryEmit(PlayerState.STATE_PAUSE)
                 }
             }
-            Player.STATE_ENDED -> playerState.tryEmit(PlayerState.STATE_END)
+            Player.STATE_ENDED -> {
+                playerState.tryEmit(PlayerState.STATE_END)
+                player.stop()
+            }
         }
     }
 }

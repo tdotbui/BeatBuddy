@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.Timestamp
 import edu.temple.beatbuddy.music_browse.model.Song
+import edu.temple.beatbuddy.music_browse.model.mapping.toPlaylistSong
 import edu.temple.beatbuddy.music_browse.screen.component.GenreItem
 import edu.temple.beatbuddy.music_browse.screen.component.PlaylistItem
 import edu.temple.beatbuddy.music_browse.screen.component.PlaylistSongRowItem
@@ -57,6 +58,7 @@ import edu.temple.beatbuddy.music_browse.screen.component.SongRowItem
 import edu.temple.beatbuddy.music_browse.view_model.SongListViewModel
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.music_playlist.model.Playlist
+import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
 import edu.temple.beatbuddy.music_playlist.screen.AddToPlaylistScreen
 import edu.temple.beatbuddy.music_playlist.view_model.PlaylistViewModel
 import edu.temple.beatbuddy.music_post.model.SongPost
@@ -81,7 +83,7 @@ fun MusicBrowseScreen(
     var openDialog by remember { mutableStateOf(false) }
     var songImage by remember { mutableStateOf("") }
     var songTitle by remember { mutableStateOf("") }
-    var selectedSong by remember { mutableStateOf<Song?>(null) }
+    var selectedSong by remember { mutableStateOf<PlaylistSong?>(null) }
 
     val scrollState = rememberLazyListState()
     LaunchedEffect(browseSongs.selectedGenre) {
@@ -233,17 +235,20 @@ fun MusicBrowseScreen(
                             .padding(horizontal = 16.dp),
                     ) {
                         val songList = browseSongs.currentSongList
-                        items(songList.size) { index ->
+                        val playlist = songList.map {
+                            it.toPlaylistSong()
+                        }
+                        items(playlist.size) { index ->
                             SongRowItem(
-                                song = songList[index],
+                                song = playlist[index],
                                 onMusicClick = { song ->
-                                    songViewModel.setUpSongLists(songList)
+                                    songViewModel.setUpSongLists(playlist)
                                     songViewModel.onSongClick(song)
                                     selectedSong = song
                                 },
                                 shareClick = { song ->
                                     openDialog = true
-                                    songImage = song.album.cover_medium ?: ""
+                                    songImage = song.songImage
                                     songTitle = song.title
                                     selectedSong = song
                                 },
@@ -271,9 +276,9 @@ fun MusicBrowseScreen(
                             PlaylistSongRowItem(
                                 playlistSong = songList[index],
                                 onMusicClick = { song ->
-//                                songViewModel.setUpSongLists(songList)
-//                                songViewModel.onSongClick(song)
-//                                selectedSong = song
+                                    songViewModel.setUpSongLists(songList)
+                                    songViewModel.onSongClick(song)
+                                    selectedSong = song
                                 },
                                 delete = {song ->
                                     playlistViewModel.deleteSong(song)
@@ -338,9 +343,9 @@ fun MusicBrowseScreen(
                             songId = selectedSong?.id ?: 0L,
                             title = selectedSong?.title ?: "",
                             preview = selectedSong?.preview ?: "",
-                            artistName = selectedSong?.artist?.name ?: "",
-                            artistPicture = selectedSong?.artist?.picture_medium ?: "",
-                            songImage = selectedSong?.album?.cover_medium ?: "",
+                            artistName = selectedSong?.artistName ?: "",
+                            artistPicture = selectedSong?.artistPicture ?: "",
+                            songImage = selectedSong?.songImage ?: "",
                             user = null
                         )
                         songPostViewModel.makePost(songPost)
