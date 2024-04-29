@@ -37,15 +37,25 @@ class PlaylistViewModel @Inject constructor(
 
     fun insertSong(playlist: Playlist) = viewModelScope.launch {
         playlistRepository.insertSongToPlayList(playlist = playlist, song = currentSong.value).let {result ->
-            if (result is Resource.Success) {
+            if (result is Resource.Success && result.data == true) {
                 fetchPlaylists()
+            } else if (result is Resource.Success && result.data == false) {
+                playlistState.update {
+                    it.copy(errorMessage = "${currentSong.value.title} already added in playlist ${playlist.name}")
+                }
+            } else {
+                playlistState.update {
+                    it.copy(errorMessage = "Error!")
+                }
             }
         }
     }
 
     fun addToFavorite(song: PlaylistSong) = viewModelScope.launch {
         playlistRepository.insertSongToFavorite(song).let {result ->
-            fetchSongsFromPlaylist(playlistState.value.playlists.first())
+            if (result is Resource.Success && result.data == true) {
+                fetchSongsFromPlaylist(playlistState.value.playlists.first())
+            }
         }
     }
 

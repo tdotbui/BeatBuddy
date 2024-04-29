@@ -47,6 +47,7 @@ import edu.temple.beatbuddy.music_browse.model.Song
 import edu.temple.beatbuddy.music_playlist.model.Playlist
 import edu.temple.beatbuddy.music_playlist.screen.component.PlaylistRowItem
 import edu.temple.beatbuddy.music_playlist.view_model.PlaylistViewModel
+import edu.temple.beatbuddy.utils.Helpers
 
 @Composable
 fun AddToPlaylistScreen(
@@ -100,6 +101,11 @@ fun AddToPlaylistScreen(
             )
         }
 
+        if (playlists.errorMessage != null) {
+            Helpers.showMessage(LocalContext.current, playlists.errorMessage)
+            playlists.errorMessage = null
+        }
+
         Divider()
 
         Row(
@@ -138,16 +144,23 @@ fun AddToPlaylistScreen(
             }
         }
 
-        Text(
-            text = "-Or-",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Light
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "-Or-",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp),
+                .padding(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
