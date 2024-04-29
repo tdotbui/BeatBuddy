@@ -146,7 +146,8 @@ fun HomeScreen(
                     SwipeSongCardScreen(
                         swipeSongViewModel = swipeSongViewModel,
                         playlistViewModel = playlistViewModel,
-                        songViewModel = songViewModel
+                        songViewModel = songViewModel,
+                        songPostViewModel = songPostViewModel
                     )
                     songViewModel.minimizeScreen()
                 }

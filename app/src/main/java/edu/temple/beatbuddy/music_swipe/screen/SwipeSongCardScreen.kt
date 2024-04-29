@@ -60,6 +60,7 @@ fun SwipeSongCardScreen(
     swipeSongViewModel: SwipeSongViewModel,
     playlistViewModel: PlaylistViewModel,
     songViewModel: SongViewModel,
+    songPostViewModel: SongPostViewModel
 ) {
     LaunchedEffect(Unit) {
         swipeSongViewModel.fetchSwipeSongPosts()
@@ -97,6 +98,7 @@ fun SwipeSongCardScreen(
                         if (direction == "right") {
                             val song = posts.posts.toMutableList().removeFirst().toPlaylistSong()
                             playlistViewModel.addToFavorite(song)
+                            songPostViewModel.fetchSongPosts()
                         }
                         songViewModel.onNextClick()
                     }

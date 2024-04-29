@@ -25,10 +25,6 @@ fun FeedsScreen(
     songPostViewModel: SongPostViewModel,
     songViewModel: SongViewModel
 ) {
-    LaunchedEffect(Unit) {
-        songPostViewModel.fetchSongPosts()
-    }
-
     val posts by songPostViewModel.songPostState.collectAsState()
     val songList = songViewModel.currentSongList
 
