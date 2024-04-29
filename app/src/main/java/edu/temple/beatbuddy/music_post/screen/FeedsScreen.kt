@@ -25,12 +25,13 @@ fun FeedsScreen(
     songViewModel: SongViewModel
 ) {
     val posts by songPostViewModel.songPostState.collectAsState()
+    val songList = songViewModel.currentSongList
 
     DisposableEffect(Unit) {
         onDispose {
             songPostViewModel.fetchSongPosts()
             songPostViewModel.clearCurrentSongPost()
-            if (songViewModel.isPlaying.value) songViewModel.onPlayPauseClick()
+            if (songList.isEmpty()) songViewModel.stop()
         }
     }
 

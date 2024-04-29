@@ -90,11 +90,11 @@ fun SwipeSongCardScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                val song = posts.posts.first().toPlaylistSong()
                 SwipeableCard(
                     onDismiss = {direction ->
                         swipeSongViewModel.removeSongFromList()
                         if (direction == "right") {
+                            val song = posts.posts.toMutableList().removeFirst().toPlaylistSong()
                             playlistViewModel.addToFavorite(song)
                         }
                         songViewModel.onNextClick()
@@ -123,7 +123,7 @@ fun SwipeSongCardScreen(
                             .wrapContentSize()
                             .clickable {
                                 songViewModel.setUpSongLists(playListPost)
-                                songViewModel.onSongClick(song)
+                                songViewModel.onSongClick(posts.posts.first().toPlaylistSong())
                                 songViewModel.discoverNow(true)
                             },
                         verticalArrangement = Arrangement.spacedBy(16.dp),

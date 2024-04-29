@@ -39,7 +39,6 @@ class SongPostRepositoryImpl @Inject constructor(
         try {
             val posts = postRef
                 .whereEqualTo("ownerUid", user.id)
-//                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
                 .await()
                 .toObjects(SongPost::class.java).map {
@@ -56,6 +55,19 @@ class SongPostRepositoryImpl @Inject constructor(
 
     override suspend fun deleteAPost(songPost: SongPost): Resource<Boolean> = try {
         postRef
+            .document(songPost.postId)
+            .delete()
+            .await()
+        Resource.Success(true)
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!, false)
+    }
+
+    override suspend fun deletePostFromFollowing(songPost: SongPost): Resource<Boolean> = try {
+        val currentUid = auth.currentUser?.uid ?: ""
+        val postSnapshot = userRef
+            .document(currentUid)
+            .collection("user-feed")
             .document(songPost.postId)
             .delete()
             .await()

@@ -69,9 +69,10 @@ class SongPostViewModel @Inject constructor(
             when(result) {
                 is Resource.Success -> {
                     result.data?.let {posts ->
+                        val sorted = posts.sortedByDescending { it.timestamp }
                         userSongPostState.update {
                             it.copy(
-                                posts = posts,
+                                posts = sorted,
                                 isLoading = false
                             )
                         }
