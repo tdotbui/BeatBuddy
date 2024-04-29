@@ -70,6 +70,8 @@ fun HomeScreen(
     val currentSong by songViewModel.selectedSong.collectAsState()
     val currentSongList by remember { mutableStateOf(songViewModel.currentSongList) }
 
+    val isDiscovering by songViewModel.isDiscovering.collectAsState()
+
     val tabs = listOf(
         TabItem(
             selectedIcon = Icons.Default.Swipe,
@@ -143,7 +145,8 @@ fun HomeScreen(
                 0 -> {
                     SwipeSongCardScreen(
                         swipeSongViewModel = swipeSongViewModel,
-                        playlistViewModel = playlistViewModel
+                        playlistViewModel = playlistViewModel,
+                        songViewModel = songViewModel
                     )
                     songViewModel.minimizeScreen()
                 }
@@ -180,7 +183,7 @@ fun HomeScreen(
                 }
             }
 
-            if (currentSong != null && currentSongList.size > 1) {
+            if (!isDiscovering && currentSongList.size > 1) {
                 MusicPlayerScreen(
                     songViewModel = songViewModel,
                     playerEvent = songViewModel,

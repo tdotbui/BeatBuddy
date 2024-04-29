@@ -19,10 +19,13 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,29 +34,51 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.temple.beatbuddy.component.ImageFactory
+import edu.temple.beatbuddy.component.VinylAlbumCover
+import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
 import edu.temple.beatbuddy.music_browse.model.mapping.toPlaylistSong
+import edu.temple.beatbuddy.music_player.view_model.SongViewModel
 import edu.temple.beatbuddy.music_playlist.view_model.PlaylistViewModel
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.screen.component.UserPostHeader
 import edu.temple.beatbuddy.music_swipe.screen.component.SwipeableCard
 import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
+import edu.temple.beatbuddy.ui.theme.Pink40
+import edu.temple.beatbuddy.ui.theme.Pink80
 import edu.temple.beatbuddy.user_auth.model.User
 
 @Composable
 fun SwipeSongCardScreen(
     swipeSongViewModel: SwipeSongViewModel,
-    playlistViewModel: PlaylistViewModel
+    playlistViewModel: PlaylistViewModel,
+    songViewModel: SongViewModel
 ) {
     LaunchedEffect(Unit) {
         swipeSongViewModel.fetchSwipeSongPosts()
     }
     val posts by swipeSongViewModel.songPostState.collectAsState()
+    val playListPost = posts.posts.map {
+        it.toPlaylistSong()
+    }
+
+    val isDiscovering by songViewModel.isDiscovering.collectAsState()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (isDiscovering) {
+                songViewModel.clearSongList()
+                songViewModel.stop()
+            }
+            songViewModel.discoverNow(false)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -61,26 +86,64 @@ fun SwipeSongCardScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (posts.posts.isNotEmpty()) {
-            val song = posts.posts.first().toPlaylistSong()
-            SwipeableCard(
-                onDismiss = {direction ->
-                    swipeSongViewModel.removeSongFromList()
-                    if (direction == "right") {
-                        playlistViewModel.addToFavorite(song)
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                val song = posts.posts.first().toPlaylistSong()
+                SwipeableCard(
+                    onDismiss = {direction ->
+                        swipeSongViewModel.removeSongFromList()
+                        if (direction == "right") {
+                            playlistViewModel.addToFavorite(song)
+                        }
+                        songViewModel.onNextClick()
+                    }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .alpha(if (isDiscovering) 1f else 0.3f)
+                            .padding(16.dp)
+                            .padding(bottom = 24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SongCard(
+                            songPost = posts.posts.first(),
+                            songViewModel = songViewModel,
+                            playToggle = {
+                                songViewModel.onPlayPauseClick()
+                            }
+                        )
                     }
                 }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .padding(bottom = 24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    SongCard(
-                        songPost = posts.posts.first()
-                    )
-                }
 
+                if (!isDiscovering) {
+                    Column(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .clickable {
+                                songViewModel.setUpSongLists(playListPost)
+                                songViewModel.onSongClick(song)
+                                songViewModel.discoverNow(true)
+                            },
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Discover Hot Pick Today",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Pink40
+                        )
+
+                        Icon(
+                            imageVector = Icons.Default.Whatshot,
+                            contentDescription = "",
+                            modifier = Modifier.size(96.dp),
+                            tint = Pink40
+                        )
+                    }
+                }
             }
         } else {
             Text(
@@ -93,9 +156,13 @@ fun SwipeSongCardScreen(
 
 @Composable
 fun SongCard(
-    songPost: SongPost
+    songPost: SongPost,
+    songViewModel: SongViewModel,
+    playToggle: () -> Unit
 ) {
-    var isPlaying by remember { mutableStateOf(false) }
+    val isPlaying by songViewModel.isPlaying.collectAsState()
+    val currentSong by songViewModel.selectedSong.collectAsState()
+    val isDiscovering by songViewModel.isDiscovering.collectAsState()
 
     Column(
         modifier = Modifier
@@ -105,16 +172,15 @@ fun SongCard(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         UserPostHeader(user = songPost.user ?: User())
-
-        ImageFactory(
-            context = LocalContext.current,
-            imageUrl = songPost.songImage,
-            imageVector = Icons.Default.ImageNotSupported,
-            description = songPost.title,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-        )
+        
+        if (isPlaying && currentSong.id == songPost.songId) {
+            VinylAlbumCoverAnimation(imageUrl = songPost.songImage)
+        } else {
+            VinylAlbumCover(
+                imageUrL = songPost.songImage,
+                modifier = Modifier.alpha(0.7f)
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -144,7 +210,7 @@ fun SongCard(
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
-                contentDescription = "play previous song",
+                contentDescription = "Dislike",
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable { }
@@ -153,14 +219,14 @@ fun SongCard(
             )
 
             Icon(
-                imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                contentDescription = if (isPlaying) "pause" else "play",
+                imageVector = if (isPlaying && isDiscovering) Icons.Default.Pause else Icons.Default.PlayArrow,
+                contentDescription = if (isPlaying && isDiscovering) "pause" else "play",
                 tint = MaterialTheme.colorScheme.background,
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.onBackground)
                     .clickable {
-                        isPlaying = !isPlaying
+                        playToggle()
                     }
                     .size(56.dp)
                     .padding(8.dp)

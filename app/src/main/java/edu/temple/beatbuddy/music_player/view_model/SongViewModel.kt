@@ -34,7 +34,7 @@ class SongViewModel @Inject constructor(
     private val _currentSongList = mutableStateListOf<PlaylistSong>()
     val currentSongList: List<PlaylistSong> get() = _currentSongList
 
-    var selectedSong = MutableStateFlow<PlaylistSong?>(null)
+    var selectedSong = MutableStateFlow(PlaylistSong())
         private set
 
     private var selectedSongIndex: Int by mutableIntStateOf(-1)
@@ -47,6 +47,13 @@ class SongViewModel @Inject constructor(
 
     var isViewingGenre = MutableStateFlow(true)
         private set
+
+    var isDiscovering = MutableStateFlow(false)
+        private set
+
+    fun discoverNow(yes: Boolean) {
+        isDiscovering.value = yes
+    }
 
     private var isAuto: Boolean = false
 
@@ -183,6 +190,8 @@ class SongViewModel @Inject constructor(
             player.seekToPosition(position)
         }
     }
+
+    fun clearSongList() = _currentSongList.clear()
 
     fun stop() = player.stopPlayer()
 }
