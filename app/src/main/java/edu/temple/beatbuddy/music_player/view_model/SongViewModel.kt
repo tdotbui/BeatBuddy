@@ -42,12 +42,19 @@ class SongViewModel @Inject constructor(
     var isFullScreen = MutableStateFlow(false)
         private set
 
+    var isViewingGenre = MutableStateFlow(true)
+        private set
+
     private var isAuto: Boolean = false
 
     private var playbackStateJob: Job? = null
 
     private val _playbackState = MutableStateFlow(PlaybackState(0L, 0L))
     val playbackState: StateFlow<PlaybackState> get() = _playbackState
+
+    fun viewingGenres(genres: String) {
+        isViewingGenre.value = genres == "Genres"
+    }
 
     init {
         viewModelScope.launch {

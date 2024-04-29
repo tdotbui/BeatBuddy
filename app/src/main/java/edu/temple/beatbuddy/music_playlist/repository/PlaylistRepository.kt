@@ -6,8 +6,8 @@ import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistRepository {
-    suspend fun insertSongToPlayList(playlist: Playlist, song: PlaylistSong)
+    suspend fun insertSongToPlayList(playlist: Playlist, song: PlaylistSong): Resource<Boolean>
 
-    suspend fun getAllPlaylists(): Flow<Resource<List<Playlist>>>
+    suspend fun getAllPlaylists(): Resource<List<Playlist>>
     suspend fun getAllSongsFromPlayList(playlist: Playlist): Flow<Resource<List<PlaylistSong>>>
 }

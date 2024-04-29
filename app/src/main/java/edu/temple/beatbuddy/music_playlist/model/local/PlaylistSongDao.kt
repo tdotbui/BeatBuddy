@@ -15,11 +15,12 @@ interface PlaylistSongDao {
     @Delete
     suspend fun deleteSong(song: PlaylistSong)
 
-    @Query("SELECT * FROM PlaylistSong WHERE songId = :songId")
-    suspend fun getSongsForPlaylist(songId: Long): List<PlaylistSong>
+    @Query("SELECT * FROM PlaylistSong WHERE songId IN (SELECT songId FROM PlaylistSongCrossRef WHERE playlistId = :playlistId)")
+    suspend fun getSongsForPlaylist(playlistId: Long): List<PlaylistSong>
 
-    @Query("SELECT * FROM PlaylistSong WHERE songId IN (:songIds)")
-    suspend fun getSongsForPlaylists(songIds: List<Long>): List<PlaylistSong>
+
+//    @Query("SELECT * FROM PlaylistSong WHERE songId IN (:songIds)")
+//    suspend fun getSongsForPlaylists(songIds: List<Long>): List<PlaylistSong>
 
     @Query("DELETE FROM PlaylistSongCrossRef WHERE playlistId = :playlistId AND songId = :songId")
     suspend fun removeSongFromPlaylist(playlistId: Long, songId: Long)

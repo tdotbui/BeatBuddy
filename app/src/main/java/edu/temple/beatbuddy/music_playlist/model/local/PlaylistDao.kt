@@ -6,6 +6,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import edu.temple.beatbuddy.music_playlist.model.Playlist
 import edu.temple.beatbuddy.music_playlist.model.PlaylistWithSongs
+import edu.temple.beatbuddy.utils.Resource
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaylistDao {
@@ -16,11 +18,11 @@ interface PlaylistDao {
     suspend fun deletePlaylist(playlist: Playlist)
 
     @Query("SELECT * FROM Playlist")
-    fun getAllPlaylists(): List<Playlist>
+    suspend fun getAllPlaylists(): List<Playlist>
 
     @Query("SELECT * FROM Playlist WHERE id = :playlistId")
     suspend fun getPlaylistById(playlistId: Long): Playlist?
 
-    @Query("SELECT * FROM Playlist WHERE id = :name")
+    @Query("SELECT * FROM Playlist WHERE name = :name")
     suspend fun getPlaylistByName(name: String): Playlist?
 }

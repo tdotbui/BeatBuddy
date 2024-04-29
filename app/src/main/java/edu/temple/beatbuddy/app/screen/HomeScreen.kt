@@ -39,6 +39,7 @@ import edu.temple.beatbuddy.user_discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.user_discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.music_player.screen.MusicPlayerScreen
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
+import edu.temple.beatbuddy.music_playlist.view_model.PlaylistViewModel
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.music_swipe.screen.SwipeSongCardScreen
@@ -55,6 +56,7 @@ fun HomeScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     swipeSongViewModel: SwipeSongViewModel = hiltViewModel(),
     songViewModel: SongViewModel = hiltViewModel(),
+    playlistViewModel: PlaylistViewModel = hiltViewModel(),
     goToSignInScreen: () -> Unit
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(1) }
@@ -144,7 +146,8 @@ fun HomeScreen(
                 }
                 1 -> MusicBrowseScreen(
                     songPostViewModel = songPostViewModel,
-                    songViewModel = songViewModel
+                    songViewModel = songViewModel,
+                    playlistViewModel = playlistViewModel
                 )
                 2 -> {
                     songViewModel.minimizeScreen()

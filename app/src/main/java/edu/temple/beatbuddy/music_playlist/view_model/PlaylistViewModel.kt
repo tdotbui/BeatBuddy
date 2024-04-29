@@ -1,9 +1,13 @@
 package edu.temple.beatbuddy.music_playlist.view_model
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import edu.temple.beatbuddy.music_browse.model.Song
+import edu.temple.beatbuddy.music_browse.model.mapping.toPlaylistSong
 import edu.temple.beatbuddy.music_playlist.model.Playlist
+import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
 import edu.temple.beatbuddy.music_playlist.repository.PlaylistRepository
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,24 +24,43 @@ class PlaylistViewModel @Inject constructor(
     var playlistState = MutableStateFlow(PlaylistState())
         private set
 
+    var currentSong = MutableStateFlow(PlaylistSong())
+        private set
+
     init {
         fetchPlaylists()
-        fetchSongsFromPlaylist(playlistState.value.selectedPlaylist)
+    }
+
+    fun setSong(song: Song) {
+        currentSong.value = song.toPlaylistSong()
+    }
+
+    fun insertSong(playlist: Playlist) = viewModelScope.launch {
+        playlistRepository.insertSongToPlayList(playlist =  playlist, song = currentSong.value).let {result ->
+            if (result is Resource.Success) {
+                fetchPlaylists()
+            }
+        }
     }
 
     fun fetchPlaylists() = viewModelScope.launch {
         playlistState.update {
             it.copy(isLoading = true)
         }
-        playlistRepository.getAllPlaylists().collectLatest { result ->
+        playlistRepository.getAllPlaylists().let { result ->
             when(result) {
                 is Resource.Success -> {
                     result.data?.let { playlists ->
+                        val list = playlists.drop(1)
                         playlistState.update {
                             it.copy(
-                                playlists = playlists,
+                                playlists = list,
+                                selectedPlaylist = list.first(),
                                 isLoading = false
                             )
+                        }
+                        if (playlistState.value.playlists.isNotEmpty()) {
+                            fetchSongsFromPlaylist(playlistState.value.playlists.first())
                         }
                     }
                 }
