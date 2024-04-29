@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import edu.temple.beatbuddy.component.ImageFactory
 import edu.temple.beatbuddy.music_browse.model.Song
 import edu.temple.beatbuddy.music_playlist.model.Playlist
+import edu.temple.beatbuddy.music_playlist.screen.component.PlaylistRowItem
 import edu.temple.beatbuddy.music_playlist.view_model.PlaylistViewModel
 
 @Composable
@@ -87,6 +88,7 @@ fun AddToPlaylistScreen(
                 modifier = Modifier
                     .clickable {
                         if (playlistName != setUpPlaylist.name) {
+                            setUpPlaylist.id = 0L
                             setUpPlaylist.name = playlistName
                             setUpPlaylist.imageUrl = playlistViewModel.currentSong.value.songImage
                             playlistViewModel.insertSong(setUpPlaylist)
@@ -164,43 +166,6 @@ fun AddToPlaylistScreen(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun PlaylistRowItem(
-    playlist: Playlist,
-    select: (Long, String) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .clickable { select(playlist.id, playlist.name) },
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        ImageFactory(
-            context = LocalContext.current,
-            imageUrl = playlist.imageUrl,
-            imageVector = Icons.Outlined.ImageSearch,
-            description = "Playlist cover",
-            modifier = Modifier.size(48.dp)
-                .clip(RoundedCornerShape(5.dp))
-        )
-
-        Column(
-            modifier = Modifier
-                .height(72.dp)
-                .padding(start = 16.dp),
-            verticalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Text(
-                text = playlist.name,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp,
-            )
         }
     }
 }

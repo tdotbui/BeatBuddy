@@ -17,9 +17,7 @@ class PlaylistRepositoryImpl @Inject constructor(
     private val favoritePlaylist = Playlist(name = "Favorite", imageUrl = "https://cdn4.iconfinder.com/data/icons/ui-for-multimedia-players/48/21_favorite_music_favorite_list_note_love_favorite_heart_like_music_musical_notes_song_audio_tone_dot-1024.png")
     override suspend fun insertSongToPlayList(playlist: Playlist, song: PlaylistSong) = try {
         val songId = db.playlistSongDao.insertSong(song)
-        Log.d("Result", "Song Id is $songId")
         val existingPlaylist = db.playlistDao.getPlaylistById(playlist.id)
-        Log.d("Result", "playlist is $existingPlaylist")
 
         if (existingPlaylist == null) {
             val newPlaylistId = db.playlistDao.insertPlaylist(playlist)
@@ -47,15 +45,35 @@ class PlaylistRepositoryImpl @Inject constructor(
     override suspend fun getAllSongsFromPlayList(playlist: Playlist): Flow<Resource<List<PlaylistSong>>> = flow {
         emit(Resource.Loading(true))
         try {
-            Log.d("Result", "Songlist is run in this function")
             val songs = db.playlistSongDao.getSongsForPlaylist(playlist.id)
-            Log.d("Result", "Songlist is ${songs.first()}")
             emit(Resource.Success(songs))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage!!))
         } finally {
             emit(Resource.Loading(false))
         }
+    }
+
+    override suspend fun deleteSongFromPlaylist(
+        playlist: Playlist,
+        song: PlaylistSong
+    ): Resource<Boolean> = try {
+        db.playlistSongDao.deleteSongFromPlaylist(playlist.id, song.songId)
+        db.playlistSongDao.deleteSong(song)
+        Resource.Success(true)
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!)
+    }
+
+    override suspend fun deletePlaylist(playlist: Playlist): Resource<Boolean> = try {
+        db.playlistSongCrossRef.deleteCrossRefsForPlaylist(playlist.id)
+        db.playlistSongDao.getSongsForPlaylist(playlist.id).forEach { song ->
+            db.playlistSongDao.deleteSong(song)
+        }
+        db.playlistDao.deletePlaylist(playlist)
+        Resource.Success(true)
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!)
     }
 
     private suspend fun createFavoritePlaylist() {

@@ -43,7 +43,32 @@ class PlaylistViewModel @Inject constructor(
         }
     }
 
-    fun fetchPlaylists() = viewModelScope.launch {
+    fun deleteSong(song: PlaylistSong) = viewModelScope.launch {
+        val playlist = playlistState.value.selectedPlaylist
+        playlistRepository.deleteSongFromPlaylist(playlist = playlist, song = song).let {result ->
+            if (result is Resource.Success) {
+                fetchSongsFromPlaylist(playlist)
+            }
+        }
+    }
+
+    fun deletePlaylist(playlist: Playlist) = viewModelScope.launch {
+        val index = playlistState.value.playlists.indexOf(playlist)
+        if (index > 0) {
+            val previousPlaylist = playlistState.value.playlists[index - 1]
+
+            playlistRepository.deletePlaylist(playlist).let {result ->
+                if (result is Resource.Success) {
+                    fetchSongsFromPlaylist(previousPlaylist)
+                    fetchPlaylists()
+                }
+            }
+        } else {
+            playlistState.update { it.copy(errorMessage = "Cannot delete Favorite playlist.") }
+        }
+    }
+
+    private fun fetchPlaylists() = viewModelScope.launch {
         playlistState.update {
             it.copy(isLoading = true)
         }

@@ -3,6 +3,7 @@ package edu.temple.beatbuddy.music_browse.screen.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +32,8 @@ import edu.temple.beatbuddy.utils.Genre
 fun PlaylistItem(
     playlist: Playlist,
     onClick: () -> Unit,
-    isSelected: Boolean
+    isSelected: Boolean,
+    onLongPress: (Playlist) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -38,7 +41,12 @@ fun PlaylistItem(
             .size(100.dp)
             .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
             .clip(RoundedCornerShape(8.dp))
-            .clickable { onClick() },
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { onLongPress(playlist) },
+                    onTap = { onClick() }
+                )
+            },
         contentAlignment = Alignment.Center
     ) {
         ImageFactory(

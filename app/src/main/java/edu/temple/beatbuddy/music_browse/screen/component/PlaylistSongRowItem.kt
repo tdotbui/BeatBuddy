@@ -47,8 +47,10 @@ import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
 fun PlaylistSongRowItem(
     playlistSong: PlaylistSong,
     onMusicClick: (PlaylistSong) -> Unit,
+    delete: (PlaylistSong) -> Unit
 ) {
     val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -112,6 +114,32 @@ fun PlaylistSongRowItem(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Light
                     )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreHoriz,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clickable { expanded = true }
+                )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    MenuItem("Play") {
+                        onMusicClick(playlistSong)
+                        expanded = false
+                    }
+                    MenuItem("Delete") {
+                        delete(playlistSong)
+                        expanded = false
+                    }
                 }
             }
         }

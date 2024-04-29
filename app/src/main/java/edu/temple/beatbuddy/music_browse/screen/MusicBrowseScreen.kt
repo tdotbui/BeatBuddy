@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.BottomSheetState
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -27,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
@@ -54,6 +56,7 @@ import edu.temple.beatbuddy.music_browse.screen.component.PlaylistSongRowItem
 import edu.temple.beatbuddy.music_browse.screen.component.SongRowItem
 import edu.temple.beatbuddy.music_browse.view_model.SongListViewModel
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
+import edu.temple.beatbuddy.music_playlist.model.Playlist
 import edu.temple.beatbuddy.music_playlist.screen.AddToPlaylistScreen
 import edu.temple.beatbuddy.music_playlist.view_model.PlaylistViewModel
 import edu.temple.beatbuddy.music_post.model.SongPost
@@ -96,6 +99,9 @@ fun MusicBrowseScreen(
     )
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
     val scope = rememberCoroutineScope()
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var selectedPlaylist by remember { mutableStateOf(Playlist(0L, "")) }
 
     BottomSheetScaffold(
         sheetContent = {
@@ -149,7 +155,11 @@ fun MusicBrowseScreen(
                         PlaylistItem(
                             playlist = playlist,
                             onClick = { playlistViewModel.fetchSongsFromPlaylist(playlist) },
-                            isSelected = playlist.id == playlistSongs.selectedPlaylist.id
+                            isSelected = playlist.id == playlistSongs.selectedPlaylist.id,
+                            onLongPress = {playlist ->
+                                showDeleteDialog = true
+                                selectedPlaylist = playlist
+                            }
                         )
                     }
                 }
@@ -265,6 +275,9 @@ fun MusicBrowseScreen(
 //                                songViewModel.onSongClick(song)
 //                                selectedSong = song
                                 },
+                                delete = {song ->
+                                    playlistViewModel.deleteSong(song)
+                                }
                             )
                         }
                     }
@@ -278,6 +291,35 @@ fun MusicBrowseScreen(
                         CircularProgressIndicator()
                     }
                 }
+            }
+
+            if (showDeleteDialog) {
+                AlertDialog(
+                    onDismissRequest = {},
+                    title = { Text(text = "Delete Playlist") },
+                    text = { Text(text = "Are you sure you want to delete playlist ${selectedPlaylist.name}?") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                playlistViewModel.deletePlaylist(selectedPlaylist)
+                                showDeleteDialog = false
+                            }
+                        ) {
+                            Text("Yes")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteDialog = false }
+                        ) {
+                            Text("No")
+                        }
+                    }
+                )
+            }
+
+            if (playlistSongs.errorMessage != null) {
+                Helpers.showMessage(context, playlistSongs.errorMessage)
+                playlistSongs.errorMessage = null
             }
 
             if (openDialog) {

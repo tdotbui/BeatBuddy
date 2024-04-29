@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import edu.temple.beatbuddy.music_playlist.model.Playlist
-import edu.temple.beatbuddy.music_playlist.model.PlaylistWithSongs
 import edu.temple.beatbuddy.utils.Resource
 import kotlinx.coroutines.flow.Flow
 

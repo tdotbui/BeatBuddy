@@ -10,4 +10,8 @@ interface PlaylistRepository {
 
     suspend fun getAllPlaylists(): Resource<List<Playlist>>
     suspend fun getAllSongsFromPlayList(playlist: Playlist): Flow<Resource<List<PlaylistSong>>>
+
+    suspend fun deleteSongFromPlaylist(playlist: Playlist, song: PlaylistSong): Resource<Boolean>
+
+    suspend fun deletePlaylist(playlist: Playlist): Resource<Boolean>
 }

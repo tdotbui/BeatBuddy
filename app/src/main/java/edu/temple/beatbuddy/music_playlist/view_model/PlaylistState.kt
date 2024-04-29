@@ -10,5 +10,5 @@ data class PlaylistState(
     val currentSongList: List<PlaylistSong> = emptyList(),
     val playlists: List<Playlist> = emptyList(),
 
-    val errorMessage: String? = null
+    var errorMessage: String? = null
 )
