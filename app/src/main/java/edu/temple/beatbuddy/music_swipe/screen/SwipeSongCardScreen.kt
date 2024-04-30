@@ -50,6 +50,7 @@ import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.screen.component.UserPostHeader
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.music_swipe.screen.component.SwipeableCard
+import edu.temple.beatbuddy.music_swipe.sensor.SensorHandler
 import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 import edu.temple.beatbuddy.ui.theme.Pink40
 import edu.temple.beatbuddy.ui.theme.Pink80
@@ -62,9 +63,21 @@ fun SwipeSongCardScreen(
     songViewModel: SongViewModel,
     songPostViewModel: SongPostViewModel
 ) {
+
     LaunchedEffect(Unit) {
         swipeSongViewModel.fetchSwipeSongPosts()
     }
+
+    val context = LocalContext.current
+    val sensorHandler = remember { SensorHandler(context, swipeSongViewModel) }
+
+    DisposableEffect(key1 = sensorHandler) {
+        sensorHandler.register()
+        onDispose {
+            sensorHandler.unregister()
+        }
+    }
+
     val posts by swipeSongViewModel.songPostState.collectAsState()
     val playListPost = posts.posts.map {
         it.toPlaylistSong()
