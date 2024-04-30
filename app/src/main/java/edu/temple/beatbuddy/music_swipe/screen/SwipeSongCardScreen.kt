@@ -63,19 +63,18 @@ fun SwipeSongCardScreen(
     songViewModel: SongViewModel,
     songPostViewModel: SongPostViewModel
 ) {
-
-    LaunchedEffect(Unit) {
-        swipeSongViewModel.fetchSwipeSongPosts()
-    }
-
     val context = LocalContext.current
     val sensorHandler = remember { SensorHandler(context, swipeSongViewModel) }
 
-    DisposableEffect(key1 = sensorHandler) {
+    DisposableEffect(Unit) {
         sensorHandler.register()
         onDispose {
             sensorHandler.unregister()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        swipeSongViewModel.fetchSwipeSongPosts()
     }
 
     val posts by swipeSongViewModel.songPostState.collectAsState()

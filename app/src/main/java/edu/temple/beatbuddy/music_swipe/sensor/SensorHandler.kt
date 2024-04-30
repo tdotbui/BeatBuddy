@@ -10,7 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 
-class SensorHandler(context: Context, private val viewModel: SwipeSongViewModel) : SensorEventListener {
+class SensorHandler(context: Context, private val swipeSongViewModel: SwipeSongViewModel) : SensorEventListener {
     private var sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private var accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     private var isNeutral = true
@@ -22,11 +22,11 @@ class SensorHandler(context: Context, private val viewModel: SwipeSongViewModel)
 
                 if (x > 5.0f && isNeutral) {
                     Log.d("SensorHandler", "Tilted left")
-                    viewModel.removeSongFromList()
+                    swipeSongViewModel.removeSongFromList()
                     isNeutral = false
                 } else if (x < -5.0f && isNeutral) {
                     Log.d("SensorHandler", "Tilted right")
-                    viewModel.removeSongFromList()
+                    swipeSongViewModel.removeSongFromList()
                     isNeutral = false
                 } else if (x > -1.0f && x < 1.0f) {
                     isNeutral = true
