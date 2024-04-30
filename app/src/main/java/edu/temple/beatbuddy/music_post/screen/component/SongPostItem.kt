@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.Comment
+import androidx.compose.material.icons.automirrored.outlined.InsertComment
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material.icons.filled.PauseCircleOutline
@@ -38,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import edu.temple.beatbuddy.component.ImageFactory
 import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
@@ -64,7 +67,7 @@ fun SongPostItem(
     Card(
         modifier = Modifier
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 24.dp, vertical = 16.dp)
             .clickable {
 
             },
@@ -130,11 +133,13 @@ fun SongPostItem(
             }
 
             Row(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = user?.username ?: "username",
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp
                 )
 
                 val caption = songPost.caption
@@ -142,6 +147,7 @@ fun SongPostItem(
                     Text(
                         text = "  $caption",
                         fontWeight = FontWeight.Light,
+                        fontSize = 12.sp
                     )
                 }
             }
@@ -151,17 +157,20 @@ fun SongPostItem(
                     .wrapContentSize()
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
                     modifier = Modifier
                         .wrapContentSize(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = if (didLike == true) Icons.Default.ThumbUp else Icons.Default.ThumbUpOffAlt,
                         contentDescription = null,
                         modifier = Modifier
+                            .size(17.dp)
                             .clickable {
                                 didLike = didLike != true
                                 if (didLike == true) {
@@ -174,18 +183,24 @@ fun SongPostItem(
                             }
                     )
                     if (likes > 0) {
-                        Text(text = "$likes")
+                        Text(
+                            text = "$likes",
+                            fontWeight = FontWeight.Light,
+                            fontSize = 14.sp
+                        )
                     }
                 }
 
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.Comment,
-                    contentDescription = null
+                    imageVector = Icons.AutoMirrored.Outlined.InsertComment,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
                 )
 
                 Icon(
                     imageVector = Icons.Default.Share,
-                    contentDescription = null
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }

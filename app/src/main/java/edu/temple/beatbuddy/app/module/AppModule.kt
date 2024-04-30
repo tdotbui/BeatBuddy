@@ -20,6 +20,8 @@ import edu.temple.beatbuddy.music_browse.model.remote.SongApi
 import edu.temple.beatbuddy.user_discover.repository.UsersRepository
 import edu.temple.beatbuddy.user_discover.repository.UsersRepositoryImpl
 import edu.temple.beatbuddy.music_player.player.CustomPlayer
+import edu.temple.beatbuddy.music_playlist.model.local.PlaylistDatabase
+import edu.temple.beatbuddy.music_playlist.repository.PlaylistRepositoryImpl
 import edu.temple.beatbuddy.music_post.repository.SongPostRepository
 import edu.temple.beatbuddy.music_post.repository.SongPostRepositoryImpl
 import edu.temple.beatbuddy.user_auth.repository.AuthRepository
@@ -147,5 +149,15 @@ class AppModule {
     @Singleton
     fun provideMyPlayer(player: ExoPlayer): CustomPlayer {
         return CustomPlayer(player)
+    }
+
+    @Provides
+    @Singleton
+    fun providesPlaylistDatabase(app: Application): PlaylistDatabase {
+        return Room.databaseBuilder(
+            app,
+            PlaylistDatabase::class.java,
+            "playlist.db"
+        ).build()
     }
 }

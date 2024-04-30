@@ -3,6 +3,7 @@ package edu.temple.beatbuddy.music_browse.model.local
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
+import edu.temple.beatbuddy.music_browse.model.Song
 
 @Dao
 interface SongDao {

@@ -17,4 +17,8 @@ interface SongPostRepository {
     suspend fun checkIfUserLikedPost(songPost: SongPost): Resource<Boolean>
 
     fun fetchPostsForUser(user: User): Flow<Resource<List<SongPost>>>
+
+    suspend fun deleteAPost(songPost: SongPost): Resource<Boolean>
+
+    suspend fun deletePostFromFollowing(songPost: SongPost): Resource<Boolean>
 }

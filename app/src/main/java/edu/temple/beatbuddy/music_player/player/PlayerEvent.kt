@@ -1,6 +1,7 @@
 package edu.temple.beatbuddy.music_player.player
 
-import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.Song
+import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
 
 interface PlayerEvent {
     fun onPlayPauseClick()
@@ -9,6 +10,6 @@ interface PlayerEvent {
 
     fun onRewindClick()
     fun onForwardClick()
-    fun onSongClick(song: Song)
+    fun onSongClick(song: PlaylistSong)
     fun onSeekBarPositionChanged(position: Long)
 }

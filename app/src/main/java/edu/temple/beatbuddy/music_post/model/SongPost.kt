@@ -10,7 +10,7 @@ data class SongPost(
     var likes: Int = 0,
     val timestamp: Timestamp? = null,
 
-    val songId: Long? = 0L,
+    val songId: Long = 0L,
     val title: String = "",
     val preview: String = "",
     val artistName: String = "",

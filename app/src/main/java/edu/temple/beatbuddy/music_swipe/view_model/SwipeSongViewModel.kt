@@ -33,21 +33,31 @@ class SwipeSongViewModel @Inject constructor(
         currentSongPost.value = songPost
     }
 
-    fun removeSongFromList() {
-        if (songPostState.value.posts.isNotEmpty()) {
-            val remainingPosts = songPostState.value.posts.toMutableList().apply {
-                removeFirst()
+    fun removeSongFromList() = viewModelScope.launch {
+        val remainingPosts = songPostState.value.posts.toMutableList().apply {
+            val post = removeFirst()
+            if (post.didLike == false) {
+                likePost(post)
             }
-            songPostState.value = songPostState.value.copy(posts = remainingPosts)
-            for (song in songPostState.value.posts) {
-                Log.d("The remaining post is", song.title)
+            repository.deletePostFromFollowing(post)
+        }
+        songPostState.update {
+            it.copy(posts = remainingPosts)
+        }
+//        for (song in songPostState.value.posts) {
+//            Log.d("The remaining post is", song.title)
+//        }
+    }
+
+    fun likePost(songPost: SongPost) {
+        viewModelScope.launch {
+            repository.likePost(songPost).let {result ->
+//                if (result is Resource.Success) fetchSongPosts()
             }
-        } else {
-            Log.d("SwipeSongViewModel", "No more posts to remove")
         }
     }
 
-    private fun fetchSwipeSongPosts() = viewModelScope.launch {
+    fun fetchSwipeSongPosts() = viewModelScope.launch {
         songPostState.update {
             it.copy(isLoading = true)
         }

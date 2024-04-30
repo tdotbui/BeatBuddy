@@ -19,7 +19,6 @@ import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,32 +39,24 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import edu.temple.beatbuddy.component.ImageFactory
 import edu.temple.beatbuddy.music_browse.model.Song
 import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
 
 @Composable
-fun SongRowItem(
-    song: PlaylistSong,
+fun PlaylistSongRowItem(
+    playlistSong: PlaylistSong,
     onMusicClick: (PlaylistSong) -> Unit,
-    shareClick: (PlaylistSong) -> Unit,
-    addClick: (PlaylistSong) -> Unit
+    delete: (PlaylistSong) -> Unit
 ) {
     val context = LocalContext.current
-
     var expanded by remember { mutableStateOf(false) }
-
-    val imageState = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(context)
-            .data(song.songImage)
-            .size(Size.ORIGINAL)
-            .build()
-    ).state
 
     Card(
         modifier = Modifier
             .wrapContentSize()
             .padding(bottom = 8.dp)
-            .clickable { onMusicClick(song) },
+            .clickable { onMusicClick(playlistSong) },
         elevation = CardDefaults.cardElevation(5.dp),
     ) {
         Box(
@@ -80,7 +71,7 @@ fun SongRowItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .clickable { onMusicClick(song) },
+                    .clickable { onMusicClick(playlistSong) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
@@ -91,22 +82,15 @@ fun SongRowItem(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (imageState.painter != null) {
-                        Image(
-                            painter = imageState.painter!!,
-                            contentDescription = song.title,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(56.dp)
-                                .clip(MaterialTheme.shapes.medium)
-                        )
-                    } else {
-                        Icon(
-                            modifier = Modifier.size(56.dp),
-                            imageVector = Icons.Rounded.ImageNotSupported,
-                            contentDescription = "\"${song.title}\" track cover"
-                        )
-                    }
+                    ImageFactory(
+                        context = context,
+                        imageUrl = playlistSong.songImage,
+                        imageVector = Icons.Rounded.ImageNotSupported,
+                        description = "\"${playlistSong.title}\" track cover",
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                    )
                 }
 
                 Column(
@@ -117,7 +101,7 @@ fun SongRowItem(
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Text(
-                        text = song.title,
+                        text = playlistSong.title,
                         maxLines = 1,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -125,7 +109,7 @@ fun SongRowItem(
                     )
 
                     Text(
-                        text = song.artistName,
+                        text = playlistSong.artistName,
                         maxLines = 1,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Light
@@ -149,27 +133,15 @@ fun SongRowItem(
                     onDismissRequest = { expanded = false }
                 ) {
                     MenuItem("Play") {
-                        onMusicClick(song)
+                        onMusicClick(playlistSong)
                         expanded = false
                     }
-                    MenuItem("Add to Playlist") {
-                        addClick(song)
-                        expanded = false
-                    }
-                    MenuItem("Share") {
-                        shareClick(song)
+                    MenuItem("Delete") {
+                        delete(playlistSong)
                         expanded = false
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-fun MenuItem(text: String, onClick: () -> Unit) {
-    DropdownMenuItem(
-        text = { Text(text = text) }, 
-        onClick = { onClick() }
-    )
 }

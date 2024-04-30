@@ -28,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -38,6 +39,7 @@ import edu.temple.beatbuddy.user_discover.screen.ProfileListScreen
 import edu.temple.beatbuddy.user_discover.view_model.ProfileViewModel
 import edu.temple.beatbuddy.music_player.screen.MusicPlayerScreen
 import edu.temple.beatbuddy.music_player.view_model.SongViewModel
+import edu.temple.beatbuddy.music_playlist.view_model.PlaylistViewModel
 import edu.temple.beatbuddy.music_post.screen.FeedsScreen
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.music_swipe.screen.SwipeSongCardScreen
@@ -54,6 +56,7 @@ fun HomeScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     swipeSongViewModel: SwipeSongViewModel = hiltViewModel(),
     songViewModel: SongViewModel = hiltViewModel(),
+    playlistViewModel: PlaylistViewModel = hiltViewModel(),
     goToSignInScreen: () -> Unit
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(1) }
@@ -66,6 +69,8 @@ fun HomeScreen(
 
     val currentSong by songViewModel.selectedSong.collectAsState()
     val currentSongList by remember { mutableStateOf(songViewModel.currentSongList) }
+
+    val isDiscovering by songViewModel.isDiscovering.collectAsState()
 
     val tabs = listOf(
         TabItem(
@@ -96,12 +101,14 @@ fun HomeScreen(
                 selectedTabIndex = selectedTabIndex,
                 contentColor = Color.Black,
                 modifier = Modifier
-                    .background(Color.White)
+                    .background(Color.Cyan)
             ) {
                 tabs.forEachIndexed { index, item ->
                     Tab(
                         selected = selectedTabIndex == index,
                         onClick = { selectedTabIndex = index },
+                        selectedContentColor = Color.Black,
+                        unselectedContentColor = Color.Gray,
                         text = {
                             Column(
                                 modifier = Modifier
@@ -114,7 +121,6 @@ fun HomeScreen(
                                     contentDescription = item.title,
                                     modifier = Modifier
                                         .size(24.dp),
-                                    tint = if (selectedTabIndex == index) Color.Black else Color.Gray
                                 )
                                 Text(
                                     text = item.title,
@@ -137,12 +143,18 @@ fun HomeScreen(
         ) {
             when (selectedTabIndex) {
                 0 -> {
-                    SwipeSongCardScreen(swipeSongViewModel = swipeSongViewModel)
+                    SwipeSongCardScreen(
+                        swipeSongViewModel = swipeSongViewModel,
+                        playlistViewModel = playlistViewModel,
+                        songViewModel = songViewModel,
+                        songPostViewModel = songPostViewModel
+                    )
                     songViewModel.minimizeScreen()
                 }
                 1 -> MusicBrowseScreen(
                     songPostViewModel = songPostViewModel,
-                    songViewModel = songViewModel
+                    songViewModel = songViewModel,
+                    playlistViewModel = playlistViewModel
                 )
                 2 -> {
                     songViewModel.minimizeScreen()
@@ -166,12 +178,13 @@ fun HomeScreen(
                         currentUserProfileViewModel = currentUserProfileViewModel,
                         onSignOut = { goToSignInScreen() },
                         songViewModel = songViewModel,
-                        songPostViewModel = songPostViewModel
+                        songPostViewModel = songPostViewModel,
+                        playlistViewModel = playlistViewModel
                     )
                 }
             }
 
-            if (currentSong != null && currentSongList.size > 1) {
+            if (!isDiscovering && currentSongList.size > 1) {
                 MusicPlayerScreen(
                     songViewModel = songViewModel,
                     playerEvent = songViewModel,

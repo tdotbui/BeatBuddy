@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -21,10 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import edu.temple.beatbuddy.component.ImageFactory
-import edu.temple.beatbuddy.music_browse.model.local.Song
-import edu.temple.beatbuddy.music_post.model.SongPost
 import kotlinx.coroutines.job
 
 @Composable

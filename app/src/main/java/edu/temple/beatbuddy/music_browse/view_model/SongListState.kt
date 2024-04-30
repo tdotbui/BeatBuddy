@@ -1,6 +1,6 @@
 package edu.temple.beatbuddy.music_browse.view_model
 
-import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.Song
 import edu.temple.beatbuddy.utils.Genre
 
 data class SongListState(

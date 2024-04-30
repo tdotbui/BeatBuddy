@@ -1,34 +1,29 @@
 package edu.temple.beatbuddy.music_player.view_model
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.Song
+import edu.temple.beatbuddy.music_browse.model.mapping.toPlaylistSong
 import edu.temple.beatbuddy.music_player.player.CustomPlayer
 import edu.temple.beatbuddy.music_player.player.PlaybackState
 import edu.temple.beatbuddy.music_player.player.PlayerEvent
 import edu.temple.beatbuddy.music_player.player.PlayerState
+import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
 import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.utils.collectPlayerState
 import edu.temple.beatbuddy.utils.launchPlaybackStateJob
 import edu.temple.beatbuddy.utils.toMediaItemList
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,10 +31,10 @@ class SongViewModel @Inject constructor(
     private val player: CustomPlayer,
 ) : ViewModel(), PlayerEvent {
 
-    private val _currentSongList = mutableStateListOf<Song>()
-    val currentSongList: List<Song> get() = _currentSongList
+    private val _currentSongList = mutableStateListOf<PlaylistSong>()
+    val currentSongList: List<PlaylistSong> get() = _currentSongList
 
-    var selectedSong = MutableStateFlow<Song?>(null)
+    var selectedSong = MutableStateFlow(PlaylistSong())
         private set
 
     private var selectedSongIndex: Int by mutableIntStateOf(-1)
@@ -50,12 +45,26 @@ class SongViewModel @Inject constructor(
     var isFullScreen = MutableStateFlow(false)
         private set
 
+    var isViewingGenre = MutableStateFlow(true)
+        private set
+
+    var isDiscovering = MutableStateFlow(false)
+        private set
+
+    fun discoverNow(yes: Boolean) {
+        isDiscovering.value = yes
+    }
+
     private var isAuto: Boolean = false
 
     private var playbackStateJob: Job? = null
 
     private val _playbackState = MutableStateFlow(PlaybackState(0L, 0L))
     val playbackState: StateFlow<PlaybackState> get() = _playbackState
+
+    fun viewingGenres(genres: String) {
+        isViewingGenre.value = genres == "Genres"
+    }
 
     init {
         viewModelScope.launch {
@@ -90,8 +99,12 @@ class SongViewModel @Inject constructor(
 
     fun getCurrentTrackDuration() = player.currentTrackDuration
 
-    fun setUpSongLists(songList: List<Song>) {
+    fun setUpSongLists(songList: List<PlaylistSong>) {
+        _currentSongList.clear()
         _currentSongList.addAll(songList)
+        _currentSongList.map {
+            Log.d("Current List", it.title)
+        }
         player.initPlayer(songList.toMediaItemList())
     }
 
@@ -167,7 +180,7 @@ class SongViewModel @Inject constructor(
         }
     }
 
-    override fun onSongClick(song: Song) {
+    override fun onSongClick(song: PlaylistSong) {
         selectedSong.value = song
         onSongSelected(index = _currentSongList.indexOf(song))
     }
@@ -177,6 +190,8 @@ class SongViewModel @Inject constructor(
             player.seekToPosition(position)
         }
     }
+
+    fun clearSongList() = _currentSongList.clear()
 
     fun stop() = player.stopPlayer()
 }

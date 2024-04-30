@@ -1,10 +1,11 @@
 package edu.temple.beatbuddy.music_browse.model.mapping
 
-import androidx.media3.common.MediaItem
-import edu.temple.beatbuddy.music_browse.model.local.Song
+import edu.temple.beatbuddy.music_browse.model.Song
 import edu.temple.beatbuddy.music_browse.model.remote.AlbumDto
 import edu.temple.beatbuddy.music_browse.model.remote.ArtistDto
 import edu.temple.beatbuddy.music_browse.model.remote.SongDto
+import edu.temple.beatbuddy.music_playlist.model.PlaylistSong
+import edu.temple.beatbuddy.music_post.model.SongPost
 
 fun SongDto.toSong(
     genre: Int
@@ -28,4 +29,22 @@ fun SongDto.toSong(
     type = type ?: "",
 
     genre = genre
+)
+
+fun Song.toPlaylistSong(): PlaylistSong = PlaylistSong(
+    id = id,
+    title = title,
+    preview = preview,
+    artistName = artist.name ?: "",
+    artistPicture = artist.picture_medium ?: "",
+    songImage = album.cover_medium ?: ""
+)
+
+fun SongPost.toPlaylistSong(): PlaylistSong = PlaylistSong(
+    id = songId,
+    title = title,
+    preview = preview,
+    artistName = artistName,
+    artistPicture = artistPicture,
+    songImage = songImage
 )

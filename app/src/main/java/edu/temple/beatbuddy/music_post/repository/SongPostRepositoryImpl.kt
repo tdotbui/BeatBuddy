@@ -39,7 +39,6 @@ class SongPostRepositoryImpl @Inject constructor(
         try {
             val posts = postRef
                 .whereEqualTo("ownerUid", user.id)
-//                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
                 .await()
                 .toObjects(SongPost::class.java).map {
@@ -52,6 +51,29 @@ class SongPostRepositoryImpl @Inject constructor(
         } finally {
             emit(Resource.Loading(false))
         }
+    }
+
+    override suspend fun deleteAPost(songPost: SongPost): Resource<Boolean> = try {
+        postRef
+            .document(songPost.postId)
+            .delete()
+            .await()
+        Resource.Success(true)
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!, false)
+    }
+
+    override suspend fun deletePostFromFollowing(songPost: SongPost): Resource<Boolean> = try {
+        val currentUid = auth.currentUser?.uid ?: ""
+        val postSnapshot = userRef
+            .document(currentUid)
+            .collection("user-feed")
+            .document(songPost.postId)
+            .delete()
+            .await()
+        Resource.Success(true)
+    } catch (e: Exception) {
+        Resource.Error(e.localizedMessage!!, false)
     }
 
     override suspend fun shareAPost(songPost: SongPost): Resource<Boolean> = try {
@@ -80,7 +102,7 @@ class SongPostRepositoryImpl @Inject constructor(
             for (doc in postSnapshot.documents) {
                 val post = postRef.document(doc.id).get().await().toObject(SongPost::class.java)?.let {
                     val user = userRef.document(it.ownerUid).get().await().toObject(User::class.java)
-                    it.copy(user = user)
+                    it.copy(user = user, didLike = checkIfUserLikedPost(it).data)
                 }
                 if (post != null) {
                     posts.add(post)
