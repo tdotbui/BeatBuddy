@@ -43,8 +43,14 @@ fun SwipeableCard(
     val sensitivityFactor: Float = 3f
 
     when (sensorViewModel.direction) {
-        Direction.LEFT -> onDismiss(Direction.LEFT)
-        Direction.RIGHT -> onDismiss(Direction.RIGHT)
+        Direction.LEFT -> {
+            sensorViewModel.sensor.stopListening()
+            onDismiss(Direction.LEFT)
+        }
+        Direction.RIGHT -> {
+            sensorViewModel.sensor.stopListening()
+            onDismiss(Direction.RIGHT)
+        }
         else -> {}
     }
 
