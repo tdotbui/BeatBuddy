@@ -24,6 +24,9 @@ import edu.temple.beatbuddy.music_playlist.model.local.PlaylistDatabase
 import edu.temple.beatbuddy.music_playlist.repository.PlaylistRepositoryImpl
 import edu.temple.beatbuddy.music_post.repository.SongPostRepository
 import edu.temple.beatbuddy.music_post.repository.SongPostRepositoryImpl
+import edu.temple.beatbuddy.music_swipe.sensor.AccelerometerSensor
+import edu.temple.beatbuddy.music_swipe.sensor.MeasurableSensor
+import edu.temple.beatbuddy.music_swipe.sensor.SensorHandler
 import edu.temple.beatbuddy.user_auth.repository.AuthRepository
 import edu.temple.beatbuddy.user_auth.repository.AuthRepositoryImpl
 import okhttp3.OkHttpClient
@@ -159,5 +162,11 @@ class AppModule {
             PlaylistDatabase::class.java,
             "playlist.db"
         ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMeasurableSensor(context: Context): MeasurableSensor {
+        return AccelerometerSensor(context) // Provide an instance of AccelerometerSensor
     }
 }

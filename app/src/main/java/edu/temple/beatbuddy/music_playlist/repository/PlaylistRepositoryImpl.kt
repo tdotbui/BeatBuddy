@@ -16,25 +16,19 @@ class PlaylistRepositoryImpl @Inject constructor(
 
     private val favoritePlaylist = Playlist(name = "Favorite", imageUrl = "https://cdn4.iconfinder.com/data/icons/ui-for-multimedia-players/48/21_favorite_music_favorite_list_note_love_favorite_heart_like_music_musical_notes_song_audio_tone_dot-1024.png")
     override suspend fun insertSongToPlayList(playlist: Playlist, song: PlaylistSong) = try {
-        val existingSong = db.playlistSongDao.getSongsForPlaylist(playlist.id).find {
-            it.id == song.id
-        }
-        if (existingSong != null) {
-            Resource.Success(false)
-        } else {
-            val songId = db.playlistSongDao.insertSong(song)
-            val existingPlaylist = db.playlistDao.getPlaylistById(playlist.id)
+        val songId = db.playlistSongDao.insertSong(song)
+        val existingPlaylist = db.playlistDao.getPlaylistById(playlist.id)
 
-            if (existingPlaylist == null) {
-                val newPlaylistId = db.playlistDao.insertPlaylist(playlist)
-                val crossRef = PlaylistSongCrossRef(newPlaylistId, songId)
-                db.playlistSongCrossRef.insertPlaylistSongCrossRef(crossRef)
-            } else {
-                val crossRef = PlaylistSongCrossRef(playlist.id, songId)
-                db.playlistSongCrossRef.insertPlaylistSongCrossRef(crossRef)
-            }
-            Resource.Success(true)
+        if (existingPlaylist == null) {
+            val newPlaylistId = db.playlistDao.insertPlaylist(playlist)
+            val crossRef = PlaylistSongCrossRef(newPlaylistId, songId)
+            db.playlistSongCrossRef.insertPlaylistSongCrossRef(crossRef)
+        } else {
+            Log.d("Result", "Playlist existed ${playlist.id}")
+            val crossRef = PlaylistSongCrossRef(playlist.id, songId)
+            db.playlistSongCrossRef.insertPlaylistSongCrossRef(crossRef)
         }
+        Resource.Success(true)
     } catch (e: Exception) {
         Resource.Error(e.localizedMessage!!)
     }
@@ -90,25 +84,17 @@ class PlaylistRepositoryImpl @Inject constructor(
     }
 
     override suspend fun insertSongToFavorite(song: PlaylistSong) = try {
-        val existingSong = db.playlistSongDao.getSongsForPlaylist(2).find {
-            it.id == song.id
-        }
-        if (existingSong != null) {
-            Log.d("Result", "From repository the song existed $existingSong")
-            Resource.Success(false)
-        } else {
-            val songId = db.playlistSongDao.insertSong(song)
-            Log.d("Result", "From repository with id $songId")
-            val existingPlaylist = db.playlistDao.getPlaylistById(2)
-            Log.d("Result", "From repository with playlist $existingPlaylist")
+        val songId = db.playlistSongDao.insertSong(song)
+        Log.d("Result", "From repository with id $songId")
+        val existingPlaylist = db.playlistDao.getPlaylistById(2)
+        Log.d("Result", "From repository with playlist $existingPlaylist")
 
-            if (existingPlaylist != null) {
-                val crossRef = PlaylistSongCrossRef(existingPlaylist.id, songId)
-                db.playlistSongCrossRef.insertPlaylistSongCrossRef(crossRef)
-                Log.d("Result", "From repository with result $crossRef")
-            }
-            Resource.Success(true)
+        if (existingPlaylist != null) {
+            val crossRef = PlaylistSongCrossRef(existingPlaylist.id, songId)
+            db.playlistSongCrossRef.insertPlaylistSongCrossRef(crossRef)
+            Log.d("Result", "From repository with result $crossRef")
         }
+        Resource.Success(true)
     } catch (e: Exception) {
         Resource.Error(e.localizedMessage!!)
     }

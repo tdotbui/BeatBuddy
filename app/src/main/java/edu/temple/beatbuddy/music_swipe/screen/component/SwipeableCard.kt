@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -23,12 +24,16 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import edu.temple.beatbuddy.music_swipe.sensor.Direction
+import edu.temple.beatbuddy.music_swipe.view_model.SensorViewModel
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
 fun SwipeableCard(
-    onDismiss: (String) -> Unit,
+    sensorViewModel: SensorViewModel,
+    onDismiss: (Direction) -> Unit,
     content: @Composable () -> Unit
 ) {
     var offsetX by remember { mutableFloatStateOf(0f) }
@@ -36,6 +41,12 @@ fun SwipeableCard(
 
     val swipeThreshold: Float = 400f
     val sensitivityFactor: Float = 3f
+
+    when (sensorViewModel.direction) {
+        Direction.LEFT -> onDismiss(Direction.LEFT)
+        Direction.RIGHT -> onDismiss(Direction.RIGHT)
+        else -> {}
+    }
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -51,10 +62,10 @@ fun SwipeableCard(
                     onDragEnd = {
                         // Determine swipe direction and call onDismiss if the swipe exceeds threshold.
                         when {
-                            offsetX > swipeThreshold -> onDismiss("right")
-                            offsetX < -swipeThreshold -> onDismiss("left")
-                            offsetY > swipeThreshold -> onDismiss("down")
-                            offsetY < -swipeThreshold -> onDismiss("up")
+                            offsetX > swipeThreshold -> onDismiss(Direction.RIGHT)
+                            offsetX < -swipeThreshold -> onDismiss(Direction.LEFT)
+//                            offsetY > swipeThreshold -> onDismiss("down")
+//                            offsetY < -swipeThreshold -> onDismiss("up")
                         }
                         offsetX = 0f
                         offsetY = 0f

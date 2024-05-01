@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SwipeSongViewModel @Inject constructor(
-    private val repository: SongPostRepository
+    private val repository: SongPostRepository,
 ): ViewModel() {
 
     var songPostState = MutableStateFlow(SongPostState())

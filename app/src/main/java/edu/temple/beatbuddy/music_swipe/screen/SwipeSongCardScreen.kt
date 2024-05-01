@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import edu.temple.beatbuddy.component.ImageFactory
 import edu.temple.beatbuddy.component.VinylAlbumCover
 import edu.temple.beatbuddy.component.VinylAlbumCoverAnimation
@@ -50,7 +51,9 @@ import edu.temple.beatbuddy.music_post.model.SongPost
 import edu.temple.beatbuddy.music_post.screen.component.UserPostHeader
 import edu.temple.beatbuddy.music_post.view_model.SongPostViewModel
 import edu.temple.beatbuddy.music_swipe.screen.component.SwipeableCard
+import edu.temple.beatbuddy.music_swipe.sensor.Direction
 import edu.temple.beatbuddy.music_swipe.sensor.SensorHandler
+import edu.temple.beatbuddy.music_swipe.view_model.SensorViewModel
 import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 import edu.temple.beatbuddy.ui.theme.Pink40
 import edu.temple.beatbuddy.ui.theme.Pink80
@@ -61,18 +64,9 @@ fun SwipeSongCardScreen(
     swipeSongViewModel: SwipeSongViewModel,
     playlistViewModel: PlaylistViewModel,
     songViewModel: SongViewModel,
-    songPostViewModel: SongPostViewModel
+    songPostViewModel: SongPostViewModel,
+    sensorViewModel: SensorViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val sensorHandler = remember { SensorHandler(context, swipeSongViewModel) }
-
-    DisposableEffect(Unit) {
-        sensorHandler.register()
-        onDispose {
-            sensorHandler.unregister()
-        }
-    }
-
     LaunchedEffect(Unit) {
         swipeSongViewModel.fetchSwipeSongPosts()
     }
@@ -91,6 +85,7 @@ fun SwipeSongCardScreen(
                 songViewModel.stop()
             }
             songViewModel.discoverNow(false)
+            sensorViewModel.sensor.stopListening()
         }
     }
 
@@ -105,9 +100,10 @@ fun SwipeSongCardScreen(
                 contentAlignment = Alignment.Center
             ) {
                 SwipeableCard(
+                    sensorViewModel = sensorViewModel,
                     onDismiss = {direction ->
                         swipeSongViewModel.removeSongFromList()
-                        if (direction == "right") {
+                        if (direction == Direction.RIGHT) {
                             val song = posts.posts.toMutableList().removeFirst().toPlaylistSong()
                             playlistViewModel.addToFavorite(song)
                             songPostViewModel.fetchSongPosts()
@@ -140,6 +136,8 @@ fun SwipeSongCardScreen(
                                 songViewModel.setUpSongLists(playListPost)
                                 songViewModel.onSongClick(posts.posts.first().toPlaylistSong())
                                 songViewModel.discoverNow(true)
+
+                                sensorViewModel.sensor.startListening()
                             },
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally

@@ -10,10 +10,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import edu.temple.beatbuddy.music_swipe.view_model.SwipeSongViewModel
 
-class SensorHandler(context: Context, private val swipeSongViewModel: SwipeSongViewModel) : SensorEventListener {
+abstract class SensorHandler(
+    private val context: Context,
+) : SensorEventListener, MeasurableSensor() {
     private var sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private var accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     private var isNeutral = true
+
 
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
@@ -21,12 +24,12 @@ class SensorHandler(context: Context, private val swipeSongViewModel: SwipeSongV
                 val x = event.values[0]
 
                 if (x > 5.0f && isNeutral) {
+                    onSensorValuesChanged?.invoke(Direction.LEFT)
                     Log.d("SensorHandler", "Tilted left")
-                    swipeSongViewModel.removeSongFromList()
                     isNeutral = false
                 } else if (x < -5.0f && isNeutral) {
+                    onSensorValuesChanged?.invoke(Direction.RIGHT)
                     Log.d("SensorHandler", "Tilted right")
-                    swipeSongViewModel.removeSongFromList()
                     isNeutral = false
                 } else if (x > -1.0f && x < 1.0f) {
                     isNeutral = true
@@ -37,13 +40,23 @@ class SensorHandler(context: Context, private val swipeSongViewModel: SwipeSongV
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
-    fun register() {
+    private fun register() {
         if (accelerometer != null) {
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI)
         }
     }
 
-    fun unregister() {
+    private fun unregister() {
         sensorManager.unregisterListener(this)
+    }
+
+    override fun startListening() {
+        Log.d("SensorHandler", "Start listening now...")
+        register()
+    }
+
+    override fun stopListening() {
+        Log.d("SensorHandler", "Stop listening now...")
+        unregister()
     }
 }
