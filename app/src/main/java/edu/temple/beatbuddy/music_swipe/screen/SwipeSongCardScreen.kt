@@ -79,6 +79,9 @@ fun SwipeSongCardScreen(
 
     val isDiscovering by songViewModel.isDiscovering.collectAsState()
 
+//    val direction by sensorViewModel.direction.collectAsState()
+//    val isListening by sensorViewModel.isSensorActive.collectAsState()
+
     DisposableEffect(Unit) {
         onDispose {
             if (isDiscovering) {
@@ -86,7 +89,7 @@ fun SwipeSongCardScreen(
                 songViewModel.stop()
             }
             songViewModel.discoverNow(false)
-            sensorViewModel.sensor.stopListening()
+            sensorViewModel.stopListening()
         }
     }
 
@@ -109,7 +112,6 @@ fun SwipeSongCardScreen(
                             playlistViewModel.addToFavorite(song)
                             songPostViewModel.fetchSongPosts()
                         }
-                        sensorViewModel.sensor.startListening()
                         songViewModel.onNextClick()
                     }
                 ) {
@@ -136,10 +138,14 @@ fun SwipeSongCardScreen(
                             .wrapContentSize()
                             .clickable {
                                 songViewModel.setUpSongLists(playListPost)
-                                songViewModel.onSongClick(posts.posts.first().toPlaylistSong())
+                                songViewModel.onSongClick(
+                                    posts.posts
+                                        .first()
+                                        .toPlaylistSong()
+                                )
                                 songViewModel.discoverNow(true)
 
-                                sensorViewModel.sensor.startListening()
+                                sensorViewModel.startListening()
                             },
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -166,6 +172,10 @@ fun SwipeSongCardScreen(
                 fontSize = 24.sp
             )
         }
+
+//        if (!isListening && direction != Direction.NONE) {
+//            sensorViewModel.startListening()
+//        }
     }
 }
 

@@ -17,7 +17,6 @@ abstract class SensorHandler(
     private var accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     private var isNeutral = true
 
-
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
             if (it.sensor.type == Sensor.TYPE_ACCELEROMETER) {
@@ -51,12 +50,11 @@ abstract class SensorHandler(
     }
 
     override fun startListening() {
-        Log.d("SensorHandler", "Start listening now...")
         register()
+        Log.d("SensorHandler", "Start listening now in the sensor...")
     }
 
     override fun stopListening() {
-        Log.d("SensorHandler", "Stop listening now...")
         unregister()
     }
 }

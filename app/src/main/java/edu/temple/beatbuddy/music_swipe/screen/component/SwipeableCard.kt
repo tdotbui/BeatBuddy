@@ -12,8 +12,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,14 +44,21 @@ fun SwipeableCard(
     val swipeThreshold: Float = 400f
     val sensitivityFactor: Float = 3f
 
-    when (sensorViewModel.direction) {
+    val isSensorActive by sensorViewModel.isSensorActive.collectAsState()
+    val direction by sensorViewModel.direction.collectAsState()
+
+    when (direction) {
         Direction.LEFT -> {
-            sensorViewModel.sensor.stopListening()
-            onDismiss(Direction.LEFT)
+            if (isSensorActive) {
+                onDismiss(Direction.LEFT)
+                sensorViewModel.resetDirection()
+            }
         }
         Direction.RIGHT -> {
-            sensorViewModel.sensor.stopListening()
-            onDismiss(Direction.RIGHT)
+            if (isSensorActive) {
+                onDismiss(Direction.RIGHT)
+                sensorViewModel.resetDirection()
+            }
         }
         else -> {}
     }
