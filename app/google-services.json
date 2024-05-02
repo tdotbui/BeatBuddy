@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "153912400009",
+    "project_id": "beatbuddy-e15d0",
+    "storage_bucket": "beatbuddy-e15d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153912400009:android:b929a078fde437cbc38e58",
+        "android_client_info": {
+          "package_name": "edu.temple.beatbuddy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMJ1BsgQkv5i_nBdtV8ciEy9wsRWssM2M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
