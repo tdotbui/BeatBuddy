@@ -27,12 +27,12 @@ class SongListRepositoryImpl @Inject constructor(
         if (shouldCache) {
             emit(Resource.Success(localSongList))
             emit(Resource.Loading(false))
-            Log.d("Result", "Fetch locally")
+//            Log.d("Result", "Fetch locally")
             return@flow
         }
 
         val songListFromRemote = try {
-            Log.d("Result", "Fetch remotely")
+//            Log.d("Result", "Fetch remotely")
             songApi.getSongList(genre)
         } catch (e: IOException) {
             e.printStackTrace()
