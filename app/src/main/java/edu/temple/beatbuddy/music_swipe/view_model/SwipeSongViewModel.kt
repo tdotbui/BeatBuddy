@@ -57,42 +57,38 @@ class SwipeSongViewModel @Inject constructor(
     }
 
     fun fetchSwipeSongPosts() = viewModelScope.launch {
-        val mockPost = MockPost.posts
         songPostState.update {
-            it.copy(posts = mockPost)
+            it.copy(isLoading = true)
         }
-//        songPostState.update {
-//            it.copy(isLoading = true)
-//        }
-//        repository.fetchPostsFromFollowing().collectLatest { result ->
-//            when(result) {
-//                is Resource.Success -> {
-//                    Log.d("Success", "Fetch following posts from fire store")
-//                    result.data?.let {posts ->
-//                        songPostState.update {
-//                            it.copy(
-//                                posts = posts,
-//                                isLoading = false
-//                            )
-//                        }
-//                    }
-//                }
-//                is Resource.Error -> {
-//                    songPostState.update {
-//                        it.copy(
-//                            errorMessage = result.message,
-//                            isLoading = false
-//                        )
-//                    }
-//                }
-//                is Resource.Loading -> {
-//                    songPostState.update {
-//                        it.copy(
-//                            isLoading = true
-//                        )
-//                    }
-//                }
-//            }
-//        }
+        repository.fetchPostsFromFollowing().collectLatest { result ->
+            when(result) {
+                is Resource.Success -> {
+                    Log.d("Success", "Fetch following posts from fire store")
+                    result.data?.let {posts ->
+                        songPostState.update {
+                            it.copy(
+                                posts = posts,
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+                is Resource.Error -> {
+                    songPostState.update {
+                        it.copy(
+                            errorMessage = result.message,
+                            isLoading = false
+                        )
+                    }
+                }
+                is Resource.Loading -> {
+                    songPostState.update {
+                        it.copy(
+                            isLoading = true
+                        )
+                    }
+                }
+            }
+        }
     }
 }
