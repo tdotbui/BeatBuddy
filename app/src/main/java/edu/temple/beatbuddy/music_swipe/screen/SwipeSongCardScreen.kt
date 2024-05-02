@@ -76,11 +76,9 @@ fun SwipeSongCardScreen(
     val playListPost = posts.posts.map {
         it.toPlaylistSong()
     }
+    val isPlaying by songViewModel.isPlaying.collectAsState()
 
     val isDiscovering by songViewModel.isDiscovering.collectAsState()
-
-//    val direction by sensorViewModel.direction.collectAsState()
-//    val isListening by sensorViewModel.isSensorActive.collectAsState()
 
     DisposableEffect(Unit) {
         onDispose {
@@ -91,6 +89,10 @@ fun SwipeSongCardScreen(
             songViewModel.discoverNow(false)
             sensorViewModel.stopListening()
         }
+    }
+
+    if (posts.posts.isEmpty() && isPlaying) {
+        songViewModel.stop()
     }
 
     Column(
@@ -172,10 +174,6 @@ fun SwipeSongCardScreen(
                 fontSize = 24.sp
             )
         }
-
-//        if (!isListening && direction != Direction.NONE) {
-//            sensorViewModel.startListening()
-//        }
     }
 }
 

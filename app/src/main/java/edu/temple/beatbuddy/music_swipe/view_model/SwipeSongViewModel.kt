@@ -46,9 +46,6 @@ class SwipeSongViewModel @Inject constructor(
         songPostState.update {
             it.copy(posts = remainingPosts)
         }
-//        for (song in songPostState.value.posts) {
-//            Log.d("The remaining post is", song.title)
-//        }
     }
 
     fun likePost(songPost: SongPost) {

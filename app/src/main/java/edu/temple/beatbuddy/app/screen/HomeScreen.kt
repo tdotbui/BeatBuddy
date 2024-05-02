@@ -76,7 +76,7 @@ fun HomeScreen(
         TabItem(
             selectedIcon = Icons.Default.Swipe,
             unselectedIcon = Icons.Outlined.Swipe,
-            title = "Top's pick"),
+            title = "Discover"),
         TabItem(
             selectedIcon = Icons.Default.Widgets,
             unselectedIcon = Icons.Outlined.Widgets,
@@ -84,7 +84,7 @@ fun HomeScreen(
         TabItem(
             selectedIcon = Icons.Default.AutoAwesome,
             unselectedIcon = Icons.Outlined.AutoAwesome,
-            title = "Newsfeed"),
+            title = "Post"),
         TabItem(
             selectedIcon = Icons.Default.PersonSearch,
             unselectedIcon = Icons.Outlined.PersonSearch,
