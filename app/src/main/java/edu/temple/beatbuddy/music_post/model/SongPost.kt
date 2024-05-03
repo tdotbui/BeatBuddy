@@ -35,7 +35,8 @@ object MockPost {
             artistName = "Tate McRae",
             artistPicture = "https://e-cdns-images.dzcdn.net/images/artist/5b635e0690f91f7ba72a25ec37285fc0/250x250-000000-80-0-0.jpg",
             songImage = "https://e-cdns-images.dzcdn.net/images/cover/ef25b6bec265332a059879f45d33cd7e/250x250-000000-80-0-0.jpg",
-            user = null
+            user = null,
+            didLike = false
         ),
         SongPost(
             postId = "124",
@@ -49,7 +50,8 @@ object MockPost {
             artistName = "Billie Eilish",
             artistPicture = "https://e-cdns-images.dzcdn.net/images/artist/8eab1a9a644889aabaca1e193e05f984/250x250-000000-80-0-0.jpg",
             songImage = "https://e-cdns-images.dzcdn.net/images/cover/2562b8d68b75635bb2d4b92dc7ed9ab5/250x250-000000-80-0-0.jpg",
-            user = null
+            user = null,
+            didLike = false
         ),
         SongPost(
             postId = "125",
@@ -63,6 +65,7 @@ object MockPost {
             artistName = "Beyoncé",
             artistPicture = "https://e-cdns-images.dzcdn.net/images/artist/0aa9d669be4e7310b8647afae37ffaab/250x250-000000-80-0-0.jpg",
             songImage = "https://e-cdns-images.dzcdn.net/images/cover/e50407841497a26457036110eab49f1b/250x250-000000-80-0-0.jpg",
+            didLike = true,
             user = User(id = "", fullName = "Jack Sparrow", email = "", username = "captain.sparrow", profileImage = "https://nypost.com/wp-content/uploads/sites/2/2022/10/jack-sparrow-39.jpg?resize=1536,1024&quality=75&strip=all")
         ),
         SongPost(
@@ -77,7 +80,8 @@ object MockPost {
             artistName = "Dua Lipa",
             artistPicture = "https://e-cdns-images.dzcdn.net/images/artist/7375742a46dbebb6efc0ae362e18eb24/250x250-000000-80-0-0.jpg",
             songImage = "https://e-cdns-images.dzcdn.net/images/cover/7dee41c61553d7cd71cd9532937780c0/250x250-000000-80-0-0.jpg",
-            user = null
+            user = null,
+            didLike = false
         ),
         SongPost(
             postId = "127",
@@ -91,7 +95,8 @@ object MockPost {
             artistName = "Miley Cyrus",
             artistPicture = "https://e-cdns-images.dzcdn.net/images/artist/e72e2ada062f2cffc770cf35608bc6d2/250x250-000000-80-0-0.jpg",
             songImage = "https://e-cdns-images.dzcdn.net/images/cover/c024f2683137c5e81f2b2040acc6ad83/250x250-000000-80-0-0.jpg",
-            user = null
+            user = null,
+            didLike = false
         )
     )
 }
