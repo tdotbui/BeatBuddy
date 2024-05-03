@@ -17,7 +17,8 @@ class TestSongPostRepository: SongPostRepository {
     }
 
     override suspend fun shareAPost(songPost: SongPost): Resource<Boolean> {
-        return Resource.Success(true)
+        posts.add(songPost)
+        return Resource.Success(MockPost.posts.size < posts.size)
     }
 
     override fun fetchPostsFromFollowing(): Flow<Resource<List<SongPost>>> = flow {
@@ -38,21 +39,30 @@ class TestSongPostRepository: SongPostRepository {
     }
 
     override suspend fun unlikePost(songPost: SongPost): Resource<Boolean> {
-        return Resource.Success(true)
+        var likes = 0
+        val post = posts.find { it.postId == songPost.postId }?.let {
+            likes = it.likes
+            it.copy(likes = it.likes - 1)
+        }
+        if (post != null) {
+            return Resource.Success(post.likes < likes)
+        }
+        return Resource.Success(false)
     }
 
     override suspend fun checkIfUserLikedPost(songPost: SongPost): Resource<Boolean> {
         return Resource.Success(true)
     }
 
-    override fun fetchPostsForUser(user: User): Flow<Resource<List<SongPost>>> {
-        TODO("Not yet implemented")
+    override fun fetchPostsForUser(user: User): Flow<Resource<List<SongPost>>> = flow {
+        val userPosts = posts.filter { it.ownerUid == user.id }
+        emit(Resource.Success(userPosts))
     }
 
     override suspend fun deleteAPost(songPost: SongPost): Resource<Boolean> {
         val post = posts.find { it.postId == songPost.postId }
         posts.remove(post)
-        return Resource.Success(posts.size != MockPost.posts.size)
+        return Resource.Success(MockPost.posts.size > posts.size)
     }
 
     override suspend fun deletePostFromFollowing(songPost: SongPost): Resource<Boolean> {

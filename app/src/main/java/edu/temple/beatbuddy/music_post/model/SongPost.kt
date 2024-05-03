@@ -85,7 +85,7 @@ object MockPost {
         ),
         SongPost(
             postId = "127",
-            ownerUid = "127",
+            ownerUid = "123",
             caption = "I grew up with her, so proud",
             likes = 4000000,
             timestamp = Timestamp.now(),
