@@ -3,7 +3,7 @@ import edu.temple.beatbuddy.music_swipe.sensor.Direction
 import edu.temple.beatbuddy.music_swipe.sensor.MeasurableSensor
 import edu.temple.beatbuddy.music_swipe.view_model.SensorViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,13 +29,13 @@ class SensorViewModelTest {
     // Set up method to initialize the mocked objects and the ViewModel
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         viewModel = SensorViewModel(sensor)
     }
 
     // Test case for the startListening method of the ViewModel
     @Test
-    fun testStartListening() = runBlockingTest {
+    fun testStartListening() = runTest {
         // Call the method to be tested
         viewModel.startListening()
 
@@ -48,7 +48,7 @@ class SensorViewModelTest {
 
     // Test case for the stopListening method of the ViewModel
     @Test
-    fun testStopListening() = runBlockingTest {
+    fun testStopListening() = runTest {
         // Call the method to be tested
         viewModel.stopListening()
 
@@ -61,7 +61,7 @@ class SensorViewModelTest {
 
     // Test case for the resetDirection method of the ViewModel
     @Test
-    fun testResetDirection() = runBlockingTest {
+    fun testResetDirection() = runTest {
         // Call the method to be tested
         viewModel.resetDirection()
 
