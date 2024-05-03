@@ -34,12 +34,12 @@ class SensorViewModel @Inject constructor(
     fun startListening() {
         sensor.startListening()
         isSensorActive.value = true
-        Log.d("SensorHandler", "Start listening now...")
+//        Log.d("SensorHandler", "Start listening now...")
     }
 
     fun stopListening() {
         sensor.stopListening()
         isSensorActive.value = false
-        Log.d("SensorHandler", "Stop listening now...")
+//        Log.d("SensorHandler", "Stop listening now...")
     }
 }
