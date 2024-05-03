@@ -91,7 +91,7 @@ fun SwipeSongCardScreen(
         }
     }
 
-    if (posts.posts.isEmpty() && isPlaying) {
+    if (posts.posts.isEmpty() && isPlaying && isDiscovering) {
         songViewModel.stop()
     }
 

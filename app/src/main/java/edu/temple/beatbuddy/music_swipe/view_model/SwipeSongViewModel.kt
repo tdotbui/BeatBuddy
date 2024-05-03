@@ -38,10 +38,10 @@ class SwipeSongViewModel @Inject constructor(
     fun removeSongFromList() = viewModelScope.launch {
         val remainingPosts = songPostState.value.posts.toMutableList().apply {
             val post = removeFirst()
+            repository.deletePostFromFollowing(post)
             if (post.didLike == false) {
                 likePost(post)
             }
-            repository.deletePostFromFollowing(post)
         }
         songPostState.update {
             it.copy(posts = remainingPosts)
