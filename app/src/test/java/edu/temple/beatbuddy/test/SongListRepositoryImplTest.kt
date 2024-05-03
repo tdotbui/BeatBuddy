@@ -1,4 +1,4 @@
-package edu.temple.beatbuddy
+package edu.temple.beatbuddy.test
 
 import edu.temple.beatbuddy.music_browse.model.Song
 import edu.temple.beatbuddy.music_browse.model.local.SongDao

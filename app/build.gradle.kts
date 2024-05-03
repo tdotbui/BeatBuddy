@@ -82,6 +82,8 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.51")
     kapt("androidx.hilt:hilt-compiler:1.1.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51")
+
 
     // JSON
     implementation("com.google.code.gson:gson:2.10.1")
