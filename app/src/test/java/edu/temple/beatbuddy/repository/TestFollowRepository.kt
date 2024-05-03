@@ -1,5 +1,6 @@
 package edu.temple.beatbuddy.repository
 
+import edu.temple.beatbuddy.user_auth.model.MockUser
 import edu.temple.beatbuddy.user_auth.model.UserStats
 import edu.temple.beatbuddy.user_discover.repository.FollowRepository
 import edu.temple.beatbuddy.utils.Resource
@@ -23,6 +24,7 @@ class TestFollowRepository: FollowRepository {
         userId: String,
         fetchFromRemote: Boolean
     ): Flow<Resource<UserStats>> = flow {
-        emit(Resource.Success(UserStats("0", 0, 0, 0)))
+        val user = MockUser.users.find { it.id == userId }
+        emit(Resource.Success(user?.stats))
     }
 }
